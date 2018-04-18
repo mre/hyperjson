@@ -1,0 +1,15 @@
+[package]
+name = "hello-world"
+version = "0.1.0"
+authors = ["Nikolay Kim <fafhrd91@gmail.com>"]
+
+[dependencies]
+serde_json = "1.0.13"
+
+[dependencies.pyo3]
+version = "0.2.0"
+default-features = false
+
+[lib]
+crate-type = ["cdylib"]
+name = "helloworld"
