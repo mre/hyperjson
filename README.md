@@ -3,6 +3,17 @@
 A Python module to load json data.
 It's a thin wrapper around Rust's [serde-json](https://github.com/serde-rs/json) built with [pyo3](https://github.com/PyO3/pyo3).
 
+## Usage
+
+hyperjson is meant to be a drop-in replacement for Python's [json module](https://docs.python.org/3/library/json.html):  
+
+```python
+import hyperjson as json
+json.loads('["foo", {"bar":["baz", null, 1.0, 2]}]')
+# ['foo', {'bar': ['baz', None, 1.0, 2L]}]
+```
+
+
 ## Motivation
 
 Parsing JSON is a solved problem.  
