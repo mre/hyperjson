@@ -16,11 +16,11 @@ especially in comparison with C extensions to parse JSON.
 
 ## TODO (help wanted!)
 
-[X] loads()
-[ ] load()
-[ ] dumps()
-[ ] dump()
-[ ] Benchmark against json and ujson
+- [X] loads()
+- [ ] load()
+- [ ] dumps()
+- [ ] dump()
+- [ ] Benchmark against json and ujson
 
 ## References
 
