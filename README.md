@@ -29,3 +29,18 @@ especially in comparison with C extensions to parse JSON.
 * [Comments on benchmark data](https://www.reddit.com/r/rust/comments/6albr0/serde_compared_to_the_fastest_c_json_library/)
 * [Another benchmark](https://github.com/serde-rs/json-benchmark)
 * [Some ultrajson benchmarks](https://pypi.python.org/pypi/ujson)
+
+## License
+
+hyperjson is licensed under either of
+
+* Apache License, Version 2.0, (LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0)
+* MIT license (LICENSE-MIT or http://opensource.org/licenses/MIT)
+
+at your option.
+
+## Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in  
+hyperjson by you, as defined in the Apache-2.0 license, shall be dual licensed as above,  
+without any additional terms or conditions.
