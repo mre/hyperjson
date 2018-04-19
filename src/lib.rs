@@ -3,17 +3,17 @@
 extern crate pyo3;
 extern crate serde_json;
 
-use pyo3::prelude::*;
 use pyo3::Python;
+use pyo3::prelude::*;
 use std::collections::BTreeMap;
 
 enum HyperJsonError {
-    SerdeError,
+    SerdeError(serde_json::Error),
 }
 
 impl From<serde_json::Error> for HyperJsonError {
-    fn from(_s: serde_json::Error) -> HyperJsonError {
-        HyperJsonError::SerdeError
+    fn from(e: serde_json::Error) -> HyperJsonError {
+        HyperJsonError::SerdeError(e)
     }
 }
 
@@ -96,9 +96,9 @@ fn convert(py: Python, v: &serde_json::Value) -> PyResult<PyObject> {
     match v {
         serde_json::Value::Number(ref v) => {
             if v.is_i64() {
-                Ok(PyInt::new(py, v.as_i64().unwrap()).to_object(py))
+                Ok(v.as_i64().unwrap().to_object(py))
             } else {
-                Ok(PyFloat::new(py, v.as_f64().unwrap()).to_object(py))
+                Ok(v.as_f64().unwrap().to_object(py))
             }
         }
         serde_json::Value::String(ref v) => Ok(v.to_object(py)),
