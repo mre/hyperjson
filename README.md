@@ -13,6 +13,13 @@ json.loads('["foo", {"bar":["baz", null, 1.0, 2]}]')
 # ['foo', {'bar': ['baz', None, 1.0, 2L]}]
 ```
 
+## Installation
+
+To compile the code and create an importable Python module from it, call  
+
+```
+make install
+```
 
 ## Motivation
 
@@ -32,6 +39,29 @@ especially in comparison with C extensions to parse JSON.
 - [ ] dumps()
 - [ ] dump()
 - [ ] Benchmark against json and ujson
+
+## Development environment
+
+If you want to hack on hyperjson, first install [setuptools-rust](https://github.com/PyO3/setuptools-rust):
+
+```
+git clone git@github.com:PyO3/setuptools-rust.git
+cd setuptools-rust
+python setup.py install
+```
+
+After that, you can install hyperjson from the project's root folder:
+
+```
+cd /path/to/hyperjson
+make install
+```
+
+To test your changes run
+
+```
+make test
+```
 
 ## References
 
