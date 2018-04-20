@@ -8,4 +8,4 @@ install:
 
 .PHONY: test
 test:
-	pytest tests
+	pytest -v
