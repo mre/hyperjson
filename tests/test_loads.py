@@ -3,6 +3,7 @@ import math
 
 import json
 import hyperjson
+from io import StringIO
 
 
 def test_loading_empty_value():
@@ -53,3 +54,9 @@ def test_loading_docs_example():
     """
     payload = '["foo", {"bar":["baz", null, 1.0, 2]}]'
     assert json.loads(payload) == hyperjson.loads(payload)
+
+
+def test_load():
+    from io import StringIO
+    obj = StringIO(u'["streaming API"]')
+    assert json.load(obj) == hyperjson.load(obj)

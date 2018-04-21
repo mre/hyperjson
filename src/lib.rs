@@ -3,6 +3,7 @@
 extern crate pyo3;
 extern crate serde_json;
 
+use pyo3::PyTryFrom;
 use pyo3::Python;
 use pyo3::prelude::*;
 use std::collections::BTreeMap;
@@ -26,6 +27,11 @@ impl From<HyperJsonError> for pyo3::PyErr {
 /// Module documentation string
 #[py::modinit(_hyperjson)]
 fn init(py: Python, m: &PyModule) -> PyResult<()> {
+    #[pyfn(m, "load", fp, kwargs = "**")]
+    fn load_fn(py: Python, fp: PyObject, kwargs: Option<&PyDict>) -> PyResult<PyObject> {
+        load(py, fp, kwargs)
+    }
+
     #[pyfn(m, "loads", s, encoding, kwargs = "**")]
     fn loads_fn(
         py: Python,
@@ -36,6 +42,27 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
         loads(py, s, encoding, kwargs)
     }
     Ok(())
+}
+
+fn load(py: Python, fp: PyObject, kwargs: Option<&PyDict>) -> PyResult<PyObject> {
+    let s = fp.call_method0(py, "read")?;
+    println!(
+        "{:?}",
+        PyString::from_object(&s.as_ref(py), "ascii", "e")
+            .unwrap_err()
+            .print(py)
+    );
+
+    //let pystr: Result<PyBytes, _> = s.extract(py);
+    let pystr: Result<&PyString, _> = pyo3::PyTryFrom::try_from(&s.as_ref(py));
+    println!("{:?}", pystr);
+    match pystr {
+        Ok(something) => loads(py, String::from(something.to_string()?), None, kwargs),
+        _ => Err(exc::TypeError::new(format!(
+            "string or none type is required as host, got: {:?}",
+            s
+        ))),
+    }
 }
 
 fn loads(
