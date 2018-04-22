@@ -34,11 +34,11 @@ especially in comparison with C extensions to parse JSON.
 
 ## TODO (help wanted!)
 
-- [X] loads()
-- [ ] load()
-- [ ] dumps()
-- [ ] dump()
-- [ ] Benchmark against json and ujson
+- [X] [`load()`](https://docs.python.org/3/library/json.html#json.load)
+- [X] [`loads()`](https://docs.python.org/3/library/json.html#json.loads)
+- [ ] [`dump()`](https://docs.python.org/3/library/json.html#json.dump)
+- [ ] [`dumps()`](https://docs.python.org/3/library/json.html#json.dumps)
+- [ ] Benchmark against [json](https://docs.python.org/3/library/json.html) and [ujson](https://github.com/esnme/ultrajson/)
 
 ## Development environment
 
