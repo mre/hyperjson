@@ -3,7 +3,7 @@ import math
 
 import json
 import hyperjson
-from io import StringIO
+import io
 
 
 def test_loading_empty_value():
@@ -11,14 +11,6 @@ def test_loading_empty_value():
         json.loads("")
     with pytest.raises(ValueError):
         hyperjson.loads("")
-
-
-def test_loading_two_values():
-    payload = '{"foo": "bar"}'
-    with pytest.raises(LookupError):
-        json.loads(payload, payload)
-    with pytest.raises(LookupError):
-        hyperjson.loads(payload, payload)
 
 
 simple_types = ["1", "1.0", "-1", "null", '"str"', "true"]
@@ -57,6 +49,8 @@ def test_loading_docs_example():
 
 
 def test_load():
-    from io import StringIO
-    obj = StringIO(u'["streaming API"]')
+    #obj = io.StringIO(u'1')
+    #assert "1" == obj.read()
+    # obj = open("foo.txt", "r")
+    obj = io.StringIO(u'["streaming API"]')
     assert json.load(obj) == hyperjson.load(obj)

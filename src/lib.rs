@@ -45,19 +45,35 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
 }
 
 fn load(py: Python, fp: PyObject, kwargs: Option<&PyDict>) -> PyResult<PyObject> {
-    let s = fp.call_method0(py, "read")?;
-    println!(
-        "{:?}",
-        PyString::from_object(&s.as_ref(py), "ascii", "e")
-            .unwrap_err()
-            .print(py)
-    );
+    // let s_bool = fp.call_method0(py, "readable")?;
+    // println!("Readable? {:?}", s_bool.as_ref(py));
+    // let s_obj = fp.call_method0(py, "read")?;
+    // println!("Result after read: {:?}", s_obj);
+    // let s = s_obj.as_ref(py);
+    // println!("Result after as_ref {:?}", s);
+
+    // let s_obj = fp.call_method0(py, "read")?;
+    // let s: String = pyo3::PyString::from(s_obj);
+    // println!("{:?}", s);
+
+    fp.call_method(py, "seek", (0,), NoArgs)?;
+    let s_obj = fp.call_method0(py, "read")?;
+    let s: Result<String, _> = s_obj.extract(py);
+    // let s_obj = fp.getattr(py, "read")?;
+    // println!("huh? {:?}", s_obj);
+    // let s: String = s_obj.extract(py)?;
+    // println!("More {:?}", s);
+
+    // let func = fp.getattr(py, "read")?;
+    // func.call(py, (-1,), NoArgs)
+
+    // Ok(1.to_object(py))
 
     //let pystr: Result<PyBytes, _> = s.extract(py);
-    let pystr: Result<&PyString, _> = pyo3::PyTryFrom::try_from(&s.as_ref(py));
-    println!("{:?}", pystr);
-    match pystr {
-        Ok(something) => loads(py, String::from(something.to_string()?), None, kwargs),
+    // let pystr: Result<&PyString, _> = pyo3::PyTryFrom::try_from(&s_obj.as_ref(py));
+    // println!("{:?}", pystr);
+    match s {
+        Ok(something) => loads(py, something, None, kwargs),
         _ => Err(exc::TypeError::new(format!(
             "string or none type is required as host, got: {:?}",
             s
