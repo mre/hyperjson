@@ -3,10 +3,14 @@
 extern crate pyo3;
 extern crate serde_json;
 
-use pyo3::PyTryFrom;
 use pyo3::Python;
 use pyo3::prelude::*;
 use std::collections::BTreeMap;
+
+struct HyperJsonValue<'a> {
+    py: &'a Python<'a>,
+    inner: &'a serde_json::Value,
+}
 
 enum HyperJsonError {
     SerdeError(serde_json::Error),
@@ -35,7 +39,7 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
     #[pyfn(m, "loads", s, encoding, kwargs = "**")]
     fn loads_fn(
         py: Python,
-        s: String,
+        s: &str,
         encoding: Option<String>,
         kwargs: Option<&PyDict>,
     ) -> PyResult<PyObject> {
@@ -52,7 +56,7 @@ fn load(py: Python, fp: PyObject, kwargs: Option<&PyDict>) -> PyResult<PyObject>
     let s_obj = fp.call_method0(py, "read")?;
     let result: Result<String, _> = s_obj.extract(py);
     match result {
-        Ok(s) => loads(py, s, None, kwargs),
+        Ok(s) => loads(py, &s, None, kwargs),
         _ => Err(exc::TypeError::new(format!(
             "string or none type is required as host, got: {:?}", result 
         ))),
@@ -61,9 +65,9 @@ fn load(py: Python, fp: PyObject, kwargs: Option<&PyDict>) -> PyResult<PyObject>
 
 fn loads(
     py: Python,
-    s: String,
+    s: &str,
     encoding: Option<String>,
-    kwargs: Option<&PyDict>,
+    _kwargs: Option<&PyDict>,
 ) -> PyResult<PyObject> {
     // if let Some(kwargs) = kwargs {
     //     for (key, val) in kwargs.iter() {
@@ -95,11 +99,14 @@ fn loads(
     convert_string(py, s)
 }
 
-fn convert_string(py: Python, s: String) -> PyResult<PyObject> {
-    let v = serde_json::from_str(&s);
+// This function is a poor man's implementation of 
+// impl From<&str> for PyResult<PyObject>, which is not possible,
+// because we have none of these types under our control.
+fn convert_string(py: Python, s: &str) -> PyResult<PyObject> {
+    let v = serde_json::from_str(s);
     match v {
-        Ok(serde_val) => convert(py, &serde_val),
-        Err(e) => match s.as_ref() {
+        Ok(serde_val) => PyResult::from(HyperJsonValue::new(&py, &serde_val)),
+        Err(e) => match s {
             // TODO: If `allow_nan` is false (default: True), then this should be a ValueError
             // https://docs.python.org/3/library/json.html
             "NaN" => Ok(std::f64::NAN.to_object(py)),
@@ -113,32 +120,49 @@ fn convert_string(py: Python, s: String) -> PyResult<PyObject> {
     }
 }
 
-fn convert(py: Python, v: &serde_json::Value) -> PyResult<PyObject> {
-    match v {
-        serde_json::Value::Number(ref v) => {
-            if v.is_i64() {
-                Ok(v.as_i64().unwrap().to_object(py))
-            } else {
-                Ok(v.as_f64().unwrap().to_object(py))
-            }
-        }
-        serde_json::Value::String(ref v) => Ok(v.to_object(py)),
-        serde_json::Value::Null => Ok(py.None()),
-        serde_json::Value::Bool(ref b) => Ok(b.to_object(py)),
-        serde_json::Value::Array(ref a) => {
-            let mut ar = vec![];
+impl<'a> HyperJsonValue<'a> {
+    fn new(py: &'a Python, inner: &'a serde_json::Value) -> HyperJsonValue<'a> {
+        HyperJsonValue { py, inner }
+    }
+}
 
-            for elem in a {
-                ar.push(convert(py, elem)?);
+// impl<'a> From<String> for HyperJsonValue<'a> {
+//     fn from(v: String) -> HyperJsonValue<'a> {
+//                 let gil = Python::acquire_gil();
+// let py = gil.python();
+//     }
+// }
+
+impl<'a> From<HyperJsonValue<'a>> for PyResult<PyObject> {
+    fn from(v: HyperJsonValue) -> PyResult<PyObject> {
+        match v.inner {
+            serde_json::Value::Number(ref x) => {
+                // Unwrap should be safe here, since we checked for the correct
+                // type before
+                if x.is_i64() {
+                    Ok(x.as_i64().unwrap().to_object(*v.py))
+                } else {
+                    Ok(x.as_f64().unwrap().to_object(*v.py))
+                }
             }
-            Ok(ar.to_object(py))
-        }
-        serde_json::Value::Object(ref o) => {
-            let mut m: BTreeMap<String, pyo3::PyObject> = BTreeMap::new();
-            for (k, v) in o.iter() {
-                m.insert(k.to_string(), convert(py, v)?);
+            serde_json::Value::String(ref x) => Ok(x.to_object(*v.py)),
+            serde_json::Value::Null => Ok(v.py.None()),
+            serde_json::Value::Bool(ref b) => Ok(b.to_object(*v.py)),
+            serde_json::Value::Array(ref a) => {
+                let mut ar = vec![];
+
+                for elem in a {
+                    ar.push(PyResult::from(HyperJsonValue::new(v.py, elem))?);
+                }
+                Ok(ar.to_object(*v.py))
             }
-            Ok(m.to_object(py))
+            serde_json::Value::Object(ref o) => {
+                let mut m: BTreeMap<String, pyo3::PyObject> = BTreeMap::new();
+                for (k, x) in o.iter() {
+                    m.insert(k.to_string(), PyResult::from(HyperJsonValue::new(v.py, x))?);
+                }
+                Ok(m.to_object(*v.py))
+            }
         }
     }
 }
