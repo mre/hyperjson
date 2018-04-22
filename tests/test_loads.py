@@ -4,6 +4,13 @@ import math
 import json
 import hyperjson
 import io
+import decimal
+
+
+def test_decimal():
+    rval = hyperjson.loads('1.1', parse_float=decimal.Decimal)
+    assert isinstance(rval, decimal.Decimal) == True
+    assert pytest.approx(rval) == decimal.Decimal('1.1')
 
 
 def test_loading_empty_value():
