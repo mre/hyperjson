@@ -9,4 +9,4 @@ install:
 
 .PHONY: test
 test:
-	pytest -v
+	pytest --verbose --capture=no
