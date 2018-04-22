@@ -63,6 +63,9 @@ fn load(py: Python, fp: PyObject, kwargs: Option<&PyDict>) -> PyResult<PyObject>
     }
 }
 
+// This function is a poor man's implementation of 
+// impl From<&str> for PyResult<PyObject>, which is not possible,
+// because we have none of these types under our control.
 fn loads(
     py: Python,
     s: &str,
@@ -96,32 +99,32 @@ fn loads(
     //     ));
     // }
     // let s = args.get_item(0).to_string();
-    convert_string(py, s)
-}
 
-// This function is a poor man's implementation of 
-// impl From<&str> for PyResult<PyObject>, which is not possible,
-// because we have none of these types under our control.
-fn convert_string(py: Python, s: &str) -> PyResult<PyObject> {
     let v = serde_json::from_str(s);
     match v {
         Ok(serde_val) => PyResult::from(HyperJsonValue::new(&py, &serde_val)),
-        Err(e) => match s {
+        Err(e) => convert_number(py, s).or(
+            Err(exc::ValueError::new(format!( "Value: {:?}, Error: {}", s, e)))),
+    }
+}
+
+fn convert_number(py: Python, s: &str) ->PyResult<PyObject> {
+    match s {
             // TODO: If `allow_nan` is false (default: True), then this should be a ValueError
             // https://docs.python.org/3/library/json.html
             "NaN" => Ok(std::f64::NAN.to_object(py)),
             "Infinity" => Ok(std::f64::INFINITY.to_object(py)),
             "-Infinity" => Ok(std::f64::NEG_INFINITY.to_object(py)),
-            _ => Err(exc::ValueError::new(format!(
-                "Value: {:?}, Error: {}",
-                s, e
-            ))),
-        },
+            _ => Err(exc::ValueError::new(format!("Value: {:?}", s))),
     }
 }
 
 impl<'a> HyperJsonValue<'a> {
     fn new(py: &'a Python, inner: &'a serde_json::Value) -> HyperJsonValue<'a> {
+        // We cannot borrow the runtime here,
+        // because it wouldn't live long enough
+        // let gil = Python::acquire_gil();
+        // let py = gil.python();
         HyperJsonValue { py, inner }
     }
 }
