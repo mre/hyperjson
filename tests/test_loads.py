@@ -49,8 +49,5 @@ def test_loading_docs_example():
 
 
 def test_load():
-    #obj = io.StringIO(u'1')
-    #assert "1" == obj.read()
-    # obj = open("foo.txt", "r")
     obj = io.StringIO(u'["streaming API"]')
     assert json.load(obj) == hyperjson.load(obj)
