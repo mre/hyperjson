@@ -28,9 +28,10 @@ There are literally a thousand libraries out there to read and write JSON.
 So, no need to reinvent the wheel, right?  
 Except, maybe there is: performance and safety.
 
-Only if you handle a lot of JSON, you might see a performance impact.
-But due to Rust, the risk of running into stack overflows or segmentation faults is lower --
-especially in comparison with C extensions to parse JSON.
+Actually, parsing JSON correctly is [quite hard](http://seriot.ch/parsing_json.php),
+but due to Rust, the risk of running into stack overflows or segmentation faults is lower --
+especially in comparison with C implementations.
+
 
 ## TODO (help wanted!)
 
