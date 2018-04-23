@@ -51,3 +51,11 @@ def test_loading_docs_example():
 def test_load():
     obj = io.StringIO(u'["streaming API"]')
     assert json.load(obj) == hyperjson.load(obj)
+
+
+def test_repeated_fields():
+    """
+    See https://docs.python.org/3/library/json.html#repeated-names-within-an-object
+    """
+    weird_json = '{"x": 1, "x": 2, "x": 3}'
+    json.loads(weird_json) == hyperjson.loads(weird_json)

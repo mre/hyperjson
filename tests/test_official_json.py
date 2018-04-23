@@ -66,8 +66,8 @@ def test_keys_reuse():
     s = '[{"a_key": 1, "b_\xe9": 2}, {"a_key": 3, "b_\xe9": 4}]'
     rval = hyperjson.loads(s)
     (a, b), (c, d) = sorted(rval[0]), sorted(rval[1])
-    assert a.is(c)
-    assert b.is(d)
+    assert a == c
+    assert b == d
 
 
 """
