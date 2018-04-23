@@ -38,7 +38,8 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
         load(py, fp, kwargs)
     }
 
-    #[pyfn(m, "loads", s, "*", encoding, cls, object_hook, parse_float, parse_int, parse_constant, object_hook, kwargs = "**")]
+    #[pyfn(m, "loads", s, "*", encoding, cls, object_hook, parse_float, parse_int, parse_constant,
+           object_hook, kwargs = "**")]
     fn loads_fn(
         py: Python,
         s: &str,
@@ -49,7 +50,16 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
         parse_int: Option<PyObject>,
         kwargs: Option<&PyDict>,
     ) -> PyResult<PyObject> {
-        loads(py, s, encoding, cls, object_hook, parse_float, parse_int, kwargs)
+        loads(
+            py,
+            s,
+            encoding,
+            cls,
+            object_hook,
+            parse_float,
+            parse_int,
+            kwargs,
+        )
     }
     Ok(())
 }
@@ -64,12 +74,13 @@ fn load(py: Python, fp: PyObject, kwargs: Option<&PyDict>) -> PyResult<PyObject>
     match result {
         Ok(s) => loads(py, &s, None, None, None, None, None, kwargs),
         _ => Err(exc::TypeError::new(format!(
-            "string or none type is required as host, got: {:?}", result 
+            "string or none type is required as host, got: {:?}",
+            result
         ))),
     }
 }
 
-// This function is a poor man's implementation of 
+// This function is a poor man's implementation of
 // impl From<&str> for PyResult<PyObject>, which is not possible,
 // because we have none of these types under our control.
 // Note: Encoding param is deprecated and ignored.
@@ -89,7 +100,6 @@ fn loads(
     //     }
     // }
 
-
     // if args.len() == 0 {
     //     // TODO: This is the wrong error message.
     //     return Err(exc::LookupError::new("oh no"));
@@ -107,30 +117,47 @@ fn loads(
 
     let v = serde_json::from_str(s);
     match v {
-        Ok(serde_val) => PyResult::from(HyperJsonValue::new(&py, &serde_val, &parse_float, &parse_int)),
-        Err(e) => convert_special_floats(py, s, parse_int).or(
-            Err(exc::ValueError::new(format!( "Value: {:?}, Error: {}", s, e)))),
+        Ok(serde_val) => PyResult::from(HyperJsonValue::new(
+            &py,
+            &serde_val,
+            &parse_float,
+            &parse_int,
+        )),
+        Err(e) => convert_special_floats(py, s, parse_int).or(Err(exc::ValueError::new(format!(
+            "Value: {:?}, Error: {}",
+            s, e
+        )))),
     }
 }
 
-fn convert_special_floats(py: Python, s: &str, parse_int: Option<PyObject>) ->PyResult<PyObject> {
+fn convert_special_floats(py: Python, s: &str, parse_int: Option<PyObject>) -> PyResult<PyObject> {
     match s {
-            // TODO: If `allow_nan` is false (default: True), then this should be a ValueError
-            // https://docs.python.org/3/library/json.html
-            "NaN" => Ok(std::f64::NAN.to_object(py)),
-            "Infinity" => Ok(std::f64::INFINITY.to_object(py)),
-            "-Infinity" => Ok(std::f64::NEG_INFINITY.to_object(py)),
-            _ => Err(exc::ValueError::new(format!("Value: {:?}", s))),
+        // TODO: If `allow_nan` is false (default: True), then this should be a ValueError
+        // https://docs.python.org/3/library/json.html
+        "NaN" => Ok(std::f64::NAN.to_object(py)),
+        "Infinity" => Ok(std::f64::INFINITY.to_object(py)),
+        "-Infinity" => Ok(std::f64::NEG_INFINITY.to_object(py)),
+        _ => Err(exc::ValueError::new(format!("Value: {:?}", s))),
     }
 }
 
 impl<'a> HyperJsonValue<'a> {
-    fn new(py: &'a Python, inner: &'a serde_json::Value, parse_float: &'a Option<PyObject>, parse_int: &'a Option<PyObject>) -> HyperJsonValue<'a> {
+    fn new(
+        py: &'a Python,
+        inner: &'a serde_json::Value,
+        parse_float: &'a Option<PyObject>,
+        parse_int: &'a Option<PyObject>,
+    ) -> HyperJsonValue<'a> {
         // We cannot borrow the runtime here,
         // because it wouldn't live long enough
         // let gil = Python::acquire_gil();
         // let py = gil.python();
-        HyperJsonValue { py, inner, parse_float, parse_int}
+        HyperJsonValue {
+            py,
+            inner,
+            parse_float,
+            parse_int,
+        }
     }
 }
 
@@ -153,7 +180,7 @@ impl<'a> From<HyperJsonValue<'a>> for PyResult<PyObject> {
                             let i = x.as_i64().unwrap();
                             Ok(parser.call1(*v.py, (i,))?)
                         }
-                        None => Ok(x.as_i64().unwrap().to_object(*v.py))
+                        None => Ok(x.as_i64().unwrap().to_object(*v.py)),
                     }
                 } else {
                     match v.parse_float {
@@ -161,7 +188,7 @@ impl<'a> From<HyperJsonValue<'a>> for PyResult<PyObject> {
                             let f = x.as_f64().unwrap();
                             Ok(parser.call1(*v.py, (f,))?)
                         }
-                        None => Ok(x.as_f64().unwrap().to_object(*v.py))
+                        None => Ok(x.as_f64().unwrap().to_object(*v.py)),
                     }
                 }
             }
@@ -172,14 +199,22 @@ impl<'a> From<HyperJsonValue<'a>> for PyResult<PyObject> {
                 let mut ar = vec![];
 
                 for elem in a {
-                    ar.push(PyResult::from(HyperJsonValue::new(v.py, elem, &v.parse_float, &v.parse_int))?);
+                    ar.push(PyResult::from(HyperJsonValue::new(
+                        v.py,
+                        elem,
+                        &v.parse_float,
+                        &v.parse_int,
+                    ))?);
                 }
                 Ok(ar.to_object(*v.py))
             }
             serde_json::Value::Object(ref o) => {
                 let mut m: BTreeMap<String, pyo3::PyObject> = BTreeMap::new();
                 for (k, x) in o.iter() {
-                    m.insert(k.to_string(), PyResult::from(HyperJsonValue::new(v.py, x, v.parse_float, v.parse_int))?);
+                    m.insert(
+                        k.to_string(),
+                        PyResult::from(HyperJsonValue::new(v.py, x, v.parse_float, v.parse_int))?,
+                    );
                 }
                 Ok(m.to_object(*v.py))
             }
