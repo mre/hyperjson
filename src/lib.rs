@@ -117,12 +117,7 @@ fn loads(
 
     let v = serde_json::from_str(s);
     match v {
-        Ok(serde_val) => PyResult::from(HyperJsonValue::new(
-            &py,
-            &serde_val,
-            &parse_float,
-            &parse_int,
-        )),
+        Ok(serde_val) => HyperJsonValue::new(&py, &serde_val, &parse_float, &parse_int).try_into(),
         Err(e) => convert_special_floats(py, s, parse_int).or(Err(exc::ValueError::new(format!(
             "Value: {:?}, Error: {}",
             s, e
@@ -168,8 +163,9 @@ impl<'a> HyperJsonValue<'a> {
 //     }
 // }
 
-impl<'a> From<HyperJsonValue<'a>> for PyResult<PyObject> {
-    fn from(v: HyperJsonValue) -> PyResult<PyObject> {
+impl<'a> TryFrom<HyperJsonValue<'a>> for PyObject {
+    type Error = PyErr;
+    fn try_from(v: HyperJsonValue) -> Result<PyObject, PyErr> {
         match v.inner {
             serde_json::Value::Number(ref x) => {
                 // Unwrap should be safe here, since we checked for the correct
@@ -196,15 +192,12 @@ impl<'a> From<HyperJsonValue<'a>> for PyResult<PyObject> {
             serde_json::Value::Null => Ok(v.py.None()),
             serde_json::Value::Bool(ref b) => Ok(b.to_object(*v.py)),
             serde_json::Value::Array(ref a) => {
-                let mut ar = vec![];
+                let mut ar: Vec<PyObject> = vec![];
 
                 for elem in a {
-                    ar.push(PyResult::from(HyperJsonValue::new(
-                        v.py,
-                        elem,
-                        &v.parse_float,
-                        &v.parse_int,
-                    ))?);
+                    ar.push(
+                        HyperJsonValue::new(v.py, elem, &v.parse_float, &v.parse_int).try_into()?,
+                    );
                 }
                 Ok(ar.to_object(*v.py))
             }
@@ -213,7 +206,7 @@ impl<'a> From<HyperJsonValue<'a>> for PyResult<PyObject> {
                 for (k, x) in o.iter() {
                     m.insert(
                         k.to_string(),
-                        PyResult::from(HyperJsonValue::new(v.py, x, v.parse_float, v.parse_int))?,
+                        HyperJsonValue::new(v.py, x, v.parse_float, v.parse_int).try_into()?,
                     );
                 }
                 Ok(m.to_object(*v.py))
