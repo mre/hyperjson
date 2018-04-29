@@ -8,9 +8,11 @@ It's a thin wrapper around Rust's [serde-json](https://github.com/serde-rs/json)
 hyperjson is meant to be a drop-in replacement for Python's [json module](https://docs.python.org/3/library/json.html):  
 
 ```python
-import hyperjson as json
-json.loads('["foo", {"bar":["baz", null, 1.0, 2]}]')
-# ['foo', {'bar': ['baz', None, 1.0, 2L]}]
+>>> import hyperjson 
+>>> hyperjson.dumps([{"key": "value"}, 81, True])
+'[{"key":"value"},81,true]'
+>>> hyperjson.loads("""[{"key": "value"}, 81, true]""")
+[{u'key': u'value'}, 81, True
 ```
 
 ## Installation
