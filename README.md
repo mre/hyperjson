@@ -35,11 +35,12 @@ especially in comparison with C implementations.
 
 ## TODO (help wanted!)
 
-- [X] [`load()`](https://docs.python.org/3/library/json.html#json.load)
 - [X] [`loads()`](https://docs.python.org/3/library/json.html#json.loads)
+- [X] [`load()`](https://docs.python.org/3/library/json.html#json.load)
+- [X] [`dumps()`](https://docs.python.org/3/library/json.html#json.dumps)
 - [ ] [`dump()`](https://docs.python.org/3/library/json.html#json.dump)
-- [ ] [`dumps()`](https://docs.python.org/3/library/json.html#json.dumps)
 - [ ] Benchmark against [json](https://docs.python.org/3/library/json.html) and [ujson](https://github.com/esnme/ultrajson/)
+- [ ] Add special flags for methods
 
 ## Development environment
 
