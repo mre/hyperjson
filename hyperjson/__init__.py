@@ -25,3 +25,10 @@ def load(fp):
     See https://docs.python.org/3/library/json.html
     """
     return _hyperjson.load(fp)
+
+
+# def dumps(obj, *, skipkeys=False, ensure_ascii=True, check_circular=True, allow_nan=True, cls=None, indent=None, separators=None, default=None, sort_keys=False, **kw):
+#     return _hyperjson.dumps(obj, skipkeys, ensure_ascii, check_circular, allow_nan, cls, indent, separators, default, sort_keys, **kw)
+
+def dumps(obj, **kw):
+    return _hyperjson.dumps(obj, **kw)

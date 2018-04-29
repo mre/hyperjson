@@ -14,8 +14,13 @@ struct HyperJsonValue<'a> {
     parse_int: &'a Option<PyObject>,
 }
 
-enum HyperJsonError {
+pub enum HyperJsonError {
     SerdeError(serde_json::Error),
+    PyErr(PyErr),
+    DictKeyNotString(PyObject),
+    InvalidFloat,
+    TypeError(String, PyResult<String>),
+    FixMeTypeError,
 }
 
 impl From<serde_json::Error> for HyperJsonError {
@@ -27,6 +32,12 @@ impl From<serde_json::Error> for HyperJsonError {
 impl From<HyperJsonError> for pyo3::PyErr {
     fn from(_h: HyperJsonError) -> pyo3::PyErr {
         PyErr::new::<pyo3::exc::TypeError, _>("Error message")
+    }
+}
+
+impl From<pyo3::PyErr> for HyperJsonError {
+    fn from(p: pyo3::PyErr) -> HyperJsonError {
+        HyperJsonError::PyErr(p)
     }
 }
 
@@ -61,7 +72,105 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
             kwargs,
         )
     }
+
+    #[pyfn(m, "dumps", obj)]
+    fn dumps_fn(
+        py: Python,
+        obj: PyObject,
+        //  skipkeys: Option<PyObject>,
+        //         ensure_ascii: Option<PyObject>,
+        //         check_circular: Option<PyObject>, allow_nan: Option<PyObject>,
+        //         cls: Option<PyObject>, indent: Option<PyObject>,
+        //         separators: Option<PyObject>, default: Option<PyObject>,
+        //         sort_keys: Option<PyObject>, kwargs: Option<&PyDict>
+    ) -> PyResult<PyObject> {
+        //  let v: Result<HyperJsonValue, _>= obj.try_into();
+        // let s: Result<String, HyperJsonError> =
+        //     serde_json::to_string(&v.inner).map_err(|e|
+        //                                                 HyperJsonError::SerdeError(e));
+        // Ok(s?.to_object(py));
+        // let s_obj = obj.call_method0(py, "__repr__")?;
+        // Ok(s_obj.to_object(py))
+        let v = to_json(py, &obj)?;
+        let s: Result<String, HyperJsonError> =
+            serde_json::to_string(&v).map_err(|e| HyperJsonError::SerdeError(e));
+        Ok(s?.to_object(py))
+    }
+
     Ok(())
+}
+
+/// Convert from a `cpython::PyObject` to a `serde_json::Value`.
+pub fn to_json(py: Python, obj: &PyObject) -> Result<serde_json::Value, HyperJsonError> {
+    macro_rules! cast {
+        ($t:ty, $f:expr) => {
+            if let Ok(val) = obj.cast_as::<$t>(py) {
+                return $f(val);
+            }
+        };
+    }
+
+    macro_rules! extract {
+        ($t:ty) => {
+            if let Ok(val) = obj.extract::<$t>(py) {
+                return serde_json::value::to_value(val).map_err(HyperJsonError::SerdeError);
+            }
+        };
+    }
+
+    cast!(PyDict, |x: &PyDict| {
+        let mut map = serde_json::Map::new();
+        for (key_obj, value) in x.iter() {
+            let key = if key_obj == py.None().as_ref(py) {
+                Ok("null".to_string())
+            } else if let Ok(val) = key_obj.extract::<bool>() {
+                Ok(if val {
+                    "true".to_string()
+                } else {
+                    "false".to_string()
+                })
+            } else if let Ok(val) = key_obj.str() {
+                Ok(val.to_string()?.into_owned())
+            } else {
+                Err(HyperJsonError::DictKeyNotString(key_obj.to_object(py)))
+            };
+            map.insert(key?, to_json(py, &value.to_object(py))?);
+        }
+        Ok(serde_json::Value::Object(map))
+    });
+
+    cast!(PyList, |x: &PyList| Ok(serde_json::Value::Array(try!(
+        x.iter().map(|x| to_json(py, &x.to_object(py))).collect()
+    ))));
+    cast!(PyTuple, |x: &PyTuple| Ok(serde_json::Value::Array(try!(
+        x.iter().map(|x| to_json(py, &x.to_object(py))).collect()
+    ))));
+
+    extract!(String);
+    extract!(bool);
+
+    cast!(PyFloat, |x: &PyFloat| {
+        match serde_json::Number::from_f64(x.value()) {
+            Some(n) => Ok(serde_json::Value::Number(n)),
+            None => Err(HyperJsonError::InvalidFloat),
+        }
+    });
+
+    extract!(u64);
+    extract!(i64);
+
+    if obj == &py.None() {
+        return Ok(serde_json::Value::Null);
+    }
+
+    // At this point we can't cast it, set up the error object
+    // let repr = obj.repr(py)
+    //     .and_then(|x| x.to_string(py).and_then(|y| Ok(y.into_owned())));
+    // Err(HyperJsonError::TypeError(
+    //     obj.get_type(py).name(py).into_owned(),
+    //     repr,
+    // ))
+    Err(HyperJsonError::FixMeTypeError)
 }
 
 fn load(py: Python, fp: PyObject, kwargs: Option<&PyDict>) -> PyResult<PyObject> {
@@ -160,6 +269,12 @@ impl<'a> HyperJsonValue<'a> {
 //     fn from(v: String) -> HyperJsonValue<'a> {
 //                 let gil = Python::acquire_gil();
 // let py = gil.python();
+//     }
+// }
+// impl<'a> TryFrom<PyObject> for HyperJsonValue<'a> {
+//     type Error = HyperJsonError;
+//     fn try_from(p: PyObject) -> Result<HyperJsonValue<'a>, HyperJsonError> {
+//         HyperJsonValue::new(p.);
 //     }
 // }
 
