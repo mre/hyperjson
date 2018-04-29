@@ -2,6 +2,7 @@ import pytest
 import json
 import hyperjson
 import string
+from io import StringIO
 
 simple_types = [1, 1.0, -1, None, "str", True]
 
@@ -32,3 +33,9 @@ dicts = [
 def test_dict(d):
     assert strip_whitespace(json.dumps(
         d)) == strip_whitespace(hyperjson.dumps(d))
+
+
+def test_dump():
+    sio = StringIO()
+    hyperjson.dump(['streaming API'], sio)
+    assert sio.getvalue() == '["streaming API"]'

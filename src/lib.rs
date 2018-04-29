@@ -84,17 +84,34 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
         //         separators: Option<PyObject>, default: Option<PyObject>,
         //         sort_keys: Option<PyObject>, kwargs: Option<&PyDict>
     ) -> PyResult<PyObject> {
-        //  let v: Result<HyperJsonValue, _>= obj.try_into();
-        // let s: Result<String, HyperJsonError> =
-        //     serde_json::to_string(&v.inner).map_err(|e|
-        //                                                 HyperJsonError::SerdeError(e));
-        // Ok(s?.to_object(py));
-        // let s_obj = obj.call_method0(py, "__repr__")?;
-        // Ok(s_obj.to_object(py))
         let v = to_json(py, &obj)?;
         let s: Result<String, HyperJsonError> =
             serde_json::to_string(&v).map_err(|e| HyperJsonError::SerdeError(e));
         Ok(s?.to_object(py))
+    }
+
+    #[pyfn(m, "dump", obj, fp)]
+    fn dump_fn(
+        py: Python,
+        obj: PyObject,
+        fp: PyObject,
+        //  skipkeys: Option<PyObject>,
+        //         ensure_ascii: Option<PyObject>,
+        //         check_circular: Option<PyObject>, allow_nan: Option<PyObject>,
+        //         cls: Option<PyObject>, indent: Option<PyObject>,
+        //         separators: Option<PyObject>, default: Option<PyObject>,
+        //         sort_keys: Option<PyObject>, kwargs: Option<&PyDict>
+    ) -> PyResult<PyObject> {
+        let s = dumps_fn(py, obj)?;
+     Ok(fp.call_method1(py, "write", (s,))?)
+    // let result: Result<String, _> = s_obj.extract(py);
+    // match result {
+    //     Ok(s) => loads(py, &s, None, None, None, None, None, kwargs),
+    //     _ => Err(exc::TypeError::new(format!(
+    //         "string or none type is required as host, got: {:?}",
+    //         result
+    //     ))),
+    // }
     }
 
     Ok(())

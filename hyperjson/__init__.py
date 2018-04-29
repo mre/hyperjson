@@ -32,3 +32,7 @@ def load(fp):
 
 def dumps(obj, **kw):
     return _hyperjson.dumps(obj, **kw)
+
+
+def dump(obj, fp, **kw):
+    return _hyperjson.dump(obj, fp, **kw)
