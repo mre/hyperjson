@@ -103,15 +103,15 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
         //         sort_keys: Option<PyObject>, kwargs: Option<&PyDict>
     ) -> PyResult<PyObject> {
         let s = dumps_fn(py, obj)?;
-     Ok(fp.call_method1(py, "write", (s,))?)
-    // let result: Result<String, _> = s_obj.extract(py);
-    // match result {
-    //     Ok(s) => loads(py, &s, None, None, None, None, None, kwargs),
-    //     _ => Err(exc::TypeError::new(format!(
-    //         "string or none type is required as host, got: {:?}",
-    //         result
-    //     ))),
-    // }
+        Ok(fp.call_method1(py, "write", (s,))?)
+        // let result: Result<String, _> = s_obj.extract(py);
+        // match result {
+        //     Ok(s) => loads(py, &s, None, None, None, None, None, kwargs),
+        //     _ => Err(exc::TypeError::new(format!(
+        //         "string or none type is required as host, got: {:?}",
+        //         result
+        //     ))),
+        // }
     }
 
     Ok(())
@@ -193,7 +193,7 @@ pub fn to_json(py: Python, obj: &PyObject) -> Result<serde_json::Value, HyperJso
 fn load(py: Python, fp: PyObject, kwargs: Option<&PyDict>) -> PyResult<PyObject> {
     // Reset file pointer to beginning
     // See https://github.com/PyO3/pyo3/issues/143
-    fp.call_method(py, "seek", (0,), NoArgs)?;
+    fp.call_method(py, "seek", (0,), pyo3::NoArgs)?;
 
     let s_obj = fp.call_method0(py, "read")?;
     let result: Result<String, _> = s_obj.extract(py);
