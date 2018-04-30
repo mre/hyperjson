@@ -1,6 +1,6 @@
 # hyperjson
 
-A Python module to load json data.
+A Python module to load JSON data.
 It's a thin wrapper around Rust's [serde-json](https://github.com/serde-rs/json) built with [pyo3](https://github.com/PyO3/pyo3).
 
 ## Usage
@@ -23,16 +23,15 @@ To compile the code and create an importable Python module from it, call
 make install
 ```
 
-## Motivation
+## Why?
 
 Parsing JSON is a solved problem.  
 There are literally a thousand libraries out there to read and write JSON.  
 So, no need to reinvent the wheel, right?  
-Except, maybe there is: performance and safety.
+Except, maybe there is: **performance and safety**.
 
 Actually, parsing JSON correctly is [quite hard](http://seriot.ch/parsing_json.php),
-but due to Rust, the risk of running into stack overflows or segmentation faults is lower --
-especially in comparison with C implementations.
+but due to Rust, the risk of running into stack overflows or segmentation faults is lower (basically non-existent) -- especially in comparison with C implementations.
 
 
 ## TODO (help wanted!)
@@ -44,7 +43,7 @@ especially in comparison with C implementations.
 - [ ] Benchmark against [json](https://docs.python.org/3/library/json.html) and [ujson](https://github.com/esnme/ultrajson/)
 - [ ] Add special flags for methods
 
-## Development environment
+## Contributions welcome!
 
 If you want to hack on hyperjson, first install [setuptools-rust](https://github.com/PyO3/setuptools-rust):
 
@@ -61,7 +60,7 @@ cd /path/to/hyperjson
 make install
 ```
 
-To test your changes run
+To test your changes, run
 
 ```
 make test
