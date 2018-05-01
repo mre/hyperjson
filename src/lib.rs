@@ -103,7 +103,10 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
         //         sort_keys: Option<PyObject>, kwargs: Option<&PyDict>
     ) -> PyResult<PyObject> {
         let s = dumps_fn(py, obj)?;
-        Ok(fp.call_method1(py, "write", (s,))?)
+        let fp_ref: &PyObjectRef = fp.as_ref(py);
+        fp_ref.call_method1("write", (s,))?;
+        // TODO: Will this always return None?
+        Ok(pyo3::Python::None(py))
         // let result: Result<String, _> = s_obj.extract(py);
         // match result {
         //     Ok(s) => loads(py, &s, None, None, None, None, None, kwargs),
@@ -191,12 +194,20 @@ pub fn to_json(py: Python, obj: &PyObject) -> Result<serde_json::Value, HyperJso
 }
 
 fn load(py: Python, fp: PyObject, kwargs: Option<&PyDict>) -> PyResult<PyObject> {
+    // Temporary workaround for
+    // https://github.com/PyO3/pyo3/issues/145
+    let io: &PyObjectRef = fp.as_ref(py);
+
+    // Alternative workaround
+    // fp.getattr(py, "seek")?;
+    // fp.getattr(py, "read")?;
+
     // Reset file pointer to beginning
     // See https://github.com/PyO3/pyo3/issues/143
-    fp.call_method(py, "seek", (0,), pyo3::NoArgs)?;
+    io.call_method("seek", (0,), pyo3::NoArgs)?;
 
-    let s_obj = fp.call_method0(py, "read")?;
-    let result: Result<String, _> = s_obj.extract(py);
+    let s_obj = io.call_method0("read")?;
+    let result: Result<String, _> = s_obj.extract();
     match result {
         Ok(s) => loads(py, &s, None, None, None, None, None, kwargs),
         _ => Err(exc::TypeError::new(format!(
