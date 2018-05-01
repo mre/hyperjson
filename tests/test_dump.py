@@ -1,6 +1,7 @@
 import pytest
 import hyperjson
 from io import StringIO
+import json
 
 
 def test_dump():
@@ -10,5 +11,7 @@ def test_dump():
 
 
 def test_dump_invalid_writer():
-    with pytest.raises(TypeError):
+    with pytest.raises(AttributeError):
+        json.dump([], '')
+    with pytest.raises(AttributeError):
         hyperjson.dump([], '')
