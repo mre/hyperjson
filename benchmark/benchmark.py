@@ -308,7 +308,6 @@ def benchmark_dict_of_arrays_of_dict_string_int_pairs():
             arrays.append(
                 {str(random.random()*20): int(random.random()*1000000)})
         test_object[str(random.random()*20)] = arrays
-    print(test_object)
     run_encode(COUNT)
 
     decode_data = json.dumps(test_object)
