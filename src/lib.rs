@@ -20,7 +20,7 @@ pub enum HyperJsonError {
     DictKeyNotString(PyObject),
     InvalidFloat,
     TypeError(String, PyResult<String>),
-    FixMeTypeError,
+    FixMeTypeError(String, String),
 }
 
 impl From<serde_json::Error> for HyperJsonError {
@@ -30,8 +30,14 @@ impl From<serde_json::Error> for HyperJsonError {
 }
 
 impl From<HyperJsonError> for pyo3::PyErr {
-    fn from(_h: HyperJsonError) -> pyo3::PyErr {
-        PyErr::new::<pyo3::exc::TypeError, _>("Error message")
+    fn from(h: HyperJsonError) -> pyo3::PyErr {
+        match h {
+            HyperJsonError::SerdeError(e) => PyErr::new::<pyo3::exc::TypeError, _>(format!("{}", e)),
+            HyperJsonError::PyErr(e) => PyErr::new::<pyo3::exc::TypeError, _>("PyErr"),
+            HyperJsonError::TypeError(e, r) => PyErr::new::<pyo3::exc::TypeError, _>("TypeErr"),
+            HyperJsonError::FixMeTypeError => PyErr::new::<pyo3::exc::TypeError, _>("FixmeTypeErr"),
+            _ => PyErr::new::<pyo3::exc::TypeError, _>("Unknown reason"),
+        }
     }
 }
 
@@ -184,13 +190,12 @@ pub fn to_json(py: Python, obj: &PyObject) -> Result<serde_json::Value, HyperJso
     }
 
     // At this point we can't cast it, set up the error object
-    // let repr = obj.repr(py)
-    //     .and_then(|x| x.to_string(py).and_then(|y| Ok(y.into_owned())));
-    // Err(HyperJsonError::TypeError(
-    //     obj.get_type(py).name(py).into_owned(),
-    //     repr,
-    // ))
-    Err(HyperJsonError::FixMeTypeError)
+    let repr = obj.repr(py)
+        .and_then(|x| x.to_string(py).and_then(|y| Ok(y.into_owned())));
+    Err(HyperJsonError::FixMeTypeError(
+        obj.get_type(py).name(py).into_owned(),
+        repr,
+    ))
 }
 
 fn load(py: Python, fp: PyObject, kwargs: Option<&PyDict>) -> PyResult<PyObject> {
