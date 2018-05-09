@@ -1,7 +1,13 @@
 #![feature(proc_macro)]
 
+#[macro_use]
+extern crate version;
+
 extern crate pyo3;
 extern crate serde_json;
+
+#[macro_use]
+extern crate version;
 
 use pyo3::Python;
 use pyo3::prelude::*;
@@ -57,6 +63,11 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
     #[pyfn(m, "load", fp, kwargs = "**")]
     fn load_fn(py: Python, fp: PyObject, kwargs: Option<&PyDict>) -> PyResult<PyObject> {
         load(py, fp, kwargs)
+    }
+
+    #[pyfn(m, "version")]
+    fn version_fn(py: Python) -> PyResult<PyObject> {
+        Ok(version!().to_string().to_object(py))
     }
 
     #[pyfn(m, "loads", s, "*", encoding, cls, object_hook, parse_float, parse_int, parse_constant,
