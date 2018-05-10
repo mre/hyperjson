@@ -6,9 +6,6 @@ extern crate version;
 extern crate pyo3;
 extern crate serde_json;
 
-#[macro_use]
-extern crate version;
-
 use pyo3::Python;
 use pyo3::prelude::*;
 use std::collections::BTreeMap;
@@ -57,10 +54,10 @@ impl From<pyo3::PyErr> for HyperJsonError {
     }
 }
 
-/// Module documentation string
+/// A hyper-fast JSON encoder/decoder written in Rust
 #[py::modinit(_hyperjson)]
 fn init(py: Python, m: &PyModule) -> PyResult<()> {
-    #[pyfn(m, "load", fp, kwargs = "**")]
+    #[pyfn(m, "load")]
     fn load_fn(py: Python, fp: PyObject, kwargs: Option<&PyDict>) -> PyResult<PyObject> {
         load(py, fp, kwargs)
     }
@@ -70,8 +67,7 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
         Ok(version!().to_string().to_object(py))
     }
 
-    #[pyfn(m, "loads", s, "*", encoding, cls, object_hook, parse_float, parse_int, parse_constant,
-           object_hook, kwargs = "**")]
+    #[pyfn(m, "loads")]
     fn loads_fn(
         py: Python,
         s: &str,
@@ -94,16 +90,20 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
         )
     }
 
-    #[pyfn(m, "dumps", obj)]
+    #[pyfn(m, "dumps")] // ensure_ascii, check_circular, allow_nan, cls, indent, separators, default, sort_keys, kwargs = "**")]
     fn dumps_fn(
         py: Python,
         obj: PyObject,
-        //  skipkeys: Option<PyObject>,
-        //         ensure_ascii: Option<PyObject>,
-        //         check_circular: Option<PyObject>, allow_nan: Option<PyObject>,
-        //         cls: Option<PyObject>, indent: Option<PyObject>,
-        //         separators: Option<PyObject>, default: Option<PyObject>,
-        //         sort_keys: Option<PyObject>, kwargs: Option<&PyDict>
+        // skipkeys: Option<PyObject>,
+        // ensure_ascii: Option<PyObject>,
+        // check_circular: Option<PyObject>,
+        // allow_nan: Option<PyObject>,
+        // cls: Option<PyObject>,
+        // indent: Option<PyObject>,
+        // separators: Option<PyObject>,
+        // default: Option<PyObject>,
+        // sort_keys: Option<PyObject>,
+        // kwargs: Option<&PyDict>
     ) -> PyResult<PyObject> {
         let v = to_json(py, &obj)?;
         let s: Result<String, HyperJsonError> =
@@ -111,7 +111,7 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
         Ok(s?.to_object(py))
     }
 
-    #[pyfn(m, "dump", obj, fp)]
+    #[pyfn(m, "dump")]
     fn dump_fn(
         py: Python,
         obj: PyObject,
@@ -128,14 +128,6 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
         fp_ref.call_method1("write", (s,))?;
         // TODO: Will this always return None?
         Ok(pyo3::Python::None(py))
-        // let result: Result<String, _> = s_obj.extract(py);
-        // match result {
-        //     Ok(s) => loads(py, &s, None, None, None, None, None, kwargs),
-        //     _ => Err(exc::TypeError::new(format!(
-        //         "string or none type is required as host, got: {:?}",
-        //         result
-        //     ))),
-        // }
     }
 
     Ok(())
