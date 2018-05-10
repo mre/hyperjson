@@ -94,16 +94,16 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
     fn dumps_fn(
         py: Python,
         obj: PyObject,
-        // skipkeys: Option<PyObject>,
-        // ensure_ascii: Option<PyObject>,
-        // check_circular: Option<PyObject>,
-        // allow_nan: Option<PyObject>,
-        // cls: Option<PyObject>,
-        // indent: Option<PyObject>,
-        // separators: Option<PyObject>,
-        // default: Option<PyObject>,
-        // sort_keys: Option<PyObject>,
-        // kwargs: Option<&PyDict>
+        skipkeys: Option<bool>,
+        ensure_ascii: Option<PyObject>,
+        check_circular: Option<PyObject>,
+        allow_nan: Option<PyObject>,
+        cls: Option<PyObject>,
+        indent: Option<PyObject>,
+        separators: Option<PyObject>,
+        default: Option<PyObject>,
+        sort_keys: Option<PyObject>,
+        kwargs: Option<&PyDict>
     ) -> PyResult<PyObject> {
         let v = to_json(py, &obj)?;
         let s: Result<String, HyperJsonError> =
@@ -116,14 +116,14 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
         py: Python,
         obj: PyObject,
         fp: PyObject,
-        //  skipkeys: Option<PyObject>,
-        //         ensure_ascii: Option<PyObject>,
-        //         check_circular: Option<PyObject>, allow_nan: Option<PyObject>,
-        //         cls: Option<PyObject>, indent: Option<PyObject>,
-        //         separators: Option<PyObject>, default: Option<PyObject>,
-        //         sort_keys: Option<PyObject>, kwargs: Option<&PyDict>
+         skipkeys: Option<PyObject>,
+                ensure_ascii: Option<PyObject>,
+                check_circular: Option<PyObject>, allow_nan: Option<PyObject>,
+                cls: Option<PyObject>, indent: Option<PyObject>,
+                separators: Option<PyObject>, default: Option<PyObject>,
+                sort_keys: Option<PyObject>, kwargs: Option<&PyDict>
     ) -> PyResult<PyObject> {
-        let s = dumps_fn(py, obj)?;
+        let s = dumps_fn(py, obj, None, None, None, None,None,None,None,None,None,None)?;
         let fp_ref: &PyObjectRef = fp.as_ref(py);
         fp_ref.call_method1("write", (s,))?;
         // TODO: Will this always return None?
