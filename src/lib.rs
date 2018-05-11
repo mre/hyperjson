@@ -28,34 +28,34 @@ struct HyperJsonValue<'a> {
 
 #[derive(Debug, Fail)]
 pub enum HyperJsonError {
-    #[fail(display = "conversion error: {}", error)]
-    SerdeError { error: serde_json::Error },
-    #[fail(display = "Python error: {}", error)]
+    #[fail(display = "Conversion error: {}", error)]
+    InvalidConversion { error: serde_json::Error },
+    #[fail(display = "Python Runtime exception: {}", error)]
     PyErr { error: String },
     #[fail(display = "Dictionary key is not a string: {:?}", obj)]
     DictKeyNotString { obj: PyObject },
     #[fail(display = "Invalid float: {}", x)]
     InvalidFloat { x: String },
     #[fail(display = "Invalid type: {}, Error: {}", t, e)]
-    CastError { t: String, e: String },
+    InvalidCast { t: String, e: String },
 }
 
 impl From<serde_json::Error> for HyperJsonError {
     fn from(error: serde_json::Error) -> HyperJsonError {
-        HyperJsonError::SerdeError { error }
+        HyperJsonError::InvalidConversion { error }
     }
 }
 
 impl From<HyperJsonError> for pyo3::PyErr {
     fn from(h: HyperJsonError) -> pyo3::PyErr {
         match h {
-            HyperJsonError::SerdeError { error } => {
+            HyperJsonError::InvalidConversion { error } => {
                 PyErr::new::<pyo3::exc::TypeError, _>(format!("{}", error))
             }
             // TODO
             HyperJsonError::PyErr { error } => PyErr::new::<pyo3::exc::TypeError, _>("PyErr"),
-            HyperJsonError::CastError { t, e } => {
-                PyErr::new::<pyo3::exc::TypeError, _>("CastError")
+            HyperJsonError::InvalidCast { t, e } => {
+                PyErr::new::<pyo3::exc::TypeError, _>("InvalidCast")
             }
             _ => PyErr::new::<pyo3::exc::TypeError, _>("Unknown reason"),
         }
@@ -125,7 +125,7 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
     ) -> PyResult<PyObject> {
         let v = to_json(py, &obj)?;
         let s: Result<String, HyperJsonError> =
-            serde_json::to_string(&v).map_err(|error| HyperJsonError::SerdeError { error });
+            serde_json::to_string(&v).map_err(|error| HyperJsonError::InvalidConversion { error });
         Ok(s?.to_object(py))
     }
 
@@ -182,7 +182,7 @@ pub fn to_json(py: Python, obj: &PyObject) -> Result<serde_json::Value, HyperJso
         ($t:ty) => {
             if let Ok(val) = obj.extract::<$t>(py) {
                 return serde_json::value::to_value(val)
-                    .map_err(|error| HyperJsonError::SerdeError { error });
+                    .map_err(|error| HyperJsonError::InvalidConversion { error });
             }
         };
     }
@@ -240,7 +240,7 @@ pub fn to_json(py: Python, obj: &PyObject) -> Result<serde_json::Value, HyperJso
     let repr = obj.as_ref(py)
         .repr()
         .and_then(|x| x.to_string().and_then(|y| Ok(y.into_owned())));
-    Err(HyperJsonError::CastError {
+    Err(HyperJsonError::InvalidCast {
         t: obj.as_ref(py).get_type().name().into_owned(),
         e: repr?,
     })
@@ -345,19 +345,6 @@ impl<'a> HyperJsonValue<'a> {
         }
     }
 }
-
-// impl<'a> From<String> for HyperJsonValue<'a> {
-//     fn from(v: String) -> HyperJsonValue<'a> {
-//                 let gil = Python::acquire_gil();
-// let py = gil.python();
-//     }
-// }
-// impl<'a> TryFrom<PyObject> for HyperJsonValue<'a> {
-//     type Error = HyperJsonError;
-//     fn try_from(p: PyObject) -> Result<HyperJsonValue<'a>, HyperJsonError> {
-//         HyperJsonValue::new(p.);
-//     }
-// }
 
 impl<'a> TryFrom<HyperJsonValue<'a>> for PyObject {
     type Error = PyErr;
