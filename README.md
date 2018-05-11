@@ -1,11 +1,16 @@
 # hyperjson
 
-A hyper-fast, native Python module to read and write JSON data. Works as a drop-in replacement for Python's built-in [json](https://docs.python.org/3/library/json.html) module.
-It's a thin wrapper around Rust's [serde-json](https://github.com/serde-rs/json) built with [pyo3](https://github.com/PyO3/pyo3).
+A hyper-fast, native Python module to read and write JSON data. Works as a
+drop-in replacement for Python's built-in
+[json](https://docs.python.org/3/library/json.html) module. It's a thin wrapper
+around Rust's [serde-json](https://github.com/serde-rs/json) built with
+[pyo3](https://github.com/PyO3/pyo3). Compatible with Python 3. Should also work
+on Python 2, but it's not officially supported.
 
 ## Usage
 
-hyperjson is meant to be a drop-in replacement for Python's [json module](https://docs.python.org/3/library/json.html):  
+hyperjson is meant to be a drop-in replacement for Python's [json
+module](https://docs.python.org/3/library/json.html):  
 
 ```python
 >>> import hyperjson 
@@ -42,12 +47,14 @@ especially in comparison with C implementations.
 - [X] [`load()`](https://docs.python.org/3/library/json.html#json.load)
 - [X] [`dumps()`](https://docs.python.org/3/library/json.html#json.dumps)
 - [X] [`dump()`](https://docs.python.org/3/library/json.html#json.dump)
-- [ ] Benchmark against [json](https://docs.python.org/3/library/json.html) and [ujson](https://github.com/esnme/ultrajson/)
+- [ ] Benchmark against [json](https://docs.python.org/3/library/json.html) and
+  [ujson](https://github.com/esnme/ultrajson/)
 - [ ] Respect keyword-only arguments in methods
 
 ## Contributions welcome!
 
-If you want to hack on hyperjson, first install [setuptools-rust](https://github.com/PyO3/setuptools-rust):
+If you want to hack on hyperjson, first install
+[setuptools-rust](https://github.com/PyO3/setuptools-rust):
 
 ```
 git clone git@github.com:PyO3/setuptools-rust.git
@@ -84,9 +91,12 @@ make test
 
 ## References
 
-* [ultrajson bugs containing segmentation faults and overflows](https://github.com/esnme/ultrajson/issues)
-* [Benchmark data](https://users.rust-lang.org/t/serde-and-serde-json-1-0-0-released/10466/3)
-* [Comments on benchmark data](https://www.reddit.com/r/rust/comments/6albr0/serde_compared_to_the_fastest_c_json_library/)
+* [ultrajson bugs containing segmentation faults and
+  overflows](https://github.com/esnme/ultrajson/issues)
+* [Benchmark
+  data](https://users.rust-lang.org/t/serde-and-serde-json-1-0-0-released/10466/3)
+* [Comments on benchmark
+  data](https://www.reddit.com/r/rust/comments/6albr0/serde_compared_to_the_fastest_c_json_library/)
 * [Another benchmark](https://github.com/serde-rs/json-benchmark)
 * [Some ultrajson benchmarks](https://pypi.python.org/pypi/ujson)
 
@@ -94,13 +104,14 @@ make test
 
 hyperjson is licensed under either of
 
-* Apache License, Version 2.0, (LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0)
+* Apache License, Version 2.0, (LICENSE-APACHE or
+  http://www.apache.org/licenses/LICENSE-2.0)
 * MIT license (LICENSE-MIT or http://opensource.org/licenses/MIT)
 
 at your option.
 
 ## Contribution
 
-Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in  
-hyperjson by you, as defined in the Apache-2.0 license, shall be dual licensed as above,  
-without any additional terms or conditions.
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in hyperjson by you, as defined in the Apache-2.0 license, shall
+be dual licensed as above, without any additional terms or conditions.
