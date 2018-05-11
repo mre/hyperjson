@@ -1,6 +1,6 @@
 # hyperjson
 
-A Python module to load JSON data.
+A hyper-fast, native Python module to read and write JSON data. Works as a drop-in replacement for Python's built-in [json](https://docs.python.org/3/library/json.html) module.
 It's a thin wrapper around Rust's [serde-json](https://github.com/serde-rs/json) built with [pyo3](https://github.com/PyO3/pyo3).
 
 ## Usage
@@ -30,8 +30,10 @@ There are literally a thousand libraries out there to read and write JSON.
 So, no need to reinvent the wheel, right?  
 Except, maybe there is: **performance and safety**.
 
-Actually, parsing JSON correctly is [quite hard](http://seriot.ch/parsing_json.php),
-but due to Rust, the risk of running into stack overflows or segmentation faults is lower (basically non-existent) -- especially in comparison with C implementations.
+Turns out, parsing JSON correctly is [quite
+hard](http://seriot.ch/parsing_json.php), but due to Rust, the risk of running
+into stack overflows or segmentation faults is lower (basically zero) --
+especially in comparison with C implementations.
 
 
 ## TODO (help wanted!)
@@ -41,7 +43,7 @@ but due to Rust, the risk of running into stack overflows or segmentation faults
 - [X] [`dumps()`](https://docs.python.org/3/library/json.html#json.dumps)
 - [X] [`dump()`](https://docs.python.org/3/library/json.html#json.dump)
 - [ ] Benchmark against [json](https://docs.python.org/3/library/json.html) and [ujson](https://github.com/esnme/ultrajson/)
-- [ ] Add special flags for methods
+- [ ] Respect keyword-only arguments in methods
 
 ## Contributions welcome!
 
