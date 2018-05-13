@@ -1,4 +1,4 @@
-# hyperjson
+![hyperjson](logo.png)
 
 A hyper-fast, native Python module to read and write JSON data. Works as a
 drop-in replacement for Python's built-in
