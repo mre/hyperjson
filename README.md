@@ -20,6 +20,29 @@ module](https://docs.python.org/3/library/json.html):
 [{u'key': u'value'}, 81, True
 ```
 
+## Motivation
+
+Parsing JSON is a solved problem. So, no need to reinvent the wheel, right?  
+Unless you care about **performance and safety**.
+
+Turns out, parsing JSON correctly is [hard](http://seriot.ch/parsing_json.php), but due to Rust, the risk of running
+into [stack overflows or segmentation faults](https://github.com/esnme/ultrajson/issues) is lower (basically zero, especially in comparison with C implementations).
+
+## Goals
+
+* **Compatibility**: Support the full feature-set of Python's json module
+* **Safety**: no segfaults, panics, overflows
+* **Performance**: significantly faster than json and as fast as ujson
+* **Full compatibility with Python's json module**
+
+## Non-goals
+
+* **Full compatibility with ujson and simplejson**: as such, custom extensions like
+  `toDict()`, `__json__()`, or `encode()` are not supported. The reason is, that
+  they go against PEP8 (e.g. `dunder` functions are reserved to the standard
+  library, camelCase is not pythonic) and are not available in Python's json
+  module.
+
 ## Installation
 
 To compile the code and create an importable Python module from it, call  
@@ -28,32 +51,21 @@ To compile the code and create an importable Python module from it, call
 make install
 ```
 
-## Why?
-
-Parsing JSON is a solved problem.  
-There are literally a thousand libraries out there to read and write JSON.  
-So, no need to reinvent the wheel, right?  
-Except, maybe there is: **performance and safety**.
-
-Turns out, parsing JSON correctly is [quite
-hard](http://seriot.ch/parsing_json.php), but due to Rust, the risk of running
-into [stack overflows or segmentation faults](https://github.com/esnme/ultrajson/issues) is lower (basically zero, especially in comparison with C implementations).
-
-
-## TODO (help wanted!)
-
-- [X] [`loads()`](https://docs.python.org/3/library/json.html#json.loads)
-- [X] [`load()`](https://docs.python.org/3/library/json.html#json.load)
-- [X] [`dumps()`](https://docs.python.org/3/library/json.html#json.dumps)
-- [X] [`dump()`](https://docs.python.org/3/library/json.html#json.dump)
-- [ ] Benchmark against [json](https://docs.python.org/3/library/json.html) and
-  [ujson](https://github.com/esnme/ultrajson/) (see #1)
-- [ ] Respect all keyword-only arguments in methods
+From there, you can simply use it from Python as seen in the usage example above.
 
 ## Contributions welcome!
 
-If you want to hack on hyperjson, first install
-[setuptools-rust](https://github.com/PyO3/setuptools-rust):
+If you like to hack on hyperjson, here is what needs to be done:
+
+- [X] Implement [`loads()`](https://docs.python.org/3/library/json.html#json.loads)
+- [X] Implement [`load()`](https://docs.python.org/3/library/json.html#json.load)
+- [X] Implement [`dumps()`](https://docs.python.org/3/library/json.html#json.dumps)
+- [X] Implement [`dump()`](https://docs.python.org/3/library/json.html#json.dump)
+- [ ] Benchmark against [json](https://docs.python.org/3/library/json.html) and
+  [ujson](https://github.com/esnme/ultrajson/) (see https://github.com/mre/hyperjson/issues/1)
+- [ ] Add remaining [keyword-only arguments](https://docs.python.org/3/library/json.html#basic-usage) to methods
+
+To get started, first you need to get [setuptools-rust](https://github.com/PyO3/setuptools-rust):
 
 ```
 git clone git@github.com:PyO3/setuptools-rust.git
@@ -73,21 +85,6 @@ To test your changes, run
 ```
 make test
 ```
-
-## Goals
-
-* **Compatibility**: Support the full feature-set of Python's json module
-* **Safety**: no segfaults, panics, overflows
-* **Performance**: significantly faster than json and as fast as ujson
-* **Full compatibility with Python's json module**
-
-## Non-goals
-
-* **Full compatibility with ujson and simplejson**: as such, custom extensions like
-  `toDict()`, `__json__()`, or `encode()` are not supported. The reason is, that
-  they go against PEP8 (e.g. `dunder` functions are reserved to the standard
-  library, camelCase is not pythonic) and are not available in Python's json
-  module.
 
 ## License
 
