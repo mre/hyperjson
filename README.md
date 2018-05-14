@@ -37,8 +37,7 @@ Except, maybe there is: **performance and safety**.
 
 Turns out, parsing JSON correctly is [quite
 hard](http://seriot.ch/parsing_json.php), but due to Rust, the risk of running
-into stack overflows or segmentation faults is lower (basically zero) --
-especially in comparison with C implementations.
+into [stack overflows or segmentation faults](https://github.com/esnme/ultrajson/issues) is lower (basically zero, especially in comparison with C implementations).
 
 
 ## TODO (help wanted!)
@@ -48,7 +47,7 @@ especially in comparison with C implementations.
 - [X] [`dumps()`](https://docs.python.org/3/library/json.html#json.dumps)
 - [X] [`dump()`](https://docs.python.org/3/library/json.html#json.dump)
 - [ ] Benchmark against [json](https://docs.python.org/3/library/json.html) and
-  [ujson](https://github.com/esnme/ultrajson/)
+  [ujson](https://github.com/esnme/ultrajson/) (see #1)
 - [ ] Respect all keyword-only arguments in methods
 
 ## Contributions welcome!
@@ -80,6 +79,7 @@ make test
 * **Compatibility**: Support the full feature-set of Python's json module
 * **Safety**: no segfaults, panics, overflows
 * **Performance**: significantly faster than json and as fast as ujson
+* **Full compatibility with Python's json module**
 
 ## Non-goals
 
@@ -88,17 +88,6 @@ make test
   they go against PEP8 (e.g. `dunder` functions are reserved to the standard
   library, camelCase is not pythonic) and are not available in Python's json
   module.
-
-## References
-
-* [ultrajson bugs containing segmentation faults and
-  overflows](https://github.com/esnme/ultrajson/issues)
-* [Benchmark
-  data](https://users.rust-lang.org/t/serde-and-serde-json-1-0-0-released/10466/3)
-* [Comments on benchmark
-  data](https://www.reddit.com/r/rust/comments/6albr0/serde_compared_to_the_fastest_c_json_library/)
-* [Another benchmark](https://github.com/serde-rs/json-benchmark)
-* [Some ultrajson benchmarks](https://pypi.python.org/pypi/ujson)
 
 ## License
 
