@@ -33,13 +33,12 @@ into [stack overflows or segmentation faults](https://github.com/esnme/ultrajson
 * **Compatibility**: Support the full feature-set of Python's json module
 * **Safety**: no segfaults, panics, overflows
 * **Performance**: significantly faster than json and as fast as ujson
-* **Full compatibility with Python's json module**
 
 ## Non-goals
 
-* **Full compatibility with ujson and simplejson**: as such, custom extensions like
-  `toDict()`, `__json__()`, or `encode()` are not supported. The reason is, that
-  they go against PEP8 (e.g. `dunder` functions are reserved to the standard
+* **Support ujson and simplejson extensions**:  
+  Custom extensions like `toDict()`, `__json__()`, or `encode()` are not supported.
+  The reason is, that they go against PEP8 (e.g. `dunder` functions are reserved to the standard
   library, camelCase is not pythonic) and are not available in Python's json
   module.
 
