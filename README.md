@@ -1,5 +1,7 @@
 ![hyperjson](logo.gif)
 
+[![Build Status](https://travis-ci.org/mre/hyperjson.svg?branch=master)](https://travis-ci.org/mre/hyperjson)
+
 A hyper-fast, safe Python module to read and write JSON data. Works as a
 drop-in replacement for Python's built-in
 [json](https://docs.python.org/3/library/json.html) module. It's a thin wrapper
