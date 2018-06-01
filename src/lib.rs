@@ -1,4 +1,6 @@
 #![feature(proc_macro)]
+#![feature(proc_macro_path_invoc)]
+#![feature(try_from)]
 
 extern crate serde;
 
@@ -14,6 +16,8 @@ extern crate pyo3;
 extern crate serde_json;
 
 use std::collections::BTreeMap;
+use std::convert::TryFrom;
+use std::convert::TryInto;
 
 use failure::Error;
 use pyo3::Python;
