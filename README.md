@@ -1,4 +1,4 @@
-![hyperjson](logo.png)
+![hyperjson](logo.gif)
 
 A hyper-fast, safe Python module to read and write JSON data. Works as a
 drop-in replacement for Python's built-in
