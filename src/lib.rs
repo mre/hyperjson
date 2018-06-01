@@ -20,8 +20,8 @@ use std::convert::TryFrom;
 use std::convert::TryInto;
 
 use failure::Error;
-use pyo3::Python;
 use pyo3::prelude::*;
+use pyo3::Python;
 
 struct HyperJsonValue<'a> {
     py: &'a Python<'a>,
@@ -150,18 +150,7 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
         kwargs: Option<&PyDict>,
     ) -> PyResult<PyObject> {
         let s = dumps_fn(
-            py,
-            obj,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
+            py, obj, None, None, None, None, None, None, None, None, None, None,
         )?;
         let fp_ref: &PyObjectRef = fp.as_ref(py);
         fp_ref.call_method1("write", (s,))?;
@@ -241,7 +230,8 @@ pub fn to_json(py: Python, obj: &PyObject) -> Result<serde_json::Value, HyperJso
     }
 
     // At this point we can't cast it, set up the error object
-    let repr = obj.as_ref(py)
+    let repr = obj
+        .as_ref(py)
         .repr()
         .and_then(|x| x.to_string().and_then(|y| Ok(y.into_owned())));
     Err(HyperJsonError::InvalidCast {
