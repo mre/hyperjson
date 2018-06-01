@@ -1,10 +1,11 @@
+.PHONY: build
+build: nightly
+	cargo build
+
 .PHONY: nightly
 nightly:
 	rustup override set nightly
 
-.PHONY: build
-build: nightly
-	cargo build
 
 .PHONY: install
 install: nightly
