@@ -1,6 +1,6 @@
 ![hyperjson](logo.png)
 
-A hyper-fast, native Python module to read and write JSON data. Works as a
+A hyper-fast, safe Python module to read and write JSON data. Works as a
 drop-in replacement for Python's built-in
 [json](https://docs.python.org/3/library/json.html) module. It's a thin wrapper
 around Rust's [serde-json](https://github.com/serde-rs/json) built with
@@ -9,7 +9,7 @@ on Python 2, but it's not officially supported.
 
 ## Usage
 
-hyperjson is meant to be a drop-in replacement for Python's [json
+hyperjson is meant as a drop-in replacement for Python's [json
 module](https://docs.python.org/3/library/json.html):  
 
 ```python
@@ -26,19 +26,19 @@ Parsing JSON is a solved problem. So, no need to reinvent the wheel, right?
 Unless you care about **performance and safety**.
 
 Turns out, parsing JSON correctly is [hard](http://seriot.ch/parsing_json.php), but due to Rust, the risk of running
-into [stack overflows or segmentation faults](https://github.com/esnme/ultrajson/issues) is lower (basically zero, especially in comparison with C implementations).
+into [stack overflows or segmentation faults](https://github.com/esnme/ultrajson/issues) is lower (basically zero, especially in comparison to C implementations).
 
 ## Goals
 
-* **Compatibility**: Support the full feature-set of Python's json module
-* **Safety**: no segfaults, panics, overflows
-* **Performance**: significantly faster than json and as fast as ujson
+* **Compatibility**: Support the full feature-set of Python's json module.
+* **Safety**: No segfaults, panics, or overflows.
+* **Performance**: Significantly faster than json and as fast as ujson (both written in C).
 
 ## Non-goals
 
 * **Support ujson and simplejson extensions**:  
-  Custom extensions like `toDict()`, `__json__()`, or `encode()` are not supported.
-  The reason is, that they go against PEP8 (e.g. `dunder` functions are reserved to the standard
+  Custom extensions like `encode()`, `__json__()`, or `toDict()` are not supported.
+  The reason is, that they go against PEP8 (e.g. `dunder` functions are restricted to the standard
   library, camelCase is not pythonic) and are not available in Python's json
   module.
 
@@ -63,6 +63,10 @@ If you like to hack on hyperjson, here is what needs to be done:
 - [ ] Benchmark against [json](https://docs.python.org/3/library/json.html) and
   [ujson](https://github.com/esnme/ultrajson/) (see [#1](https://github.com/mre/hyperjson/issues/1))
 - [ ] Add remaining [keyword-only arguments](https://docs.python.org/3/library/json.html#basic-usage) to methods
+- [ ] Create a proper pip package from it to make installing easier (see [#3](https://github.com/mre/hyperjson/issues/3)).
+- [ ] Add a CI/CD pipeline for easier testing (see [#2](https://github.com/mre/hyperjson/issues/2))
+
+## Developer guide
 
 To get started, first you need to get [setuptools-rust](https://github.com/PyO3/setuptools-rust):
 
