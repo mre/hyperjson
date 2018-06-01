@@ -10,10 +10,10 @@ main() {
         return
     fi
 
-    pip3 show setuptools-rust 2>&1 1>/dev/null || \
-        pip3 install setuptools-rust
-    pip3 install -r requirements-test.txt
-    python3 setup.py test
+    pip show setuptools-rust 2>&1 1>/dev/null || \
+        pip install setuptools-rust
+    pip install -r requirements-test.txt
+    python setup.py test
 }
 
 main

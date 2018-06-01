@@ -3,9 +3,9 @@
 set -ex
 
 main() {
-    # pip3 install -r requirements.txt
-    pip3 install .
-    pip3 freeze
+    # pip install -r requirements.txt
+    pip install .
+    pip freeze
 }
 
 main
