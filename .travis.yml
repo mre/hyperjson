@@ -1,0 +1,22 @@
+language: python
+sudo: false
+
+addons:
+  apt:
+    packages:
+      - rpm
+
+python:
+  #- 2.7
+  #- 3.4
+  - 3.5
+  - 3.6
+
+install:
+    - bash ci/install.sh
+
+script:
+    - bash ci/script.sh
+
+before_deploy:
+    - bash ci/before_deploy.sh
