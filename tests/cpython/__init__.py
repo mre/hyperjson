@@ -33,7 +33,7 @@ class RustTest(unittest.TestCase):
         json = hyperjson
         loads = staticmethod(hyperjson.loads)
         dumps = staticmethod(hyperjson.dumps)
-        # FIXME: WTF
+        # FIXME: hyperjson does not have this
         JSONDecodeError = staticmethod(pyjson.JSONDecodeError)
         # JSONDecodeError = staticmethod(hyperjson.JSONDecodeError)
 
@@ -57,7 +57,7 @@ class TestCTest(CTest):
 
 class TestRustTest(RustTest):
     def test_hyperjson(self):
-        # FIXME:
+        # FIXME: hyperjson does not have any of this
         pass
         # self.assertEqual(self.json.scanner.make_scanner.__module__, 'hyperjson')
         # self.assertEqual(self.json.decoder.scanstring.__module__, 'hyperjson')
