@@ -17,7 +17,7 @@ CASES = [
     ('\u0123\u4567\u89ab\ucdef\uabcd\uef4a', '"\\u0123\\u4567\\u89ab\\ucdef\\uabcd\\uef4a"'),
 ]
 
-class TestEncodeBasestringAscii:
+class _TestEncodeBasestringAscii:
     def test_encode_basestring_ascii(self):
         fname = self.json.encoder.encode_basestring_ascii.__name__
         for input_string, expect in CASES:
@@ -38,8 +38,8 @@ class TestEncodeBasestringAscii:
         self.assertEqual(s, '{"five": 5, "four": 4, "one": 1, "three": 3, "two": 2}')
 
 
-class TestPyEncodeBasestringAscii(TestEncodeBasestringAscii, PyTest): pass
-class TestCEncodeBasestringAscii(TestEncodeBasestringAscii, CTest):
+class TestPyEncodeBasestringAscii(_TestEncodeBasestringAscii, PyTest): pass
+class TestCEncodeBasestringAscii(_TestEncodeBasestringAscii, CTest):
     @bigaddrspacetest
     def test_overflow(self):
         size = (2**32)//6 + 1

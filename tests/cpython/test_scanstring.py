@@ -2,7 +2,7 @@ import sys
 from test.test_json import PyTest, CTest
 
 
-class TestScanstring:
+class _TestScanstring:
     def test_scanstring(self):
         scanstring = self.json.decoder.scanstring
         self.assertEqual(
@@ -137,5 +137,5 @@ class TestScanstring:
             self.json.decoder.scanstring(b"xxx", sys.maxsize+1)
 
 
-class TestPyScanstring(TestScanstring, PyTest): pass
-class TestCScanstring(TestScanstring, CTest): pass
+class TestPyScanstring(_TestScanstring, PyTest): pass
+class TestCScanstring(_TestScanstring, CTest): pass

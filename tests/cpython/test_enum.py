@@ -31,7 +31,7 @@ class WierdNum(float, Enum):
     neg_inf = NEG_INF
     nan = NAN
 
-class TestEnum:
+class _TestEnum:
 
     def test_floats(self):
         for enum in FloatNum:
@@ -116,5 +116,5 @@ class TestEnum:
         self.assertEqual(nd['j'], NEG_INF)
         self.assertTrue(isnan(nd['n']))
 
-class TestPyEnum(TestEnum, PyTest): pass
-class TestCEnum(TestEnum, CTest): pass
+class TestPyEnum(_TestEnum, PyTest): pass
+class TestCEnum(_TestEnum, CTest): pass

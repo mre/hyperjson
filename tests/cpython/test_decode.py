@@ -4,7 +4,7 @@ from collections import OrderedDict
 from test.test_json import PyTest, CTest
 
 
-class TestDecode:
+class _TestDecode:
     def test_decimal(self):
         rval = self.loads('1.1', parse_float=decimal.Decimal)
         self.assertTrue(isinstance(rval, decimal.Decimal))
@@ -93,5 +93,5 @@ class TestDecode:
         d = self.json.JSONDecoder()
         self.assertRaises(ValueError, d.raw_decode, 'a'*42, -50000)
 
-class TestPyDecode(TestDecode, PyTest): pass
-class TestCDecode(TestDecode, CTest): pass
+class TestPyDecode(_TestDecode, PyTest): pass
+class TestCDecode(_TestDecode, CTest): pass

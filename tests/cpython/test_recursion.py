@@ -5,7 +5,7 @@ class JSONTestObject:
     pass
 
 
-class TestRecursion:
+class _TestRecursion:
     def test_listrecursion(self):
         x = []
         x.append(x)
@@ -96,5 +96,5 @@ class TestRecursion:
             EndlessJSONEncoder(check_circular=False).encode(5j)
 
 
-class TestPyRecursion(TestRecursion, PyTest): pass
-class TestCRecursion(TestRecursion, CTest): pass
+class TestPyRecursion(_TestRecursion, PyTest): pass
+class TestCRecursion(_TestRecursion, CTest): pass

@@ -2,7 +2,7 @@ import math
 from test.test_json import PyTest, CTest
 
 
-class TestFloat:
+class _TestFloat:
     def test_floats(self):
         for num in [1617161771.7650001, math.pi, math.pi**100, math.pi**-100, 3.1]:
             self.assertEqual(float(self.dumps(num)), num)
@@ -29,5 +29,5 @@ class TestFloat:
             self.assertRaises(ValueError, self.dumps, [val], allow_nan=False)
 
 
-class TestPyFloat(TestFloat, PyTest): pass
-class TestCFloat(TestFloat, CTest): pass
+class TestPyFloat(_TestFloat, PyTest): pass
+class TestCFloat(_TestFloat, CTest): pass

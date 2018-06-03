@@ -3,7 +3,7 @@ from io import StringIO
 from test.test_json import PyTest, CTest
 
 
-class TestIndent:
+class _TestIndent:
     def test_indent(self):
         h = [['blorpie'], ['whoops'], [], 'd-shtaeou', 'd-nthiouh', 'i-vhbjkhnth',
              {'nifty': 87}, {'field': 'yes', 'morefield': False} ]
@@ -63,5 +63,5 @@ class TestIndent:
         check(None, '{"3": 1}')
 
 
-class TestPyIndent(TestIndent, PyTest): pass
-class TestCIndent(TestIndent, CTest): pass
+class TestPyIndent(_TestIndent, PyTest): pass
+class TestCIndent(_TestIndent, CTest): pass

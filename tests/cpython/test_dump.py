@@ -3,7 +3,7 @@ from test.test_json import PyTest, CTest
 
 from test.support import bigmemtest, _1G
 
-class TestDump:
+class _TestDump:
     def test_dump(self):
         sio = StringIO()
         self.json.dump({}, sio)
@@ -48,9 +48,9 @@ class TestDump:
         self.assertEqual(self.dumps(d, sort_keys=True), '{"1337": "true.dat"}')
 
 
-class TestPyDump(TestDump, PyTest): pass
+class TestPyDump(_TestDump, PyTest): pass
 
-class TestCDump(TestDump, CTest):
+class TestCDump(_TestDump, CTest):
 
     # The size requirement here is hopefully over-estimated (actual
     # memory consumption depending on implementation details, and also
