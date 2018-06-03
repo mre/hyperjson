@@ -1,6 +1,6 @@
 from enum import Enum, IntEnum
 from math import isnan
-from test.test_json import PyTest, CTest
+from cpython import PyTest, CTest, RustTest
 
 SMALL = 1
 BIG = 1<<32
@@ -118,3 +118,4 @@ class _TestEnum:
 
 class TestPyEnum(_TestEnum, PyTest): pass
 class TestCEnum(_TestEnum, CTest): pass
+class TestRustEnum(_TestEnum, RustTest): pass

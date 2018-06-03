@@ -1,6 +1,6 @@
 import codecs
 from collections import OrderedDict
-from test.test_json import PyTest, CTest
+from cpython import PyTest, CTest, RustTest
 
 
 class _TestUnicode:
@@ -96,3 +96,4 @@ class _TestUnicode:
 
 class TestPyUnicode(_TestUnicode, PyTest): pass
 class TestCUnicode(_TestUnicode, CTest): pass
+class TestRustUnicode(_TestUnicode, RustTest): pass

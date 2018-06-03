@@ -1,4 +1,4 @@
-from test.test_json import CTest
+from cpython import CTest
 
 
 class BadBool:

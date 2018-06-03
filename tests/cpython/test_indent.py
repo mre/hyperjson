@@ -1,6 +1,6 @@
 import textwrap
 from io import StringIO
-from test.test_json import PyTest, CTest
+from cpython import PyTest, CTest, RustTest
 
 
 class _TestIndent:
@@ -65,3 +65,4 @@ class _TestIndent:
 
 class TestPyIndent(_TestIndent, PyTest): pass
 class TestCIndent(_TestIndent, CTest): pass
+class TestRustIndent(_TestIndent, RustTest): pass

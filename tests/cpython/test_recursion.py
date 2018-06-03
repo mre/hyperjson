@@ -1,4 +1,4 @@
-from test.test_json import PyTest, CTest
+from cpython import PyTest, CTest, RustTest
 
 
 class JSONTestObject:
@@ -98,3 +98,4 @@ class _TestRecursion:
 
 class TestPyRecursion(_TestRecursion, PyTest): pass
 class TestCRecursion(_TestRecursion, CTest): pass
+class TestRustRecursion(_TestRecursion, RustTest): pass

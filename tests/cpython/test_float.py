@@ -1,5 +1,5 @@
 import math
-from test.test_json import PyTest, CTest
+from cpython import PyTest, CTest, RustTest
 
 
 class _TestFloat:
@@ -31,3 +31,4 @@ class _TestFloat:
 
 class TestPyFloat(_TestFloat, PyTest): pass
 class TestCFloat(_TestFloat, CTest): pass
+class TestRustFloat(_TestFloat, RustTest): pass

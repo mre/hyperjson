@@ -1,5 +1,5 @@
 import sys
-from test.test_json import PyTest, CTest
+from cpython import PyTest, CTest, RustTest
 
 
 class _TestScanstring:
@@ -139,3 +139,4 @@ class _TestScanstring:
 
 class TestPyScanstring(_TestScanstring, PyTest): pass
 class TestCScanstring(_TestScanstring, CTest): pass
+class TestRustScanstring(_TestScanstring, RustTest): pass

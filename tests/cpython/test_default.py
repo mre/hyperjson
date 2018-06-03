@@ -1,4 +1,4 @@
-from test.test_json import PyTest, CTest
+from cpython import PyTest, CTest, RustTest
 
 
 class _TestDefault:
@@ -10,3 +10,4 @@ class _TestDefault:
 
 class TestPyDefault(_TestDefault, PyTest): pass
 class TestCDefault(_TestDefault, CTest): pass
+class TestRustDefault(_TestDefault, RustTest): pass

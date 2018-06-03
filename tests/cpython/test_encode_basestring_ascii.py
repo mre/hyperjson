@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from test.test_json import PyTest, CTest
+from cpython import PyTest, CTest, RustTest
 from test.support import bigaddrspacetest
 
 
@@ -46,3 +46,5 @@ class TestCEncodeBasestringAscii(_TestEncodeBasestringAscii, CTest):
         s = "\x00"*size
         with self.assertRaises(OverflowError):
             self.json.encoder.encode_basestring_ascii(s)
+
+class TestRustEncodeBasestringAscii(_TestEncodeBasestringAscii, RustTest): pass

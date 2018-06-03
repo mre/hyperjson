@@ -1,5 +1,5 @@
 import textwrap
-from test.test_json import PyTest, CTest
+from cpython import PyTest, CTest, RustTest
 
 
 class _TestSeparators:
@@ -48,3 +48,4 @@ class _TestSeparators:
 
 class TestPySeparators(_TestSeparators, PyTest): pass
 class TestCSeparators(_TestSeparators, CTest): pass
+class TestRustSeparators(_TestSeparators, RustTest): pass

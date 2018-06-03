@@ -1,4 +1,4 @@
-from test.test_json import PyTest, CTest
+from cpython import PyTest, CTest, RustTest
 
 
 # from http://json.org/JSON_checker/test/pass3.json
@@ -22,3 +22,4 @@ class _TestPass3:
 
 class TestPyPass3(_TestPass3, PyTest): pass
 class TestCPass3(_TestPass3, CTest): pass
+class TestRustPass3(_TestPass3, RustTest): pass

@@ -1,4 +1,4 @@
-from test.test_json import PyTest, CTest
+from cpython import PyTest, CTest, RustTest
 
 # 2007-10-05
 JSONDOCS = [
@@ -214,3 +214,4 @@ class _TestFail:
 
 class TestPyFail(_TestFail, PyTest): pass
 class TestCFail(_TestFail, CTest): pass
+class TestRustFail(_TestFail, RustTest): pass

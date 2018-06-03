@@ -1,5 +1,5 @@
 from io import StringIO
-from test.test_json import PyTest, CTest
+from cpython import PyTest, CTest, RustTest
 
 from test.support import bigmemtest, _1G
 
@@ -66,3 +66,5 @@ class TestCDump(_TestDump, CTest):
         self.assertEqual(encoded[:1], "[")
         self.assertEqual(encoded[-2:], "1]")
         self.assertEqual(encoded[1:-2], "1, " * (N - 1))
+
+class TestRustDump(_TestDump, RustTest): pass
