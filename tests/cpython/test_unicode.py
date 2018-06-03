@@ -94,6 +94,6 @@ class _TestUnicode:
                          OrderedDict(p))
 
 
-class TestPyUnicode(_TestUnicode, PyTest): pass
-class TestCUnicode(_TestUnicode, CTest): pass
+# class TestPyUnicode(_TestUnicode, PyTest): pass
+# class TestCUnicode(_TestUnicode, CTest): pass
 class TestRustUnicode(_TestUnicode, RustTest): pass

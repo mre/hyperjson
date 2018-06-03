@@ -20,6 +20,6 @@ class _TestPass3:
         self.assertEqual(res, self.loads(out))
 
 
-class TestPyPass3(_TestPass3, PyTest): pass
-class TestCPass3(_TestPass3, CTest): pass
+# class TestPyPass3(_TestPass3, PyTest): pass
+# class TestCPass3(_TestPass3, CTest): pass
 class TestRustPass3(_TestPass3, RustTest): pass

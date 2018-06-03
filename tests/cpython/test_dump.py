@@ -48,23 +48,23 @@ class _TestDump:
         self.assertEqual(self.dumps(d, sort_keys=True), '{"1337": "true.dat"}')
 
 
-class TestPyDump(_TestDump, PyTest): pass
+# class TestPyDump(_TestDump, PyTest): pass
 
-class TestCDump(_TestDump, CTest):
+# class TestCDump(_TestDump, CTest):
 
-    # The size requirement here is hopefully over-estimated (actual
-    # memory consumption depending on implementation details, and also
-    # system memory management, since this may allocate a lot of
-    # small objects).
+#     # The size requirement here is hopefully over-estimated (actual
+#     # memory consumption depending on implementation details, and also
+#     # system memory management, since this may allocate a lot of
+#     # small objects).
 
-    @bigmemtest(size=_1G, memuse=1)
-    def test_large_list(self, size):
-        N = int(30 * 1024 * 1024 * (size / _1G))
-        l = [1] * N
-        encoded = self.dumps(l)
-        self.assertEqual(len(encoded), N * 3)
-        self.assertEqual(encoded[:1], "[")
-        self.assertEqual(encoded[-2:], "1]")
-        self.assertEqual(encoded[1:-2], "1, " * (N - 1))
+#     @bigmemtest(size=_1G, memuse=1)
+#     def test_large_list(self, size):
+#         N = int(30 * 1024 * 1024 * (size / _1G))
+#         l = [1] * N
+#         encoded = self.dumps(l)
+#         self.assertEqual(len(encoded), N * 3)
+#         self.assertEqual(encoded[:1], "[")
+#         self.assertEqual(encoded[-2:], "1]")
+#         self.assertEqual(encoded[1:-2], "1, " * (N - 1))
 
 class TestRustDump(_TestDump, RustTest): pass

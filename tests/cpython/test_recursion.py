@@ -96,6 +96,6 @@ class _TestRecursion:
             EndlessJSONEncoder(check_circular=False).encode(5j)
 
 
-class TestPyRecursion(_TestRecursion, PyTest): pass
-class TestCRecursion(_TestRecursion, CTest): pass
+# class TestPyRecursion(_TestRecursion, PyTest): pass
+# class TestCRecursion(_TestRecursion, CTest): pass
 class TestRustRecursion(_TestRecursion, RustTest): pass

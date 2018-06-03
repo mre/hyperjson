@@ -137,6 +137,6 @@ class _TestScanstring:
             self.json.decoder.scanstring(b"xxx", sys.maxsize+1)
 
 
-class TestPyScanstring(_TestScanstring, PyTest): pass
-class TestCScanstring(_TestScanstring, CTest): pass
+# class TestPyScanstring(_TestScanstring, PyTest): pass
+# class TestCScanstring(_TestScanstring, CTest): pass
 class TestRustScanstring(_TestScanstring, RustTest): pass

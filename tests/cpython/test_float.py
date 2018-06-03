@@ -29,6 +29,6 @@ class _TestFloat:
             self.assertRaises(ValueError, self.dumps, [val], allow_nan=False)
 
 
-class TestPyFloat(_TestFloat, PyTest): pass
-class TestCFloat(_TestFloat, CTest): pass
+# class TestPyFloat(_TestFloat, PyTest): pass
+# class TestCFloat(_TestFloat, CTest): pass
 class TestRustFloat(_TestFloat, RustTest): pass

@@ -93,6 +93,6 @@ class _TestDecode:
         d = self.json.JSONDecoder()
         self.assertRaises(ValueError, d.raw_decode, 'a'*42, -50000)
 
-class TestPyDecode(_TestDecode, PyTest): pass
-class TestCDecode(_TestDecode, CTest): pass
+# class TestPyDecode(_TestDecode, PyTest): pass
+# class TestCDecode(_TestDecode, CTest): pass
 class TestRustDecode(_TestDecode, RustTest): pass

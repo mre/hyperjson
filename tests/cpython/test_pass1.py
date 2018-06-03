@@ -71,6 +71,6 @@ class _TestPass1:
         self.assertEqual(res, self.loads(out))
 
 
-class TestPyPass1(_TestPass1, PyTest): pass
-class TestCPass1(_TestPass1, CTest): pass
+# class TestPyPass1(_TestPass1, PyTest): pass
+# class TestCPass1(_TestPass1, CTest): pass
 class TestRustPass1(_TestPass1, RustTest): pass

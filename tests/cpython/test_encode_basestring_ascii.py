@@ -38,13 +38,13 @@ class _TestEncodeBasestringAscii:
         self.assertEqual(s, '{"five": 5, "four": 4, "one": 1, "three": 3, "two": 2}')
 
 
-class TestPyEncodeBasestringAscii(_TestEncodeBasestringAscii, PyTest): pass
-class TestCEncodeBasestringAscii(_TestEncodeBasestringAscii, CTest):
-    @bigaddrspacetest
-    def test_overflow(self):
-        size = (2**32)//6 + 1
-        s = "\x00"*size
-        with self.assertRaises(OverflowError):
-            self.json.encoder.encode_basestring_ascii(s)
+# class TestPyEncodeBasestringAscii(_TestEncodeBasestringAscii, PyTest): pass
+# class TestCEncodeBasestringAscii(_TestEncodeBasestringAscii, CTest):
+#     @bigaddrspacetest
+#     def test_overflow(self):
+#         size = (2**32)//6 + 1
+#         s = "\x00"*size
+#         with self.assertRaises(OverflowError):
+#             self.json.encoder.encode_basestring_ascii(s)
 
 class TestRustEncodeBasestringAscii(_TestEncodeBasestringAscii, RustTest): pass

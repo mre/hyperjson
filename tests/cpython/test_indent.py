@@ -63,6 +63,6 @@ class _TestIndent:
         check(None, '{"3": 1}')
 
 
-class TestPyIndent(_TestIndent, PyTest): pass
-class TestCIndent(_TestIndent, CTest): pass
+# class TestPyIndent(_TestIndent, PyTest): pass
+# class TestCIndent(_TestIndent, CTest): pass
 class TestRustIndent(_TestIndent, RustTest): pass

@@ -8,6 +8,6 @@ class _TestDefault:
             self.dumps(repr(type)))
 
 
-class TestPyDefault(_TestDefault, PyTest): pass
-class TestCDefault(_TestDefault, CTest): pass
+# class TestPyDefault(_TestDefault, PyTest): pass
+# class TestCDefault(_TestDefault, CTest): pass
 class TestRustDefault(_TestDefault, RustTest): pass

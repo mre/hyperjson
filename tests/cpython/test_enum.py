@@ -116,6 +116,6 @@ class _TestEnum:
         self.assertEqual(nd['j'], NEG_INF)
         self.assertTrue(isnan(nd['n']))
 
-class TestPyEnum(_TestEnum, PyTest): pass
-class TestCEnum(_TestEnum, CTest): pass
+# class TestPyEnum(_TestEnum, PyTest): pass
+# class TestCEnum(_TestEnum, CTest): pass
 class TestRustEnum(_TestEnum, RustTest): pass

@@ -212,6 +212,6 @@ class _TestFail:
                              'Expecting value: line %s column %d (char %d)' %
                              (line, col, idx))
 
-class TestPyFail(_TestFail, PyTest): pass
-class TestCFail(_TestFail, CTest): pass
+# class TestPyFail(_TestFail, PyTest): pass
+# class TestCFail(_TestFail, CTest): pass
 class TestRustFail(_TestFail, RustTest): pass
