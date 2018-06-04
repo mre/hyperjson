@@ -2,7 +2,7 @@ import sys
 from setuptools import setup
 
 try:
-    from setuptools_rust import RustExtension
+    from setuptools_rust import Binding, RustExtension
 except ImportError:
     import subprocess
     errno = subprocess.call(
@@ -11,9 +11,9 @@ except ImportError:
         print("Please install setuptools-rust package")
         raise SystemExit(errno)
     else:
-        from setuptools_rust import RustExtension
+        from setuptools_rust import Binding, RustExtension
 
-setup_requires = ['setuptools-rust>=0.6.0']
+setup_requires = ['setuptools-rust>=0.9.2']
 install_requires = []
 
 setup(name='hyperjson',
@@ -27,8 +27,7 @@ setup(name='hyperjson',
           'Operating System :: POSIX',
           'Operating System :: MacOS :: MacOS X',
       ],
-      packages=['hyperjson'],
-      include_package_data=True,
       rust_extensions=[
-          RustExtension('hyperjson._hyperjson', 'Cargo.toml')],
+          RustExtension('hyperjson._hyperjson', 'Cargo.toml', binding=Binding.PyO3)],
+      packages=['hyperjson'],
       zip_safe=False)
