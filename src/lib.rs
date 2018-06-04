@@ -12,6 +12,7 @@ extern crate serde_derive;
 #[macro_use]
 extern crate version;
 
+#[macro_use]
 extern crate pyo3;
 extern crate serde_json;
 
@@ -79,9 +80,32 @@ impl From<pyo3::PyErr> for HyperJsonError {
 /// A hyper-fast JSON encoder/decoder written in Rust
 #[py::modinit(_hyperjson)]
 fn init(py: Python, m: &PyModule) -> PyResult<()> {
+    py_exception!(_hyperjson, JSONDecodeError);
+
     #[pyfn(m, "load")]
     fn load_fn(py: Python, fp: PyObject, kwargs: Option<&PyDict>) -> PyResult<PyObject> {
-        load(py, fp, kwargs)
+        // Temporary workaround for
+        // https://github.com/PyO3/pyo3/issues/145
+        let io: &PyObjectRef = fp.as_ref(py);
+
+        // Alternative workaround
+        // fp.getattr(py, "seek")?;
+        // fp.getattr(py, "read")?;
+
+        // Reset file pointer to beginning See
+        // https://github.com/PyO3/pyo3/issues/143 Note that we ignrore the return
+        // value, because `seek` does not strictly need to exist on the object
+        let _success = io.call_method("seek", (0,), pyo3::NoArgs);
+
+        let s_obj = io.call_method0("read")?;
+        let result: Result<String, _> = s_obj.extract();
+        match result {
+            Ok(s) => loads_fn(py, &s, None, None, None, None, None, kwargs),
+            _ => Err(exc::TypeError::new(format!(
+                "string or none type is required as host, got: {:?}",
+                result
+            ))),
+        }
     }
 
     #[pyfn(m, "version")]
@@ -89,6 +113,10 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
         Ok(version!().to_string().to_object(py))
     }
 
+    // This function is a poor man's implementation of
+    // impl From<&str> for PyResult<PyObject>, which is not possible,
+    // because we have none of these types under our control.
+    // Note: Encoding param is deprecated and ignored.
     #[pyfn(m, "loads")]
     fn loads_fn(
         py: Python,
@@ -100,16 +128,48 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
         parse_int: Option<PyObject>,
         kwargs: Option<&PyDict>,
     ) -> PyResult<PyObject> {
-        loads(
-            py,
-            s,
-            encoding,
-            cls,
-            object_hook,
-            parse_float,
-            parse_int,
-            kwargs,
-        )
+        // if let Some(kwargs) = kwargs {
+        //     for (key, val) in kwargs.iter() {
+        //         println!("{} = {}", key, val);
+        //     }
+        // }
+
+        // if args.len() == 0 {
+        //     // TODO: This is the wrong error message.
+        //     return Err(exc::LookupError::new("oh no"));
+        // }
+        // if args.len() >= 2 {
+        //     // return Err(exc::TypeError::new(format!(
+        //     //     "Unknown encoding: {}",
+        //     //     args.get_item(1).to_string()
+        //     // )));
+        //     return Err(exc::LookupError::new(
+        //         "loads() takes exactly 1 argument (2 given)",
+        //     ));
+        // }
+        // let s = args.get_item(0).to_string();
+
+        let v = serde_json::from_str(s);
+        match v {
+            Ok(serde_val) => {
+                HyperJsonValue::new(&py, &serde_val, &parse_float, &parse_int).try_into()
+            }
+            Err(e) => convert_special_floats(py, s, parse_int).or(if e.is_syntax() {
+                Err(JSONDecodeError::new(format!(
+                    "Value: {:?}, Error: {}",
+                    s, e
+                )))
+            // Err(exc::ValueError::new(format!(
+            //     "Value: {:?}, Error: {}",
+            //     s, e
+            // )))
+            } else {
+                Err(exc::ValueError::new(format!(
+                    "Value: {:?}, Error: {}",
+                    s, e
+                )))
+            }),
+        }
     }
 
     #[pyfn(m, "dumps")] // ensure_ascii, check_circular, allow_nan, cls, indent, separators, default, sort_keys, kwargs = "**")]
@@ -221,7 +281,6 @@ pub fn to_json(py: Python, obj: &PyObject) -> Result<serde_json::Value, HyperJso
             }),
         }
     });
-
     extract!(u64);
     extract!(i64);
 
@@ -238,75 +297,6 @@ pub fn to_json(py: Python, obj: &PyObject) -> Result<serde_json::Value, HyperJso
         t: obj.as_ref(py).get_type().name().into_owned(),
         e: repr?,
     })
-}
-
-fn load(py: Python, fp: PyObject, kwargs: Option<&PyDict>) -> PyResult<PyObject> {
-    // Temporary workaround for
-    // https://github.com/PyO3/pyo3/issues/145
-    let io: &PyObjectRef = fp.as_ref(py);
-
-    // Alternative workaround
-    // fp.getattr(py, "seek")?;
-    // fp.getattr(py, "read")?;
-
-    // Reset file pointer to beginning
-    // See https://github.com/PyO3/pyo3/issues/143
-    io.call_method("seek", (0,), pyo3::NoArgs)?;
-
-    let s_obj = io.call_method0("read")?;
-    let result: Result<String, _> = s_obj.extract();
-    match result {
-        Ok(s) => loads(py, &s, None, None, None, None, None, kwargs),
-        _ => Err(exc::TypeError::new(format!(
-            "string or none type is required as host, got: {:?}",
-            result
-        ))),
-    }
-}
-
-// This function is a poor man's implementation of
-// impl From<&str> for PyResult<PyObject>, which is not possible,
-// because we have none of these types under our control.
-// Note: Encoding param is deprecated and ignored.
-fn loads(
-    py: Python,
-    s: &str,
-    _encoding: Option<PyObject>,
-    _cls: Option<PyObject>,
-    _object_hook: Option<PyObject>,
-    parse_float: Option<PyObject>,
-    parse_int: Option<PyObject>,
-    _kwargs: Option<&PyDict>,
-) -> PyResult<PyObject> {
-    // if let Some(kwargs) = kwargs {
-    //     for (key, val) in kwargs.iter() {
-    //         println!("{} = {}", key, val);
-    //     }
-    // }
-
-    // if args.len() == 0 {
-    //     // TODO: This is the wrong error message.
-    //     return Err(exc::LookupError::new("oh no"));
-    // }
-    // if args.len() >= 2 {
-    //     // return Err(exc::TypeError::new(format!(
-    //     //     "Unknown encoding: {}",
-    //     //     args.get_item(1).to_string()
-    //     // )));
-    //     return Err(exc::LookupError::new(
-    //         "loads() takes exactly 1 argument (2 given)",
-    //     ));
-    // }
-    // let s = args.get_item(0).to_string();
-
-    let v = serde_json::from_str(s);
-    match v {
-        Ok(serde_val) => HyperJsonValue::new(&py, &serde_val, &parse_float, &parse_int).try_into(),
-        Err(e) => convert_special_floats(py, s, parse_int).or(Err(exc::ValueError::new(format!(
-            "Value: {:?}, Error: {}",
-            s, e
-        )))),
-    }
 }
 
 fn convert_special_floats(py: Python, s: &str, parse_int: Option<PyObject>) -> PyResult<PyObject> {
