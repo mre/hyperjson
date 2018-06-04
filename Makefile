@@ -9,7 +9,6 @@ nightly:
 
 .PHONY: install
 install: nightly
-	python setup.py install
 	python3 setup.py install
 
 .PHONY: test
