@@ -12,6 +12,9 @@ import time
 import sys
 import string
 
+# Workaround for https://github.com/PyO3/pyo3/issues/171
+from json import JSONDecodeError
+
 if six.PY2:
     import unittest2 as unittest
 else:
@@ -800,7 +803,7 @@ class UltraJSONTests(unittest.TestCase):
     def test_decodeWithTrailingNonWhitespaces(self):
         print(dir(hyperjson))
         input = "{}\n\t a"
-        self.assertRaises(hyperjson.JSONDecodeError, hyperjson.loads, input)
+        self.assertRaises(JSONDecodeError, hyperjson.loads, input)
 
     @unittest.skip("module 'json': ValueError not raised by dumps")
     def test_decodeArrayWithBigInt(self):

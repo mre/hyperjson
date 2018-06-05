@@ -77,10 +77,15 @@ impl From<pyo3::PyErr> for HyperJsonError {
     }
 }
 
+import_exception!(json, JSONDecodeError);
+
 /// A hyper-fast JSON encoder/decoder written in Rust
 #[py::modinit(_hyperjson)]
 fn init(py: Python, m: &PyModule) -> PyResult<()> {
-    py_exception!(_hyperjson, JSONDecodeError);
+    // See https://github.com/PyO3/pyo3/issues/171
+    // Use JSONDecodeError from stdlib until issue is resolved.
+    // py_exception!(_hyperjson, JSONDecodeError);
+    // m.add("JSONDecodeError", py.get_type::<JSONDecodeError>());
 
     #[pyfn(m, "load")]
     fn load_fn(py: Python, fp: PyObject, kwargs: Option<&PyDict>) -> PyResult<PyObject> {
@@ -152,9 +157,10 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
                 HyperJsonValue::new(&py, &serde_val, &parse_float, &parse_int).try_into()
             }
             Err(e) => convert_special_floats(py, s, parse_int).or(if e.is_syntax() {
-                Err(JSONDecodeError::new(format!(
-                    "Value: {:?}, Error: {}",
-                    s, e
+                Err(JSONDecodeError::new((
+                    format!("Value: {:?}, Error: {}", s, e),
+                    s.to_object(py),
+                    0,
                 )))
             // Err(exc::ValueError::new(format!(
             //     "Value: {:?}, Error: {}",
