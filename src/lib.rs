@@ -108,10 +108,7 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
         }
     }
 
-    #[pyfn(m, "version")]
-    fn version_fn(py: Python) -> PyResult<PyObject> {
-        Ok(version!().to_string().to_object(py))
-    }
+    m.add("__version__", version!());
 
     // This function is a poor man's implementation of
     // impl From<&str> for PyResult<PyObject>, which is not possible,
