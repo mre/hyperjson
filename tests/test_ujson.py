@@ -236,20 +236,19 @@ class UltraJSONTests(unittest.TestCase):
     def testEncodeSymbols(self):
         s = '\u273f\u2661\u273f'  # ✿♡✿
         encoded = hyperjson.dumps(s)
-        encoded_json = hyperjson.dumps(s)
+        encoded_json = json.dumps(s)
         self.assertEqual(len(encoded), len(s) * 6 + 2)  # 6 characters + quotes
         self.assertEqual(encoded, encoded_json)
         decoded = hyperjson.loads(encoded)
         self.assertEqual(s, decoded)
 
-        # hyperjson outputs an UTF-8 encoded str object
         if six.PY3:
             encoded = hyperjson.dumps(s, ensure_ascii=False)
         else:
             encoded = hyperjson.dumps(s, ensure_ascii=False).decode("utf-8")
 
         # json outputs an unicode object
-        encoded_json = hyperjson.dumps(s, ensure_ascii=False)
+        encoded_json = json.dumps(s, ensure_ascii=False)
         self.assertEqual(len(encoded), len(s) + 2)  # original length + quotes
         self.assertEqual(encoded, encoded_json)
         decoded = hyperjson.loads(encoded)
@@ -519,7 +518,6 @@ class UltraJSONTests(unittest.TestCase):
     def test_encodeLongUnsignedConversion(self):
         input = 18446744073709551615
         output = hyperjson.dumps(input)
-        print(output)
 
         self.assertEqual(input, hyperjson.loads(output))
         self.assertEqual(output, hyperjson.dumps(input))

@@ -338,11 +338,14 @@ impl<'a> TryFrom<HyperJsonValue<'a>> for PyObject {
     fn try_from(v: HyperJsonValue) -> Result<PyObject, PyErr> {
         match v.inner {
             serde_json::Value::Number(ref x) => {
-                // Unwrap should be safe here, since we checked for the correct
-                // type before
-                if x.is_i64() {
+                if x.is_u64() {
+                    // TODO: Do we need to use the use parse_int here as below?
+                    Ok(x.as_u64().unwrap().to_object(*v.py))
+                } else if x.is_i64() {
                     match v.parse_int {
                         Some(parser) => {
+                            // Unwrap should be safe here, since we checked for the correct
+                            // type before
                             let i = x.as_i64().unwrap();
                             Ok(parser.call1(*v.py, (i,))?)
                         }
@@ -351,6 +354,8 @@ impl<'a> TryFrom<HyperJsonValue<'a>> for PyObject {
                 } else {
                     match v.parse_float {
                         Some(parser) => {
+                            // Unwrap should be safe here, since we checked for the correct
+                            // type before
                             let f = x.as_f64().unwrap();
                             Ok(parser.call1(*v.py, (f,))?)
                         }
