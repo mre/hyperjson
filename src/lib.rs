@@ -340,7 +340,15 @@ impl<'a> TryFrom<HyperJsonValue<'a>> for PyObject {
             serde_json::Value::Number(ref x) => {
                 if x.is_u64() {
                     // TODO: Do we need to use the use parse_int here as below?
-                    Ok(x.as_u64().unwrap().to_object(*v.py))
+                    match v.parse_int {
+                        Some(parser) => {
+                            // Unwrap should be safe here, since we checked for the correct
+                            // type before
+                            let i = x.as_u64().unwrap();
+                            Ok(parser.call1(*v.py, (i,))?)
+                        }
+                        None => Ok(x.as_u64().unwrap().to_object(*v.py)),
+                    }
                 } else if x.is_i64() {
                     match v.parse_int {
                         Some(parser) => {
