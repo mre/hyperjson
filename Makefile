@@ -8,6 +8,9 @@ build: nightly
 nightly:
 	rustup override set nightly
 
+.PHONY: install2
+install2: nightly
+	python2 setup.py install
 
 .PHONY: install
 install: nightly
