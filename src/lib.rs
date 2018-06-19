@@ -103,14 +103,16 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
         let _success = io.call_method("seek", (0,), pyo3::NoArgs);
 
         let s_obj = io.call_method0("read")?;
-        let result: Result<String, _> = s_obj.extract();
-        match result {
-            Ok(s) => loads_fn(py, &s, None, None, None, None, None, kwargs),
-            _ => Err(exc::TypeError::new(format!(
-                "string or none type is required as host, got: {:?}",
-                result
-            ))),
-        }
+        loads_fn(
+            py,
+            s_obj.to_object(py),
+            None,
+            None,
+            None,
+            None,
+            None,
+            kwargs,
+        )
     }
 
     m.add("__version__", version!());
@@ -122,7 +124,7 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
     #[pyfn(m, "loads")]
     fn loads_fn(
         py: Python,
-        s: &str,
+        s: PyObject,
         encoding: Option<PyObject>,
         cls: Option<PyObject>,
         object_hook: Option<PyObject>,
@@ -151,27 +153,54 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
         // }
         // let s = args.get_item(0).to_string();
 
-        let v = serde_json::from_str(s);
-        match v {
-            Ok(serde_val) => {
-                HyperJsonValue::new(&py, &serde_val, &parse_float, &parse_int).try_into()
+        let string_result: Result<String, _> = s.extract(py);
+        match string_result {
+            Ok(string) => {
+                let v = serde_json::from_str(&string);
+                match v {
+                    Ok(serde_val) => {
+                        return HyperJsonValue::new(&py, &serde_val, &parse_float, &parse_int)
+                            .try_into();
+                    }
+                    Err(e) => {
+                        return convert_special_floats(py, &string, parse_int).or_else(|err| {
+                            if e.is_syntax() {
+                                return Err(JSONDecodeError::new((
+                                    format!("Value: {:?}, Error: {:?}", s, err),
+                                    string,
+                                    0,
+                                )));
+                            } else {
+                                return Err(exc::ValueError::new(format!(
+                                    "Value: {:?}, Error: {:?}",
+                                    s, e
+                                )));
+                            }
+                        })
+                    }
+                }
             }
-            Err(e) => convert_special_floats(py, s, parse_int).or(if e.is_syntax() {
-                Err(JSONDecodeError::new((
-                    format!("Value: {:?}, Error: {}", s, e),
-                    s.to_object(py),
-                    0,
-                )))
-            // Err(exc::ValueError::new(format!(
-            //     "Value: {:?}, Error: {}",
-            //     s, e
-            // )))
-            } else {
-                Err(exc::ValueError::new(format!(
-                    "Value: {:?}, Error: {}",
-                    s, e
-                )))
-            }),
+            _ => {
+                let bytes: Vec<u8> = s.extract(py).or_else(|e| {
+                    Err(exc::TypeError::new(format!(
+                        "the JSON object must be str, bytes or bytearray, got: {:?}",
+                        e
+                    )))
+                })?;
+                let v = serde_json::from_slice(&bytes);
+                match v {
+                    Ok(serde_val) => {
+                        return HyperJsonValue::new(&py, &serde_val, &parse_float, &parse_int)
+                            .try_into();
+                    }
+                    Err(e) => {
+                        return Err(exc::TypeError::new(format!(
+                            "the JSON object must be str, bytes or bytearray, got: {:?}",
+                            e
+                        )));
+                    }
+                }
+            }
         }
     }
 
