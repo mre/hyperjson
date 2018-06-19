@@ -653,14 +653,14 @@ class UltraJSONTests(unittest.TestCase):
             input = base * 1024 * 1024 * 2
             hyperjson.dumps(input)
 
+    @unittest.skipIf(sys.version_info < (3, 6), "Bytes input not supported in older Python versions")
     def test_decodeEscape(self):
         base = '\u00e5'.encode('utf-8')
         quote = "\"".encode()
         input = quote + base + quote
-        print(input)
-        json.loads(input)
-        hyperjson.loads(input)
+        self.assertEqual(json.loads(input), hyperjson.loads(input))
 
+    @unittest.skipIf(sys.version_info < (3, 6), "Bytes input not supported in older Python versions")
     def test_decodeBigEscape(self):
         for x in range(10):
             if six.PY3:
@@ -670,8 +670,7 @@ class UltraJSONTests(unittest.TestCase):
                 base = "\xc3\xa5"
                 quote = "\""
             input = quote + (base * 1024 * 1024 * 2) + quote
-            json.loads(input)
-            hyperjson.loads(input)
+            self.assertEqual(json.loads(input), hyperjson.loads(input))
 
     @unittest.skip("ujson specific, see github.com/esnme/ultrajson/issues/104")
     def test_toDict(self):
