@@ -20,3 +20,12 @@ script:
 
 before_deploy:
     - bash ci/before_deploy.sh
+
+deploy:
+  provider: pypi
+  distributions: sdist bdist_wheel
+  user: mre0
+  password: $PYPI_PASSWORD
+  on:
+    tags: true
+    python: '3.6'
