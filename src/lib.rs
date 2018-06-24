@@ -98,7 +98,7 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
         // fp.getattr(py, "read")?;
 
         // Reset file pointer to beginning See
-        // https://github.com/PyO3/pyo3/issues/143 Note that we ignrore the return
+        // https://github.com/PyO3/pyo3/issues/143 Note that we ignore the return
         // value, because `seek` does not strictly need to exist on the object
         let _success = io.call_method("seek", (0,), pyo3::NoArgs);
 
@@ -404,13 +404,14 @@ impl<'a> TryFrom<HyperJsonValue<'a>> for PyObject {
             serde_json::Value::Null => Ok(v.py.None()),
             serde_json::Value::Bool(ref b) => Ok(b.to_object(*v.py)),
             serde_json::Value::Array(ref a) => {
-                let mut ar: Vec<PyObject> = vec![];
+                let mut ar: Vec<PyObject> = Vec::with_capacity(a.len());
 
                 for elem in a {
                     ar.push(
                         HyperJsonValue::new(v.py, elem, &v.parse_float, &v.parse_int).try_into()?,
                     );
                 }
+
                 Ok(ar.to_object(*v.py))
             }
             serde_json::Value::Object(ref o) => {
