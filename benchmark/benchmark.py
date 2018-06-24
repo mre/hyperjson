@@ -149,6 +149,10 @@ def dumps_sorted_with_json():
     json.dumps(test_object, sort_keys=True)
 
 
+def dumps_sorted_with_hyperjson():
+    hyperjson.dumps(test_object, sort_keys=True)
+
+
 def dumps_sorted_with_simplejson():
     simplejson.dumps(test_object, sort_keys=True)
 
@@ -205,6 +209,7 @@ def run_encode_sort_keys(count):
     results_record_result(dumps_sorted_with_ujson, True, count)
     if not skip_lib_comparisons:
         results_record_result(dumps_sorted_with_simplejson, True, count)
+        results_record_result(dumps_sorted_with_hyperjson, True, count)
         results_record_result(dumps_sorted_with_json, True, count)
 
 
@@ -352,12 +357,13 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and "skip-lib-comps" in sys.argv:
         skip_lib_comparisons = True
 
-    # benchmark_array_doubles()
-    # benchmark_array_utf8_strings()
-    # benchmark_array_byte_strings()
-    # benchmark_medium_complex_object()
-    # benchmark_array_true_values()
-    # benchmark_array_of_dict_string_int_pairs()
+    benchmark_array_doubles()
+    benchmark_array_utf8_strings()
+    benchmark_array_byte_strings()
+    benchmark_medium_complex_object()
+    benchmark_array_true_values()
+    benchmark_array_of_dict_string_int_pairs()
     benchmark_dict_of_arrays_of_dict_string_int_pairs()
-    benchmark_complex_object()
+    # Disabled for now because of https://github.com/PyO3/pyo3/issues/177
+    # benchmark_complex_object()
     results_output_table()
