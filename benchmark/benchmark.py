@@ -12,6 +12,10 @@ import timeit
 import ujson
 import hyperjson
 
+if sys.platform == 'win32':
+    from colorama import init
+    init()
+
 USER = {"userId": 3381293, "age": 213, "username": "johndoe", "fullname": "John Doe the Second",
         "isAuthorized": True, "liked": 31231.31231202, "approval": 31.1471, "jobs": [1, 2], "currJob": None}
 FRIENDS = [USER, USER, USER, USER, USER, USER, USER, USER]
@@ -50,7 +54,9 @@ def results_record_result(callback, is_encode, count):
 
 
 def results_output_table():
-    LIBRARIES = ("ujson", "yajl", "simplejson", "json")
+    LIBRARIES = ("hyperjson", "ujson", "yajl", "simplejson", "json")
+    ENDC = '\033[0m'
+    GREEN = '\033[92m'
 
     uname_system, _, uname_release, uname_version, _, uname_processor = platform.uname()
     print()
@@ -74,17 +80,22 @@ def results_output_table():
     print(line.replace("-", "="))
 
     for name, encodes, decodes in benchmark_results:
-        columns = [" "*(width + 2) for width in column_widths]
+        columns = [" " * (width + 2) for width in column_widths]
         columns[0] = (" " + name).ljust(column_widths[0] + 2)
         print("|{}|".format("|".join(columns)))
         print(line)
 
         columns = [None] * len(column_widths)
         columns[0] = " encode".ljust(column_widths[0] + 2)
+        best = max([encodes[library] for library in LIBRARIES])
         for i, library in enumerate(LIBRARIES):
             if library in encodes:
-                columns[i + 1] = "{:.2f} ".format(
-                    encodes[library]).rjust(column_widths[i + 1] + 2)
+                if encodes[library] == best:
+                    s = GREEN
+                else:
+                    s = ''
+                columns[i + 1] = s + "{:.2f} ".format(
+                    encodes[library]).rjust(column_widths[i + 1] + 2) + ENDC
             else:
                 columns[i + 1] = " "*(column_widths[i + 1] + 2)
         print("|{}|".format("|".join(columns)))
@@ -93,10 +104,15 @@ def results_output_table():
         if decodes:
             columns = [None] * len(column_widths)
             columns[0] = " decode".ljust(column_widths[0] + 2)
+            best = max([decodes[library] for library in LIBRARIES])
             for i, library in enumerate(LIBRARIES):
                 if library in decodes:
-                    columns[i + 1] = "{:.2f} ".format(
-                        decodes[library]).rjust(column_widths[i + 1] + 2)
+                    if decodes[library] == best:
+                        s = GREEN
+                    else:
+                        s = ''
+                    columns[i + 1] = s + "{:.2f} ".format(
+                        decodes[library]).rjust(column_widths[i + 1] + 2) + ENDC
                 else:
                     columns[i + 1] = " "*(column_widths[i + 1] + 2)
             print("|{}|".format("|".join(columns)))
@@ -197,9 +213,8 @@ def benchmark_array_doubles():
     results_new_benchmark("Array with 256 doubles")
     COUNT = 10000
 
-    test_object = []
-    for x in range(256):
-        test_object.append(sys.maxsize * random.random())
+    test_object = [sys.maxsize * random.random() for _ in range(256)]
+
     run_encode(COUNT)
 
     decode_data = json.dumps(test_object)
@@ -214,10 +229,8 @@ def benchmark_array_utf8_strings():
     results_new_benchmark("Array with 256 UTF-8 strings")
     COUNT = 2000
 
-    test_object = []
-    for x in range(256):
-        test_object.append(
-            "نظام الحكم سلطاني وراثي في الذكور من ذرية السيد تركي بن سعيد بن سلطان ويشترط فيمن يختار لولاية الحكم من بينهم ان يكون مسلما رشيدا عاقلا ًوابنا شرعيا لابوين عمانيين ")
+    s = "نظام الحكم سلطاني وراثي في الذكور من ذرية السيد تركي بن سعيد بن سلطان ويشترط فيمن يختار لولاية الحكم من بينهم ان يكون مسلما رشيدا عاقلا ًوابنا شرعيا لابوين عمانيين "
+    test_object = [s] * 256
     run_encode(COUNT)
 
     decode_data = json.dumps(test_object)
@@ -232,9 +245,7 @@ def benchmark_array_byte_strings():
     results_new_benchmark("Array with 256 strings")
     COUNT = 10000
 
-    test_object = []
-    for x in range(256):
-        test_object.append("A pretty long string which is in a list")
+    test_object = ["A pretty long string which is in a list"] * 256
     run_encode(COUNT)
 
     decode_data = json.dumps(test_object)
@@ -265,9 +276,7 @@ def benchmark_array_true_values():
     results_new_benchmark("Array with 256 True values")
     COUNT = 50000
 
-    test_object = []
-    for x in range(256):
-        test_object.append(True)
+    test_object = [True] * 256
     run_encode(COUNT)
 
     decode_data = json.dumps(test_object)
@@ -302,11 +311,9 @@ def benchmark_dict_of_arrays_of_dict_string_int_pairs():
     COUNT = 50
 
     test_object = {}
-    for y in range(256):
-        arrays = []
-        for x in range(256):
-            arrays.append(
-                {str(random.random()*20): int(random.random()*1000000)})
+    for _ in range(256):
+        arrays = [{str(random.random()*20): int(random.random()*1000000)}
+                  for _ in range(256)]
         test_object[str(random.random()*20)] = arrays
     run_encode(COUNT)
 
