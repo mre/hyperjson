@@ -15,7 +15,8 @@ If you change them, consider sending a pull request to the upstream repo, too.
 def test_decimal():
     rval = hyperjson.loads('1.1', parse_float=decimal.Decimal)
     assert isinstance(rval, decimal.Decimal) == True
-    assert pytest.approx(rval) == decimal.Decimal('1.1')
+    assert pytest.approx(rval, rel=decimal.Decimal("5e-6")
+                         ) == decimal.Decimal('1.1')
 
 
 def test_float():
