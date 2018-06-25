@@ -44,9 +44,10 @@ def results_record_result(callback, is_encode, count):
     try:
         results = timeit.repeat("{}()".format(callback_name), "from __main__ import {}".format(
             callback_name), repeat=10, number=count)
-    except TypeError:
-        return
-    result = count / min(results)
+        result = count / min(results)
+    except TypeError as e:
+        print(e)
+        result = 0.0
     benchmark_results[-1][1 if is_encode else 2][library] = result
 
     print("{} {}: {:.02f} calls/sec".format(library,
@@ -149,6 +150,10 @@ def dumps_sorted_with_json():
     json.dumps(test_object, sort_keys=True)
 
 
+def dumps_sorted_with_yajl():
+    yajl.dumps(test_object, sort_keys=True)
+
+
 def dumps_sorted_with_hyperjson():
     hyperjson.dumps(test_object, sort_keys=True)
 
@@ -208,8 +213,9 @@ def run_encode(count):
 def run_encode_sort_keys(count):
     results_record_result(dumps_sorted_with_ujson, True, count)
     if not skip_lib_comparisons:
-        results_record_result(dumps_sorted_with_simplejson, True, count)
         results_record_result(dumps_sorted_with_hyperjson, True, count)
+        results_record_result(dumps_sorted_with_simplejson, True, count)
+        results_record_result(dumps_sorted_with_yajl, True, count)
         results_record_result(dumps_sorted_with_json, True, count)
 
 
