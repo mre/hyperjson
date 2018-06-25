@@ -39,10 +39,15 @@ into [stack overflows or segmentation faults](https://github.com/esnme/ultrajson
 ## Non-goals
 
 * **Support ujson and simplejson extensions**:  
-  Custom extensions like `encode()`, `__json__()`, or `toDict()` are not supported.
-  The reason is, that they go against PEP8 (e.g. `dunder` functions are restricted to the standard
-  library, camelCase is not pythonic) and are not available in Python's json
-  module.
+  Custom extensions like `encode()`, `__json__()`, or `toDict()` are not
+  supported. The reason is, that they go against PEP8 (e.g. `dunder` functions
+  are restricted to the standard library, camelCase is not pythonic) and are not
+  available in Python's json module.
+* **Whitespace preservation**: Whitespace in JSON strings is not preserved.
+  Mainly because JSON is a whitespace-agnostic format and `serde-json` stips
+  them out by design. In practice this should not be a problem, since your
+  application shouldn't depend on whitespace padding, but it's something to be
+  aware of.
 
 ## Benchmark
 
