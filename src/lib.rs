@@ -404,15 +404,23 @@ impl<'a> TryFrom<HyperJsonValue<'a>> for PyObject {
             serde_json::Value::Null => Ok(v.py.None()),
             serde_json::Value::Bool(ref b) => Ok(b.to_object(*v.py)),
             serde_json::Value::Array(ref a) => {
-                let mut ar: Vec<PyObject> = Vec::with_capacity(a.len());
+                //let mut ar: Vec<PyObject> = Vec::with_capacity(a.len());
 
-                for elem in a {
-                    ar.push(
-                        HyperJsonValue::new(v.py, elem, &v.parse_float, &v.parse_int).try_into()?,
-                    );
-                }
-
-                Ok(ar.to_object(*v.py))
+                //for elem in a {
+                //    ar.push(
+                //        HyperJsonValue::new(v.py, elem, &v.parse_float, &v.parse_int).try_into()?,
+                //    );
+                //}
+                //Ok(ar.to_object(*v.py))
+                let ret: Vec<PyObject> = a
+                    .iter()
+                    .map(|elem| {
+                        HyperJsonValue::new(v.py, elem, &v.parse_float, &v.parse_int)
+                            .try_into()
+                            .unwrap()
+                    })
+                    .collect();
+                Ok(ret.to_object(*v.py))
             }
             serde_json::Value::Object(ref o) => {
                 let mut m: BTreeMap<String, pyo3::PyObject> = BTreeMap::new();
