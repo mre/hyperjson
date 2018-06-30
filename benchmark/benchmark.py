@@ -9,7 +9,6 @@ import random
 import sys
 import timeit
 
-import ujson
 import hyperjson
 
 if sys.platform == 'win32':
@@ -24,6 +23,7 @@ decode_data = None
 test_object = None
 skip_lib_comparisons = False
 if not skip_lib_comparisons:
+    import ujson
     import simplejson
     import yajl
 
@@ -193,27 +193,27 @@ def loads_with_yajl():
 # Benchmarks.
 # =============================================================================
 def run_decode(count):
-    results_record_result(loads_with_ujson, False, count)
+    results_record_result(loads_with_hyperjson, False, count)
     if not skip_lib_comparisons:
-        results_record_result(loads_with_hyperjson, False, count)
+        results_record_result(loads_with_ujson, False, count)
         results_record_result(loads_with_simplejson, False, count)
         results_record_result(loads_with_yajl, False, count)
         results_record_result(loads_with_json, False, count)
 
 
 def run_encode(count):
-    results_record_result(dumps_with_ujson, True, count)
+    results_record_result(dumps_with_hyperjson, True, count)
     if not skip_lib_comparisons:
-        results_record_result(dumps_with_hyperjson, True, count)
+        results_record_result(dumps_with_ujson, True, count)
         results_record_result(dumps_with_simplejson, True, count)
         results_record_result(dumps_with_yajl, True, count)
         results_record_result(dumps_with_json, True, count)
 
 
 def run_encode_sort_keys(count):
-    results_record_result(dumps_sorted_with_ujson, True, count)
+    results_record_result(dumps_sorted_with_hyperjson, True, count)
     if not skip_lib_comparisons:
-        results_record_result(dumps_sorted_with_hyperjson, True, count)
+        results_record_result(dumps_sorted_with_ujson, True, count)
         results_record_result(dumps_sorted_with_simplejson, True, count)
         results_record_result(dumps_sorted_with_yajl, True, count)
         results_record_result(dumps_sorted_with_json, True, count)
