@@ -372,4 +372,5 @@ if __name__ == "__main__":
     benchmark_dict_of_arrays_of_dict_string_int_pairs()
     # Disabled for now because of https://github.com/PyO3/pyo3/issues/177
     # benchmark_complex_object()
-    results_output_table()
+    if not skip_lib_comparisons:
+        results_output_table()
