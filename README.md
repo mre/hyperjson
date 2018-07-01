@@ -51,9 +51,18 @@ into [stack overflows or segmentation faults](https://github.com/esnme/ultrajson
 
 ## Benchmark
 
-We are *not* fast yet. On the other side, we haven't made any optimizations or even done any cleanup yet.  
-So there's a chance that these values might soon improve.  
-If you want, you can help by running `make bench`, profiling, and improving the hotspots. 
+We are *not* fast yet. That said, we haven't made any optimizations or even done
+any cleanup yet.  
+So there's a chance that these values might improve soon.  
+If you want, you can help by running `make bench`, profiling, and improving the
+hotspots. 
+
+Another reason why `hyperjson` can be fast in the long-term is by exploiting
+features of newer CPUs like multi-core and SIMD. That's one area other (C-based)
+JSON extensions haven't touched yet because it might make code harder to debug
+and prone to race-conditions. In Rust, this is feasible due to crates like
+[faster](https://github.com/AdamNiederer/faster) and
+[rayon](https://github.com/nikomatsakis/rayon).
 
 **Test machine:**  
 MacBook Pro 15 inch, Mid 2015 (2,2 GHz Intel Core i7, 16 GB RAM) Darwin 17.6.18
