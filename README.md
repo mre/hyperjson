@@ -111,7 +111,7 @@ If you like to hack on hyperjson, here is what needs to be done:
 - [X] Implement [`load()`](https://docs.python.org/3/library/json.html#json.load)
 - [X] Implement [`dumps()`](https://docs.python.org/3/library/json.html#json.dumps)
 - [X] Implement [`dump()`](https://docs.python.org/3/library/json.html#json.dump)
-- X ] Benchmark against [json](https://docs.python.org/3/library/json.html) and
+- [X] Benchmark against [json](https://docs.python.org/3/library/json.html) and
   [ujson](https://github.com/esnme/ultrajson/) (see [#1](https://github.com/mre/hyperjson/issues/1))
 - [ ] Profile and optimize
 - [ ] Add remaining [keyword-only arguments](https://docs.python.org/3/library/json.html#basic-usage) to methods
