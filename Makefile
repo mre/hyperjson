@@ -24,4 +24,8 @@ test:
 
 .PHONY: bench
 bench:
+	python3 benchmark/benchmark.py skip-lib-comps
+
+.PHONY: bench-all
+bench-all:
 	python3 benchmark/benchmark.py
