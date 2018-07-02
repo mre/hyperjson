@@ -43,6 +43,11 @@ pub enum HyperJsonError {
     InvalidFloat { x: String },
     #[fail(display = "Invalid type: {}, Error: {}", t, e)]
     InvalidCast { t: String, e: String },
+    // NoneError doesn't have an impl for `Display`
+    // See https://github.com/rust-lang-nursery/failure/issues/61
+    // See https://github.com/rust-lang/rust/issues/42327#issuecomment-378324282
+    // #[fail(display = "Error: {}", s)]
+    // NoneError { s: String },
 }
 
 impl From<serde_json::Error> for HyperJsonError {
@@ -369,34 +374,31 @@ impl<'a> TryFrom<HyperJsonValue<'a>> for PyObject {
             serde_json::Value::Number(ref x) => {
                 if x.is_u64() {
                     // TODO: Do we need to use the use parse_int here as below?
+                    let u_int = x.as_u64().ok_or_else(|| HyperJsonError::InvalidCast {
+                        t: x.to_string(),
+                        e: "Cannot convert to u64".to_string(),
+                    })?;
                     match v.parse_int {
-                        Some(parser) => {
-                            // Unwrap should be safe here, since we checked for the correct
-                            // type before
-                            let i = x.as_u64().unwrap();
-                            Ok(parser.call1(*v.py, (i,))?)
-                        }
-                        None => Ok(x.as_u64().unwrap().to_object(*v.py)),
+                        Some(parser) => Ok(parser.call1(*v.py, (u_int,))?),
+                        None => Ok(u_int.to_object(*v.py)),
                     }
                 } else if x.is_i64() {
+                    let u_int = x.as_i64().ok_or_else(|| HyperJsonError::InvalidCast {
+                        t: x.to_string(),
+                        e: "Cannot convert to i64".to_string(),
+                    })?;
                     match v.parse_int {
-                        Some(parser) => {
-                            // Unwrap should be safe here, since we checked for the correct
-                            // type before
-                            let i = x.as_i64().unwrap();
-                            Ok(parser.call1(*v.py, (i,))?)
-                        }
-                        None => Ok(x.as_i64().unwrap().to_object(*v.py)),
+                        Some(parser) => Ok(parser.call1(*v.py, (u_int,))?),
+                        None => Ok(u_int.to_object(*v.py)),
                     }
                 } else {
+                    let f = x.as_f64().ok_or_else(|| HyperJsonError::InvalidCast {
+                        t: x.to_string(),
+                        e: "Cannot convert to f64".to_string(),
+                    })?;
                     match v.parse_float {
-                        Some(parser) => {
-                            // Unwrap should be safe here, since we checked for the correct
-                            // type before
-                            let f = x.as_f64().unwrap();
-                            Ok(parser.call1(*v.py, (f,))?)
-                        }
-                        None => Ok(x.as_f64().unwrap().to_object(*v.py)),
+                        Some(parser) => Ok(parser.call1(*v.py, (f,))?),
+                        None => Ok(f.to_object(*v.py)),
                     }
                 }
             }
