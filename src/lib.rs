@@ -432,25 +432,28 @@ impl<'a> TryFrom<HyperJsonValue<'a>> for PyObject {
             serde_json::Value::Null => Ok(v.py.None()),
             serde_json::Value::Bool(ref b) => Ok(b.to_object(*v.py)),
             serde_json::Value::Array(ref a) => {
-                let mut ar: Vec<PyObject> = Vec::with_capacity(a.len());
-
-                for elem in a {
-                    ar.push(
-                        HyperJsonValue::new(v.py, elem, &v.parse_float, &v.parse_int).try_into()?,
-                    );
-                }
-
-                Ok(ar.to_object(*v.py))
+                let ret: Result<Vec<PyObject>, _> = a
+                    .iter()
+                    .map(|elem| {
+                        HyperJsonValue::new(v.py, elem, &v.parse_float, &v.parse_int).try_into()
+                    })
+                    .collect();
+                Ok(ret?.to_object(*v.py))
             }
             serde_json::Value::Object(ref o) => {
-                let mut m: BTreeMap<String, pyo3::PyObject> = BTreeMap::new();
-                for (k, x) in o.iter() {
-                    m.insert(
-                        k.to_string(),
-                        HyperJsonValue::new(v.py, x, v.parse_float, v.parse_int).try_into()?,
-                    );
-                }
-                Ok(m.to_object(*v.py))
+                let ret: Result<BTreeMap<String, PyObject>, _> = o
+                    .iter()
+                    .map(|(k, x)| {
+                        let key = k.to_string();
+                        let value =
+                            HyperJsonValue::new(v.py, x, v.parse_float, v.parse_int).try_into();
+                        match value {
+                            Ok(val) => Ok((key, val)),
+                            Err(e) => Err(e),
+                        }
+                    })
+                    .collect();
+                Ok(ret?.to_object(*v.py))
             }
         }
     }
