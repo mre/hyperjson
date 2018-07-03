@@ -1,6 +1,9 @@
 #![feature(proc_macro)]
 #![feature(proc_macro_path_invoc)]
 #![feature(try_from)]
+#![feature(test)]
+
+extern crate test;
 
 extern crate serde;
 
@@ -93,7 +96,7 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
     // m.add("JSONDecodeError", py.get_type::<JSONDecodeError>());
 
     #[pyfn(m, "load")]
-    fn load_fn(py: Python, fp: PyObject, kwargs: Option<&PyDict>) -> PyResult<PyObject> {
+    pub fn load_fn(py: Python, fp: PyObject, kwargs: Option<&PyDict>) -> PyResult<PyObject> {
         // Temporary workaround for
         // https://github.com/PyO3/pyo3/issues/145
         let io: &PyObjectRef = fp.as_ref(py);
@@ -127,7 +130,7 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
     // because we have none of these types under our control.
     // Note: Encoding param is deprecated and ignored.
     #[pyfn(m, "loads")]
-    fn loads_fn(
+    pub fn loads_fn(
         py: Python,
         s: PyObject,
         encoding: Option<PyObject>,
@@ -158,59 +161,21 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
         // }
         // let s = args.get_item(0).to_string();
 
-        let string_result: Result<String, _> = s.extract(py);
-        match string_result {
-            Ok(string) => {
-                let v = serde_json::from_str(&string);
-                match v {
-                    Ok(serde_val) => {
-                        return HyperJsonValue::new(&py, &serde_val, &parse_float, &parse_int)
-                            .try_into();
-                    }
-                    Err(e) => {
-                        return convert_special_floats(py, &string, parse_int).or_else(|err| {
-                            if e.is_syntax() {
-                                return Err(JSONDecodeError::new((
-                                    format!("Value: {:?}, Error: {:?}", s, err),
-                                    string,
-                                    0,
-                                )));
-                            } else {
-                                return Err(exc::ValueError::new(format!(
-                                    "Value: {:?}, Error: {:?}",
-                                    s, e
-                                )));
-                            }
-                        })
-                    }
-                }
-            }
-            _ => {
-                let bytes: Vec<u8> = s.extract(py).or_else(|e| {
-                    Err(exc::TypeError::new(format!(
-                        "the JSON object must be str, bytes or bytearray, got: {:?}",
-                        e
-                    )))
-                })?;
-                let v = serde_json::from_slice(&bytes);
-                match v {
-                    Ok(serde_val) => {
-                        return HyperJsonValue::new(&py, &serde_val, &parse_float, &parse_int)
-                            .try_into();
-                    }
-                    Err(e) => {
-                        return Err(exc::TypeError::new(format!(
-                            "the JSON object must be str, bytes or bytearray, got: {:?}",
-                            e
-                        )));
-                    }
-                }
-            }
-        }
+        // This was moved out of the Python module code to enable benchmarking.
+        loads_impl(
+            py,
+            s,
+            encoding,
+            cls,
+            object_hook,
+            parse_float,
+            parse_int,
+            kwargs,
+        )
     }
 
     #[pyfn(m, "dumps")] // ensure_ascii, check_circular, allow_nan, cls, indent, separators, default, sort_keys, kwargs = "**")]
-    fn dumps_fn(
+    pub fn dumps_fn(
         py: Python,
         obj: PyObject,
         skipkeys: Option<bool>,
@@ -231,7 +196,7 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
     }
 
     #[pyfn(m, "dump")]
-    fn dump_fn(
+    pub fn dump_fn(
         py: Python,
         obj: PyObject,
         fp: PyObject,
@@ -256,6 +221,67 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
     }
 
     Ok(())
+}
+
+pub fn loads_impl(
+    py: Python,
+    s: PyObject,
+    encoding: Option<PyObject>,
+    cls: Option<PyObject>,
+    object_hook: Option<PyObject>,
+    parse_float: Option<PyObject>,
+    parse_int: Option<PyObject>,
+    kwargs: Option<&PyDict>,
+) -> PyResult<PyObject> {
+    let string_result: Result<String, _> = s.extract(py);
+    match string_result {
+        Ok(string) => {
+            let v = serde_json::from_str(&string);
+            match v {
+                Ok(serde_val) => {
+                    return HyperJsonValue::new(&py, &serde_val, &parse_float, &parse_int)
+                        .try_into();
+                }
+                Err(e) => {
+                    return convert_special_floats(py, &string, parse_int).or_else(|err| {
+                        if e.is_syntax() {
+                            return Err(JSONDecodeError::new((
+                                format!("Value: {:?}, Error: {:?}", s, err),
+                                string,
+                                0,
+                            )));
+                        } else {
+                            return Err(exc::ValueError::new(format!(
+                                "Value: {:?}, Error: {:?}",
+                                s, e
+                            )));
+                        }
+                    })
+                }
+            }
+        }
+        _ => {
+            let bytes: Vec<u8> = s.extract(py).or_else(|e| {
+                Err(exc::TypeError::new(format!(
+                    "the JSON object must be str, bytes or bytearray, got: {:?}",
+                    e
+                )))
+            })?;
+            let v = serde_json::from_slice(&bytes);
+            match v {
+                Ok(serde_val) => {
+                    return HyperJsonValue::new(&py, &serde_val, &parse_float, &parse_int)
+                        .try_into();
+                }
+                Err(e) => {
+                    return Err(exc::TypeError::new(format!(
+                        "the JSON object must be str, bytes or bytearray, got: {:?}",
+                        e
+                    )));
+                }
+            }
+        }
+    }
 }
 
 /// Convert from a `cpython::PyObject` to a `serde_json::Value`.
@@ -427,5 +453,28 @@ impl<'a> TryFrom<HyperJsonValue<'a>> for PyObject {
                 Ok(m.to_object(*v.py))
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs::File;
+    use std::io::Read;
+    use test::Bencher;
+
+    #[bench]
+    fn bench_dict_string_int_pairs(b: &mut Bencher) {
+        let mut f = File::open("benchmark/dict_string_int_plain.txt").unwrap();
+        let mut dict_string_int = String::new();
+        f.read_to_string(&mut dict_string_int).unwrap();
+
+        let gil = Python::acquire_gil();
+        let py = gil.python();
+
+        b.iter(|| {
+            let obj = dict_string_int.to_object(py);
+            loads_impl(py, obj, None, None, None, None, None, None)
+        });
     }
 }
