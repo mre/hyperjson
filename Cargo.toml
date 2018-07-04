@@ -16,5 +16,12 @@ default-features = false
 features = ["extension-module"]
 
 [lib]
-crate-type = ["cdylib"]
 name = "hyperjson"
+# crate-type = ["cdylib"]
+
+[[bin]]
+name = "hyperjson-bench"
+path = "src/bench.rs"
+
+[profile.release]
+debug = true

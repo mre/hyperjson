@@ -2,7 +2,7 @@
 //! Usage:
 //!
 //! ```
-//! Cargo build
+//! cargo build
 //! valgrind --tool=callgrind --main-stacksize=1000000000 target/debug/hyperjson-bench
 //! callgrind_annotate --auto=yes callgrind.out.35583 >out.rs
 //! qcachegrind callgrind.out.35583
