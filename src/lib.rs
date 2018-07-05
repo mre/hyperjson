@@ -441,10 +441,10 @@ impl<'a> TryFrom<HyperJsonValue<'a>> for PyObject {
                 Ok(ret?.to_object(*v.py))
             }
             serde_json::Value::Object(ref o) => {
-                let ret: Result<BTreeMap<String, PyObject>, _> = o
+                let ret: Result<BTreeMap<&String, PyObject>, _> = o
                     .iter()
                     .map(|(k, x)| {
-                        let key = k.to_string();
+                        let key = k;
                         let value =
                             HyperJsonValue::new(v.py, x, v.parse_float, v.parse_int).try_into();
                         match value {
