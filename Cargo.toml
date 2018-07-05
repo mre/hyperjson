@@ -17,7 +17,7 @@ features = ["extension-module"]
 
 [lib]
 name = "hyperjson"
-# crate-type = ["cdylib"]
+crate-type = ["cdylib"]
 
 [[bin]]
 name = "hyperjson-bench"
