@@ -16,7 +16,7 @@ def pytest_benchmark_group_stats(config, benchmarks, group_by):
 
 
 def pytest_addoption(parser):
-    parser.addoption('--compare-other-engines', action='store_true',
+    parser.addoption('--compare', action='store_true',
                      help='compare against other JSON engines')
 
 
@@ -53,7 +53,7 @@ else:
 
 def pytest_generate_tests(metafunc):
     if 'contender' in metafunc.fixturenames:
-        if metafunc.config.getoption('compare_other_engines'):
+        if metafunc.config.getoption('compare'):
             metafunc.parametrize('contender', contenders,
                                  ids=attrgetter('name'))
         else:

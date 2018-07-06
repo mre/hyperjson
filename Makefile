@@ -26,4 +26,4 @@ bench:
 
 .PHONY: bench-all
 bench-all:
-	pytest benchmarks --help
+	pytest benchmarks --compare
