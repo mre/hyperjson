@@ -53,7 +53,7 @@ else:
 
 def pytest_generate_tests(metafunc):
     if 'contender' in metafunc.fixturenames:
-        if metafunc.config.option.compare_other_engines:
+        if metafunc.config.getoption('compare_other_engines'):
             metafunc.parametrize('contender', contenders,
                                  ids=attrgetter('name'))
         else:
