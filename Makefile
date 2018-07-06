@@ -24,8 +24,8 @@ test:
 
 .PHONY: bench
 bench:
-	python3 benchmark/benchmark.py skip-lib-comps
+	pytest benchmarks
 
 .PHONY: bench-all
 bench-all:
-	python3 benchmark/benchmark.py
+	pytest benchmarks --compare-other-engines

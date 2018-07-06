@@ -24,12 +24,13 @@ composite_object = {
     'int': 100100100,
     'float': 100999.123456
 }
-for x in range(256):
-    doubles.append(sys.maxsize * random.random())
-    unicode_strings.append(
-        "نظام الحكم سلطاني وراثي في الذكور من ذرية السيد تركي بن سعيد بن سلطان ويشترط فيمن يختار لولاية الحكم من بينهم ان يكون مسلما رشيدا عاقلا ًوابنا شرعيا لابوين عمانيين ")
-    strings.append("A pretty long string which is in a list")
-    booleans.append(True)
+
+doubles = [sys.maxsize * random.random() for _ in range(256)]
+unicode_strings = [
+    "نظام الحكم سلطاني وراثي في الذكور من ذرية السيد تركي بن سعيد بن سلطان ويشترط فيمن يختار لولاية الحكم من بينهم ان يكون مسلما رشيدا عاقلا ًوابنا شرعيا لابوين عمانيين " for _ in range(256)]
+strings = ["A pretty long string which is in a list"] * 256
+
+booleans = [True] * 256
 
 for y in range(100):
     arrays = []
