@@ -18,9 +18,7 @@ install: nightly
 
 .PHONY: test
 test:
-	# Run tests outside of project folder.
-	# See https://github.com/PyO3/pyo3/issues/105
-	cd .. && pytest --verbose --capture=no $(DIR)
+	pytest tests
 
 .PHONY: bench
 bench:
