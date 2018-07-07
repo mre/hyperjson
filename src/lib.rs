@@ -249,7 +249,7 @@ pub fn loads_impl(
                         if e.is_syntax() {
                             return Err(JSONDecodeError::new((
                                 format!("Error: {:?}", err),
-                                "bla",
+                                "todo",
                                 0,
                             )));
                         } else {
