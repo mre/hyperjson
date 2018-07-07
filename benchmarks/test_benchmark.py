@@ -4,14 +4,6 @@ import pytest
 
 benchmark = pytest.importorskip('pytest_benchmark')
 
-doubles = []
-numbers = []
-unicode_strings = []
-strings = []
-booleans = []
-list_dicts = []
-dict_lists = {}
-
 composite_object = {
     'words': """
         Lorem ipsum dolor sit amet, consectetur adipiscing
@@ -32,10 +24,12 @@ strings = ["A pretty long string which is in a list"] * 256
 
 booleans = [True] * 256
 
+list_dicts = [{str(random.random()*20): int(random.random()*1000000)}
+              for _ in range(100)]
+
+dict_lists = {}
 for y in range(100):
     arrays = []
-    list_dicts.append({str(random.random()*20): int(random.random()*1000000)})
-
     for x in range(100):
         arrays.append({str(random.random() * 20): int(random.random()*1000000)})
         dict_lists[str(random.random() * 20)] = arrays
