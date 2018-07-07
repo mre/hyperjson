@@ -22,18 +22,14 @@ extern crate serde_json;
 use std::collections::BTreeMap;
 use std::convert::TryFrom;
 use std::convert::TryInto;
+use std::fmt;
+use std::marker::PhantomData;
 
 use failure::Error;
 use pyo3::prelude::*;
 use pyo3::Python;
+use serde::de::{self, DeserializeSeed, Deserializer, MapAccess, SeqAccess, Visitor};
 use serde::ser::{self, Serialize, SerializeMap, SerializeSeq, Serializer};
-
-struct HyperJsonValue<'a> {
-    py: &'a Python<'a>,
-    inner: &'a serde_json::Value,
-    parse_float: &'a Option<PyObject>,
-    parse_int: &'a Option<PyObject>,
-}
 
 #[derive(Debug, Fail)]
 pub enum HyperJsonError {
@@ -244,18 +240,21 @@ pub fn loads_impl(
     let string_result: Result<String, _> = s.extract(py);
     match string_result {
         Ok(string) => {
-            let v = serde_json::from_str(&string);
-            match v {
-                Ok(serde_val) => {
-                    return HyperJsonValue::new(&py, &serde_val, &parse_float, &parse_int)
-                        .try_into();
+            let mut deserializer = serde_json::Deserializer::from_str(&string);
+            let seed = HyperJsonValue::new(py, &parse_float, &parse_int);
+            match seed.deserialize(&mut deserializer) {
+                Ok(py_object) => {
+                    deserializer
+                        .end()
+                        .map_err(|e| JSONDecodeError::new((e.to_string(), string.clone(), 0)))?;
+                    Ok(py_object)
                 }
                 Err(e) => {
-                    return convert_special_floats(py, &string, parse_int).or_else(|err| {
+                    return convert_special_floats(py, &string, &parse_int).or_else(|err| {
                         if e.is_syntax() {
                             return Err(JSONDecodeError::new((
                                 format!("Value: {:?}, Error: {:?}", s, err),
-                                string,
+                                string.clone(),
                                 0,
                             )));
                         } else {
@@ -275,11 +274,14 @@ pub fn loads_impl(
                     e
                 )))
             })?;
-            let v = serde_json::from_slice(&bytes);
-            match v {
-                Ok(serde_val) => {
-                    return HyperJsonValue::new(&py, &serde_val, &parse_float, &parse_int)
-                        .try_into();
+            let mut deserializer = serde_json::Deserializer::from_slice(&bytes);
+            let seed = HyperJsonValue::new(py, &parse_float, &parse_int);
+            match seed.deserialize(&mut deserializer) {
+                Ok(py_object) => {
+                    deserializer
+                        .end()
+                        .map_err(|e| JSONDecodeError::new((e.to_string(), bytes.clone(), 0)))?;
+                    Ok(py_object)
                 }
                 Err(e) => {
                     return Err(exc::TypeError::new(format!(
@@ -409,7 +411,7 @@ impl<'p, 'a> Serialize for SerializePyObject<'p, 'a> {
     }
 }
 
-fn convert_special_floats(py: Python, s: &str, parse_int: Option<PyObject>) -> PyResult<PyObject> {
+fn convert_special_floats(py: Python, s: &str, parse_int: &Option<PyObject>) -> PyResult<PyObject> {
     match s {
         // TODO: If `allow_nan` is false (default: True), then this should be a ValueError
         // https://docs.python.org/3/library/json.html
@@ -420,10 +422,16 @@ fn convert_special_floats(py: Python, s: &str, parse_int: Option<PyObject>) -> P
     }
 }
 
+#[derive(Copy, Clone)]
+struct HyperJsonValue<'a> {
+    py: Python<'a>,
+    parse_float: &'a Option<PyObject>,
+    parse_int: &'a Option<PyObject>,
+}
+
 impl<'a> HyperJsonValue<'a> {
     fn new(
-        py: &'a Python,
-        inner: &'a serde_json::Value,
+        py: Python<'a>,
         parse_float: &'a Option<PyObject>,
         parse_int: &'a Option<PyObject>,
     ) -> HyperJsonValue<'a> {
@@ -433,76 +441,115 @@ impl<'a> HyperJsonValue<'a> {
         // let py = gil.python();
         HyperJsonValue {
             py,
-            inner,
             parse_float,
             parse_int,
         }
     }
 }
 
-impl<'a> TryFrom<HyperJsonValue<'a>> for PyObject {
-    type Error = PyErr;
-    fn try_from(v: HyperJsonValue) -> Result<PyObject, PyErr> {
-        match v.inner {
-            serde_json::Value::Number(ref x) => {
-                if x.is_u64() {
-                    // TODO: Do we need to use the use parse_int here as below?
-                    let u_int = x.as_u64().ok_or_else(|| HyperJsonError::InvalidCast {
-                        t: x.to_string(),
-                        e: "Cannot convert to u64".to_string(),
-                    })?;
-                    match v.parse_int {
-                        Some(parser) => Ok(parser.call1(*v.py, (u_int,))?),
-                        None => Ok(u_int.to_object(*v.py)),
-                    }
-                } else if x.is_i64() {
-                    let u_int = x.as_i64().ok_or_else(|| HyperJsonError::InvalidCast {
-                        t: x.to_string(),
-                        e: "Cannot convert to i64".to_string(),
-                    })?;
-                    match v.parse_int {
-                        Some(parser) => Ok(parser.call1(*v.py, (u_int,))?),
-                        None => Ok(u_int.to_object(*v.py)),
-                    }
-                } else {
-                    let f = x.as_f64().ok_or_else(|| HyperJsonError::InvalidCast {
-                        t: x.to_string(),
-                        e: "Cannot convert to f64".to_string(),
-                    })?;
-                    match v.parse_float {
-                        Some(parser) => Ok(parser.call1(*v.py, (f,))?),
-                        None => Ok(f.to_object(*v.py)),
-                    }
-                }
-            }
-            serde_json::Value::String(ref x) => Ok(x.to_object(*v.py)),
-            serde_json::Value::Null => Ok(v.py.None()),
-            serde_json::Value::Bool(ref b) => Ok(b.to_object(*v.py)),
-            serde_json::Value::Array(ref a) => {
-                let ret: Result<Vec<PyObject>, _> = a
-                    .iter()
-                    .map(|elem| {
-                        HyperJsonValue::new(v.py, elem, &v.parse_float, &v.parse_int).try_into()
-                    })
-                    .collect();
-                Ok(ret?.to_object(*v.py))
-            }
-            serde_json::Value::Object(ref o) => {
-                let ret: Result<BTreeMap<&String, PyObject>, _> = o
-                    .iter()
-                    .map(|(k, x)| {
-                        let key = k;
-                        let value =
-                            HyperJsonValue::new(v.py, x, v.parse_float, v.parse_int).try_into();
-                        match value {
-                            Ok(val) => Ok((key, val)),
-                            Err(e) => Err(e),
-                        }
-                    })
-                    .collect();
-                Ok(ret?.to_object(*v.py))
-            }
+impl<'de, 'a> DeserializeSeed<'de> for HyperJsonValue<'a> {
+    type Value = PyObject;
+
+    fn deserialize<D>(self, deserializer: D) -> Result<Self::Value, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        deserializer.deserialize_any(self)
+    }
+}
+
+impl<'a> HyperJsonValue<'a> {
+    fn parse_primitive<E, T>(self, value: T, parser: &PyObject) -> Result<PyObject, E>
+    where
+        E: de::Error,
+        T: ToString,
+    {
+        match parser.call1(self.py, (value.to_string(),)) {
+            Ok(primitive) => Ok(primitive),
+            Err(err) => Err(de::Error::custom(HyperJsonError::from(err))),
         }
+    }
+}
+
+impl<'de, 'a> Visitor<'de> for HyperJsonValue<'a> {
+    type Value = PyObject;
+
+    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        formatter.write_str("any valid JSON value")
+    }
+
+    fn visit_bool<E>(self, value: bool) -> Result<Self::Value, E>
+    where
+        E: de::Error,
+    {
+        Ok(value.to_object(self.py))
+    }
+
+    fn visit_i64<E>(self, value: i64) -> Result<Self::Value, E>
+    where
+        E: de::Error,
+    {
+        match self.parse_int {
+            Some(parser) => self.parse_primitive(value, parser),
+            None => Ok(value.to_object(self.py)),
+        }
+    }
+
+    fn visit_u64<E>(self, value: u64) -> Result<Self::Value, E>
+    where
+        E: de::Error,
+    {
+        match self.parse_int {
+            Some(parser) => self.parse_primitive(value, parser),
+            None => Ok(value.to_object(self.py)),
+        }
+    }
+
+    fn visit_f64<E>(self, value: f64) -> Result<Self::Value, E>
+    where
+        E: de::Error,
+    {
+        match self.parse_float {
+            Some(parser) => self.parse_primitive(value, parser),
+            None => Ok(value.to_object(self.py)),
+        }
+    }
+
+    fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
+    where
+        E: de::Error,
+    {
+        Ok(value.to_object(self.py))
+    }
+
+    fn visit_unit<E>(self) -> Result<Self::Value, E> {
+        Ok(self.py.None())
+    }
+
+    fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+    where
+        A: SeqAccess<'de>,
+    {
+        let mut elements = Vec::new();
+
+        while let Some(elem) = seq.next_element_seed(self)? {
+            elements.push(elem);
+        }
+
+        Ok(elements.to_object(self.py))
+    }
+
+    fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
+    where
+        A: MapAccess<'de>,
+    {
+        let mut entries = BTreeMap::new();
+
+        while let Some((key, value)) = map.next_entry_seed(PhantomData::<String>, self)? {
+            entries.insert(key, value);
+        }
+
+        Ok(entries.to_object(self.py))
     }
 }
 
