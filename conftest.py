@@ -50,6 +50,15 @@ else:
                                 yajl.dumps,
                                 yajl.loads))
 
+try:
+    import rapidjson
+except ImportError:
+    pass
+else:
+    contenders.append(Contender('rapidjson',
+                                rapidjson.dumps,
+                                rapidjson.loads))
+
 
 def pytest_generate_tests(metafunc):
     if 'contender' in metafunc.fixturenames:
