@@ -1,2 +1,4 @@
 pytest>=3.5.0
 pytest-runner>=4.2      # add setup.py test support for pytest
+pytest-benchmark>=3.1
+
