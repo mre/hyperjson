@@ -67,6 +67,9 @@ and prone to race-conditions. In Rust, this is feasible due to crates like
 **Test machine:**  
 MacBook Pro 15 inch, Mid 2015 (2,2 GHz Intel Core i7, 16 GB RAM) Darwin 17.6.18
 
+**Metric:**
+Messages/second
+
 | Test                                                                          | hyperjson  | ujson      | yajl       | simplejson | json       |
 |-------------------------------------------------------------------------------|------------|------------|------------|------------|------------|
 | Array with 256 doubles                                                        |            |            |            |            |            |
