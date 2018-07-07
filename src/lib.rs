@@ -233,41 +233,40 @@ pub fn loads_impl(
     parse_int: Option<PyObject>,
     kwargs: Option<&PyDict>,
 ) -> PyResult<PyObject> {
-    let string_result: Result<String, _> = s.extract(py);
+    let string_result: Result<&PyString, _> = s.cast_as::<PyString>(py);
+    //PyString::from_object(s.as_ref(py), "utf-8", "strict");
     match string_result {
         Ok(string) => {
-            let v = serde_json::from_str(&string);
+            let utf8_str = string.to_string_lossy();
+            let v = serde_json::from_str(&utf8_str);
             match v {
                 Ok(serde_val) => {
                     return HyperJsonValue::new(&py, &serde_val, &parse_float, &parse_int)
                         .try_into();
                 }
                 Err(e) => {
-                    return convert_special_floats(py, &string, parse_int).or_else(|err| {
+                    return convert_special_floats(py, &utf8_str, parse_int).or_else(|err| {
                         if e.is_syntax() {
                             return Err(JSONDecodeError::new((
-                                format!("Value: {:?}, Error: {:?}", s, err),
-                                string,
+                                format!("Error: {:?}", err),
+                                "bla",
                                 0,
                             )));
                         } else {
-                            return Err(exc::ValueError::new(format!(
-                                "Value: {:?}, Error: {:?}",
-                                s, e
-                            )));
+                            return Err(exc::ValueError::new(format!("Error: {:?}", e)));
                         }
-                    })
+                    });
                 }
             }
         }
         _ => {
-            let bytes: Vec<u8> = s.extract(py).or_else(|e| {
+            let bytes: &PyBytes = PyObject::extract(&s, py).or_else(|e| {
                 Err(exc::TypeError::new(format!(
                     "the JSON object must be str, bytes or bytearray, got: {:?}",
                     e
                 )))
             })?;
-            let v = serde_json::from_slice(&bytes);
+            let v = serde_json::from_slice(&bytes.data());
             match v {
                 Ok(serde_val) => {
                     return HyperJsonValue::new(&py, &serde_val, &parse_float, &parse_int)
