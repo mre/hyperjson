@@ -26,6 +26,7 @@ use std::convert::TryInto;
 use failure::Error;
 use pyo3::prelude::*;
 use pyo3::Python;
+use serde::ser::{self, Serialize, SerializeMap, SerializeSeq, Serializer};
 
 struct HyperJsonValue<'a> {
     py: &'a Python<'a>,
@@ -189,7 +190,14 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
         sort_keys: Option<PyObject>,
         kwargs: Option<&PyDict>,
     ) -> PyResult<PyObject> {
-        let v = to_json(py, &obj)?;
+        let v = SerializePyObject {
+            py,
+            obj: obj.as_ref(py),
+            sort_keys: match sort_keys {
+                Some(sort_keys) => sort_keys.is_true(py)?,
+                None => false,
+            },
+        };
         let s: Result<String, HyperJsonError> =
             serde_json::to_string(&v).map_err(|error| HyperJsonError::InvalidConversion { error });
         Ok(s?.to_object(py))
@@ -284,82 +292,121 @@ pub fn loads_impl(
     }
 }
 
-/// Convert from a `cpython::PyObject` to a `serde_json::Value`.
-pub fn to_json(py: Python, obj: &PyObject) -> Result<serde_json::Value, HyperJsonError> {
-    macro_rules! cast {
-        ($t:ty, $f:expr) => {
-            if let Ok(val) = obj.cast_as::<$t>(py) {
-                return $f(val);
-            }
-        };
-    }
+struct SerializePyObject<'p, 'a> {
+    py: Python<'p>,
+    obj: &'a PyObjectRef,
+    sort_keys: bool,
+}
 
-    macro_rules! extract {
-        ($t:ty) => {
-            if let Ok(val) = obj.extract::<$t>(py) {
-                return serde_json::value::to_value(val)
-                    .map_err(|error| HyperJsonError::InvalidConversion { error });
-            }
-        };
-    }
-
-    cast!(PyDict, |x: &PyDict| {
-        let mut map = serde_json::Map::new();
-        for (key_obj, value) in x.iter() {
-            let key = if key_obj == py.None().as_ref(py) {
-                Ok("null".to_string())
-            } else if let Ok(val) = key_obj.extract::<bool>() {
-                Ok(if val {
-                    "true".to_string()
-                } else {
-                    "false".to_string()
-                })
-            } else if let Ok(val) = key_obj.str() {
-                Ok(val.to_string()?.into_owned())
-            } else {
-                Err(HyperJsonError::DictKeyNotString {
-                    obj: key_obj.to_object(py),
-                })
+impl<'p, 'a> Serialize for SerializePyObject<'p, 'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        macro_rules! cast {
+            ($f:expr) => {
+                if let Ok(val) = PyTryFrom::try_from(self.obj) {
+                    return $f(val);
+                }
             };
-            map.insert(key?, to_json(py, &value.to_object(py))?);
         }
-        Ok(serde_json::Value::Object(map))
-    });
 
-    cast!(PyList, |x: &PyList| Ok(serde_json::Value::Array(try!(
-        x.iter().map(|x| to_json(py, &x.to_object(py))).collect()
-    ))));
-    cast!(PyTuple, |x: &PyTuple| Ok(serde_json::Value::Array(try!(
-        x.iter().map(|x| to_json(py, &x.to_object(py))).collect()
-    ))));
-
-    extract!(String);
-    extract!(bool);
-
-    cast!(PyFloat, |x: &PyFloat| {
-        match serde_json::Number::from_f64(x.value()) {
-            Some(n) => Ok(serde_json::Value::Number(n)),
-            None => Err(HyperJsonError::InvalidFloat {
-                x: format!("{}", x),
-            }),
+        macro_rules! extract {
+            ($t:ty) => {
+                if let Ok(val) = <$t as FromPyObject>::extract(self.obj) {
+                    return val.serialize(serializer);
+                }
+            };
         }
-    });
-    extract!(u64);
-    extract!(i64);
 
-    if obj == &py.None() {
-        return Ok(serde_json::Value::Null);
+        fn debug_py_err<E: ser::Error>(err: PyErr) -> E {
+            E::custom(format_args!("{:?}", err))
+        }
+
+        cast!(|x: &PyDict| {
+            if self.sort_keys {
+                // TODO: this could be implemented more efficiently by building
+                // a `Vec<Cow<str>, &PyObjectRef>` of the map entries, sorting
+                // by key, and serializing as in the `else` branch. That avoids
+                // buffering every map value into a serde_json::Value.
+                let no_sort_keys = SerializePyObject {
+                    py: self.py,
+                    obj: self.obj,
+                    sort_keys: false,
+                };
+                let jv = serde_json::to_value(no_sort_keys).map_err(ser::Error::custom)?;
+                jv.serialize(serializer)
+            } else {
+                let mut map = serializer.serialize_map(Some(x.len()))?;
+                for (key, value) in x {
+                    if key == self.py.None().as_ref(self.py) {
+                        map.serialize_key("null")?;
+                    } else if let Ok(key) = key.extract::<bool>() {
+                        map.serialize_key(if key { "true" } else { "false" })?;
+                    } else if let Ok(key) = key.str() {
+                        let key = key.to_string().map_err(debug_py_err)?;
+                        map.serialize_key(&key)?;
+                    } else {
+                        return Err(ser::Error::custom(format_args!(
+                            "Dictionary key is not a string: {:?}",
+                            key
+                        )));
+                    }
+                    map.serialize_value(&SerializePyObject {
+                        py: self.py,
+                        obj: value,
+                        sort_keys: self.sort_keys,
+                    })?;
+                }
+                map.end()
+            }
+        });
+
+        cast!(|x: &PyList| {
+            let mut seq = serializer.serialize_seq(Some(x.len()))?;
+            for element in x {
+                seq.serialize_element(&SerializePyObject {
+                    py: self.py,
+                    obj: element,
+                    sort_keys: self.sort_keys,
+                })?
+            }
+            seq.end()
+        });
+        cast!(|x: &PyTuple| {
+            let mut seq = serializer.serialize_seq(Some(x.len()))?;
+            for element in x {
+                seq.serialize_element(&SerializePyObject {
+                    py: self.py,
+                    obj: element,
+                    sort_keys: self.sort_keys,
+                })?
+            }
+            seq.end()
+        });
+
+        extract!(String);
+        extract!(bool);
+
+        cast!(|x: &PyFloat| x.value().serialize(serializer));
+        extract!(u64);
+        extract!(i64);
+
+        if self.obj == self.py.None().as_ref(self.py) {
+            return serializer.serialize_unit();
+        }
+
+        match self.obj.repr() {
+            Ok(repr) => Err(ser::Error::custom(format_args!(
+                "Value is not JSON serializable: {}",
+                repr,
+            ))),
+            Err(_) => Err(ser::Error::custom(format_args!(
+                "Type is not JSON serializable: {}",
+                self.obj.get_type().name().into_owned(),
+            ))),
+        }
     }
-
-    // At this point we can't cast it, set up the error object
-    let repr = obj
-        .as_ref(py)
-        .repr()
-        .and_then(|x| x.to_string().and_then(|y| Ok(y.into_owned())));
-    Err(HyperJsonError::InvalidCast {
-        t: obj.as_ref(py).get_type().name().into_owned(),
-        e: repr?,
-    })
 }
 
 fn convert_special_floats(py: Python, s: &str, parse_int: Option<PyObject>) -> PyResult<PyObject> {
