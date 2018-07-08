@@ -30,7 +30,8 @@ simple_dicts = [
 @pytest.mark.parametrize("d,allowed", simple_dicts)
 def test_simple_dicts(d, allowed):
     """
-    Python dictionaries are guaranteed to be ordered.
+    Python dictionaries are guaranteed to be ordered in Python 3.6+,
+    in Python <=3.5 they are not ordered.
     In Rust, HashMaps are not, but that's not a big deal
     because JSON also doesn't guarantee order.
     See https://stackoverflow.com/a/7214316/270334
