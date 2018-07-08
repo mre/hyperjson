@@ -11,6 +11,7 @@ main() {
     pip install pipenv
     pipenv install
     pipenv graph
+    make install
 }
 
 main
