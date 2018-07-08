@@ -22,24 +22,23 @@ def ignore_whitespace(a):
 
 
 simple_dicts = [
-    ({"a": 1, "b": 2}, {"b": 2, "a": 1}),
-    ({1: "a", 2: "b"}, {1: "b", 2: "a"}),
+    ({"a": 1, "b": 2}, ['{"a":1,"b":2}', '{"b":2,"a":1}']),
+    ({1: "a", 2: "b"}, ['{"1":"a","2":"b"}', '{"2":"b","1":"a"}']),
 ]
 
 
-@pytest.mark.parametrize("d", simple_dicts)
-def test_dict(v1, v2):
+@pytest.mark.parametrize("d,allowed", simple_dicts)
+def test_simple_dicts(d, allowed):
     """
-    Python dictionaries are guaranteed to be ordered.
+    Python dictionaries are guaranteed to be ordered in Python 3.6+,
+    in Python <=3.5 they are not ordered.
     In Rust, HashMaps are not, but that's not a big deal
     because JSON also doesn't guarantee order.
     See https://stackoverflow.com/a/7214316/270334
     Therefore, we ignore ordering to avoid flaky tests.
     """
-    expected1 = ignore_whitespace(json.dumps(v1))
-    expected2 = ignore_whitespace(json.dumps(v2))
     actual = ignore_whitespace(hyperjson.dumps(d))
-    assert (expected1 == actual) or (expected2 == actual)
+    assert actual in allowed
 
 
 complex_dicts = [
@@ -49,7 +48,7 @@ complex_dicts = [
 
 
 @pytest.mark.parametrize("d", complex_dicts)
-def test_dict(d):
+def test_complex_dicts(d):
     assert ignore_whitespace(json.dumps(
         d)) == ignore_whitespace(hyperjson.dumps(d))
 
