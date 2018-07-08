@@ -128,14 +128,6 @@ This project uses [pipenv](https://docs.pipenv.org/) for managing the developmen
 pip install pipenv
 ```
 
-To get started, run the following command:
-
-```
-pipenv install
-```
-
-This will set up a brand new development environment, just for you. ❤️
-
 After that, you can compile the current version of hyperjson, execute all tests and benchmarks with the following commands:
 
 ```

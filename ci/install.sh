@@ -9,9 +9,8 @@ main() {
     which rustc
     rustc --version
     pip install pipenv
-    pipenv install
-    pipenv graph
     make install
+    pipenv graph
 }
 
 main
