@@ -120,7 +120,7 @@ fn init(py: Python, m: &PyModule) -> PyResult<()> {
         )
     }
 
-    m.add("__version__", version!());
+    m.add("__version__", env!("CARGO_PKG_VERSION"));
 
     // This function is a poor man's implementation of
     // impl From<&str> for PyResult<PyObject>, which is not possible,
