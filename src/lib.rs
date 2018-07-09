@@ -1,7 +1,4 @@
-#![feature(proc_macro)]
-#![feature(proc_macro_path_invoc)]
-#![feature(try_from)]
-#![feature(test)]
+#![feature(use_extern_macros, try_from, test)]
 
 extern crate test;
 
@@ -13,9 +10,6 @@ extern crate failure;
 extern crate serde_derive;
 
 #[macro_use]
-extern crate version;
-
-#[macro_use]
 extern crate pyo3;
 extern crate serde_json;
 
@@ -25,9 +19,7 @@ use std::convert::TryInto;
 use std::fmt;
 use std::marker::PhantomData;
 
-use failure::Error;
 use pyo3::prelude::*;
-use pyo3::Python;
 use serde::de::{self, DeserializeSeed, Deserializer, MapAccess, SeqAccess, Visitor};
 use serde::ser::{self, Serialize, SerializeMap, SerializeSeq, Serializer};
 
@@ -56,8 +48,8 @@ impl From<serde_json::Error> for HyperJsonError {
     }
 }
 
-impl From<HyperJsonError> for pyo3::PyErr {
-    fn from(h: HyperJsonError) -> pyo3::PyErr {
+impl From<HyperJsonError> for PyErr {
+    fn from(h: HyperJsonError) -> PyErr {
         match h {
             HyperJsonError::InvalidConversion { error } => {
                 PyErr::new::<pyo3::exc::TypeError, _>(format!("{}", error))
@@ -72,9 +64,9 @@ impl From<HyperJsonError> for pyo3::PyErr {
     }
 }
 
-impl From<pyo3::PyErr> for HyperJsonError {
-    fn from(error: pyo3::PyErr) -> HyperJsonError {
-        // TODO: This should probably just have the underlying pyo3::PyErr as an argument,
+impl From<PyErr> for HyperJsonError {
+    fn from(error: PyErr) -> HyperJsonError {
+        // TODO: This should probably just have the underlying PyErr as an argument,
         // but this type is not `Sync`, so we just use the debug representation for now.
         HyperJsonError::PyErr {
             error: format!("{:?}", error),
@@ -85,8 +77,8 @@ impl From<pyo3::PyErr> for HyperJsonError {
 import_exception!(json, JSONDecodeError);
 
 /// A hyper-fast JSON encoder/decoder written in Rust
-#[py::modinit(_hyperjson)]
-fn init(py: Python, m: &PyModule) -> PyResult<()> {
+#[pymodinit]
+fn hyperjson(py: Python, m: &PyModule) -> PyResult<()> {
     // See https://github.com/PyO3/pyo3/issues/171
     // Use JSONDecodeError from stdlib until issue is resolved.
     // py_exception!(_hyperjson, JSONDecodeError);
@@ -556,15 +548,13 @@ impl<'de, 'a> Visitor<'de> for HyperJsonValue<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::fs::File;
+    use std::fs;
     use std::io::Read;
     use test::Bencher;
 
     #[bench]
     fn bench_dict_string_int_pairs(b: &mut Bencher) {
-        let mut f = File::open("benchmark/dict_string_int_plain.txt").unwrap();
-        let mut dict_string_int = String::new();
-        f.read_to_string(&mut dict_string_int).unwrap();
+        let dict_string_int = fs::read_to_string("benchmark/dict_string_int_plain.txt").unwrap();
 
         let gil = Python::acquire_gil();
         let py = gil.python();

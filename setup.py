@@ -28,7 +28,7 @@ setup(name='hyperjson',
           'Operating System :: MacOS :: MacOS X',
       ],
       rust_extensions=[
-          RustExtension('hyperjson._hyperjson', 'Cargo.toml', binding=Binding.PyO3)],
+          RustExtension('hyperjson.hyperjson', 'Cargo.toml', binding=Binding.PyO3)],
       packages=['hyperjson'],
       package_dir={'':'package'},
       zip_safe=False)
