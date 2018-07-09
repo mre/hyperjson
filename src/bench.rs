@@ -19,7 +19,7 @@ fn main() {
     let bench_file_name = "benchmarks/dict_string_int_plain.txt";
 
     let mut dict_string_int = fs::read_to_string(bench_file_name)
-        .expect(format!("Could not open bench file '{}'", bench_file_name));
+        .expect(&format!("Could not open bench file '{}'", bench_file_name));
 
     let gil = Python::acquire_gil();
     let py = gil.python();
