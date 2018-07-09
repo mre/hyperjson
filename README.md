@@ -116,10 +116,13 @@ If you like to hack on hyperjson, here is what needs to be done:
 - [X] Implement [`dump()`](https://docs.python.org/3/library/json.html#json.dump)
 - [X] Benchmark against [json](https://docs.python.org/3/library/json.html) and
   [ujson](https://github.com/esnme/ultrajson/) (see [#1](https://github.com/mre/hyperjson/issues/1))
-- [ ] Profile and optimize
+- [ ] Profile and optimize (see [#16](https://github.com/mre/hyperjson/issues/16))
 - [ ] Add remaining [keyword-only arguments](https://docs.python.org/3/library/json.html#basic-usage) to methods
 - [ ] Create a proper pip package from it to make installing easier (see [#3](https://github.com/mre/hyperjson/issues/3)).
 - [ ] Add a CI/CD pipeline for easier testing (see [#2](https://github.com/mre/hyperjson/issues/2))
+
+Just pick one of the open tickets. We will provide mentorship for all of them. :smiley:
+
 
 ## Developer guide
 
