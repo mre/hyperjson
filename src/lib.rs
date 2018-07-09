@@ -530,7 +530,10 @@ impl<'de, 'a> Visitor<'de> for HyperJsonValue<'a> {
     where
         A: SeqAccess<'de>,
     {
-        let mut elements = Vec::new();
+        let mut elements = match seq.size_hint() {
+            Some(n) => Vec::with_capacity(n),
+            None => Vec::new(),
+        };
 
         while let Some(elem) = seq.next_element_seed(self)? {
             elements.push(elem);
