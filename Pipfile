@@ -1,0 +1,19 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[dev-packages]
+setuptools-rust = "*"
+pytest = "*"
+pytest-runner = "*"
+pytest-benchmark = "*"
+simplejson = "*"
+ujson = "*"
+yajl = "*"
+python-rapidjson = "*"
+
+[packages]
+
+[requires]
+python_version = "3.6"

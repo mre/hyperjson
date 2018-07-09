@@ -53,16 +53,15 @@ into [stack overflows or segmentation faults](https://github.com/esnme/ultrajson
 
 We are *not* fast yet. That said, we haven't made any optimizations or even done
 any cleanup yet.  
-So there's a chance that these values might improve soon.  
-If you want, you can help by running `make bench`, profiling, and improving the
-hotspots. 
-
 Another reason why `hyperjson` can be fast in the long-term is by exploiting
 features of newer CPUs like multi-core and SIMD. That's one area other (C-based)
 JSON extensions haven't touched yet because it might make code harder to debug
 and prone to race-conditions. In Rust, this is feasible due to crates like
 [faster](https://github.com/AdamNiederer/faster) and
 [rayon](https://github.com/nikomatsakis/rayon).
+
+So there's a chance that these values might improve soon.  
+If you want to help, check the instructions in the *Development Environment* section below.
 
 **Test machine:**  
 MacBook Pro 15 inch, Mid 2015 (2,2 GHz Intel Core i7, 16 GB RAM) Darwin 17.6.18
@@ -126,26 +125,23 @@ Just pick one of the open tickets. We will provide mentorship for all of them. :
 
 ## Developer guide
 
-To get started, first you need to get [setuptools-rust](https://github.com/PyO3/setuptools-rust):
+This project uses [pipenv](https://docs.pipenv.org/) for managing the development environment. If you don't have it installed, run
 
 ```
-git clone git@github.com:PyO3/setuptools-rust.git
-cd setuptools-rust
-python setup.py install
+pip install pipenv
 ```
 
-After that, you can install hyperjson from the project's root folder:
+After that, you can compile the current version of hyperjson, execute all tests and benchmarks with the following commands:
 
 ```
-cd /path/to/hyperjson
 make install
-```
-
-To test your changes, run
-
-```
 make test
+make bench
 ```
+
+Now just modify the source code and run the above commands again to test your changes. Happy hacking!
+
+🤫 Pssst!...check out the `Makefile` for more commands.
 
 ## License
 
