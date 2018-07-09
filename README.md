@@ -7,7 +7,7 @@ drop-in replacement for Python's built-in
 [json](https://docs.python.org/3/library/json.html) module. It's a thin wrapper
 around Rust's [serde-json](https://github.com/serde-rs/json) built with
 [pyo3](https://github.com/PyO3/pyo3). Compatible with Python 3. Should also work
-on Python 2, but it's not officially supported.
+on Python 2, but it's not officially supported. This is alpha software and there will be bugs, so maybe don't deploy to production *just* yet. :wink:
 
 ## Usage
 
