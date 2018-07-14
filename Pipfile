@@ -12,6 +12,9 @@ simplejson = "*"
 ujson = "*"
 yajl = "*"
 python-rapidjson = "*"
+pylint = "*"
+matplotlib = "*"
+"autopep8" = "*"
 
 [packages]
 

@@ -1,4 +1,4 @@
-![hyperjson](logo.gif)
+![hyperjson](assets/logo.gif)
 
 [![Build Status](https://travis-ci.org/mre/hyperjson.svg?branch-master)](https://travis-ci.org/mre/hyperjson)
 
@@ -66,34 +66,8 @@ If you want to help, check the instructions in the *Development Environment* sec
 **Test machine:**  
 MacBook Pro 15 inch, Mid 2015 (2,2 GHz Intel Core i7, 16 GB RAM) Darwin 17.6.18
 
-**Metric:**
-Messages/second
-
-| Test                                                                          | hyperjson  | ujson      | yajl       | simplejson | json       |
-|-------------------------------------------------------------------------------|------------|------------|------------|------------|------------|
-| Array with 256 doubles                                                        |            |            |            |            |            |
-| encode                                                                        |   **22311.58** |    5888.22 |   14661.28 |    3785.57 |    3853.87 |
-| decode                                                                        |   33903.26 |   **53306.86** |   10812.34 |   10686.22 |   10122.36 |
-| Array with 256 UTF-8 strings                                                  |            |            |            |            |            |
-| encode                                                                        |    **3319.31** |    3184.30 |    1820.44 |    2878.60 |    2478.80 |
-| decode                                                                        |     588.61 |    **1838.47** |     685.14 |     346.99 |     310.73 |
-| Array with 256 strings                                                        |            |            |            |            |            |
-| encode                                                                        |   11019.30 |   **45911.65** |   10585.56 |   19380.16 |   16168.17 |
-| decode                                                                        |   11302.88 |   22595.75 |   17584.74 |   **33094.16** |   22808.74 |
-| Medium complex object                                                         |            |            |            |            |            |
-| encode                                                                        |    2855.54 |   **13852.91** |    5507.62 |    3807.31 |    4614.96 |
-| decode                                                                        |    2736.87 |   **11141.01** |    6108.78 |    5613.81 |    6683.04 |
-| Array with 256 True values                                                    |            |            |            |            |            |
-| encode                                                                        |   51048.52 |  111403.73 |  **126858.75** |   54786.24 |   62589.10 |
-| decode                                                                        |   69094.83 |  **174591.18** |   78901.81 |   92094.40 |   94647.73 |
-| Array with 256 dict{string, int} pairs                                        |            |            |            |            |            |
-| encode                                                                        |    5764.72 |   **16267.18** |    8856.06 |    3136.99 |    6335.88 |
-| decode                                                                        |    3527.49 |   **13393.59** |    8142.81 |    6216.31 |    8008.25 |
-| Dict with 256 arrays with 256 dict{string, int} pairs                         |            |            |            |            |            |
-| encode                                                                        |      17.05 |      **54.64** |      31.17 |       9.68 |      17.87 |
-| decode                                                                        |       9.67 |      **25.35** |      19.49 |      15.10 |      17.78 |
-| Dict with 256 arrays with 256 dict{string, int} pairs, outputting sorted keys |            |            |            |            |            |
-| encode                                                                        |      16.08 |      **36.50** |       0.00 |       7.22 |      18.52 |
+![Serialization benchmarks](assets/serialize.png)
+![Deserialization benchmarks](assets/deserialize.png)
 
 ## Installation
 
@@ -142,6 +116,26 @@ make bench
 Now just modify the source code and run the above commands again to test your changes. Happy hacking!
 
 🤫 Pssst!...check out the `Makefile` for more commands.
+
+## Creating pretty diagrams
+
+In order to create the benchmark histogram, you first need a few additional prerequisites:
+
+* [Matplotlib](https://matplotlib.org/)
+* [Numpy](http://www.numpy.org/)
+
+On macOS, please also add the following to your `~/.matplotlib/matplotlibrc` ([reference](https://markhneedham.com/blog/2018/05/04/python-runtime-error-osx-matplotlib-not-installed-as-framework-mac/)):
+
+```
+backend: TkAgg
+```
+
+After that, run the following
+
+```
+make bench-all
+python benchmarks/histogram.py
+```
 
 ## License
 
