@@ -28,6 +28,6 @@ bench:
 
 .PHONY: bench-all
 bench-all:
-	pytest benchmarks --compare --benchmark-json=benchmark
+	pytest benchmarks --compare --benchmark-json=benchmark.json
 	@echo "Rendering plots from benchmarks"
 	python benchmarks/histogram.py
