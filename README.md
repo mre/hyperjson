@@ -133,8 +133,7 @@ backend: TkAgg
 After that, run the following
 
 ```
-make bench-all
-python benchmarks/histogram.py
+make plot
 ```
 
 ## License
