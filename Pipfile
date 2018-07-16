@@ -12,6 +12,7 @@ simplejson = "*"
 ujson = "*"
 yajl = "*"
 python-rapidjson = "*"
+hypothesis = "*"
 
 [packages]
 
