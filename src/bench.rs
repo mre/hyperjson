@@ -12,13 +12,14 @@ extern crate pyo3;
 
 use pyo3::prelude::*;
 use pyo3::Python;
-use std::fs::File;
+use std::fs;
 use std::io::Read;
 
 fn main() {
-    let mut f = File::open("benchmark/dict_string_int_plain.txt").unwrap();
-    let mut dict_string_int = String::new();
-    f.read_to_string(&mut dict_string_int).unwrap();
+    let bench_file_name = "benchmarks/dict_string_int_plain.txt";
+
+    let mut dict_string_int = fs::read_to_string(bench_file_name)
+        .expect(&format!("Could not open bench file '{}'", bench_file_name));
 
     let gil = Python::acquire_gil();
     let py = gil.python();

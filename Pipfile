@@ -13,6 +13,9 @@ ujson = "*"
 yajl = "*"
 python-rapidjson = "*"
 hypothesis = "*"
+pylint = "*"
+matplotlib = "*"
+"autopep8" = "*"
 
 [packages]
 
