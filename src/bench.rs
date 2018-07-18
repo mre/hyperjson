@@ -11,7 +11,6 @@ extern crate hyperjson;
 extern crate pyo3;
 
 use pyo3::prelude::*;
-use pyo3::Python;
 use std::fs;
 use std::io::Read;
 
