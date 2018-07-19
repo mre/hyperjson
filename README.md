@@ -103,11 +103,6 @@ This project uses [pipenv](https://docs.pipenv.org/) for managing the developmen
 ```
 pip install pipenv
 ```
-After installing `pipenv`, enter the project directory and create virtual enviroment by running
-
-```
-pipenv shell
-```
 
 The project requires the `nightly` version of Rust.
 
@@ -134,6 +129,20 @@ make bench
 Now just modify the source code and run the above commands again to test your changes. Happy hacking!
 
 🤫 Pssst!...check out the `Makefile` for more commands.
+
+## Troubleshooting
+
+In case you want to test your changes within a virtual environment, run
+
+```
+pipenv shell
+```
+
+When you are done testing, exit the virtual environment:
+
+```
+exit
+```
 
 ## Creating pretty diagrams
 
