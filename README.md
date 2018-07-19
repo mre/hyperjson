@@ -98,11 +98,24 @@ Just pick one of the open tickets. We will provide mentorship for all of them. :
 
 
 ## Developer guide
-
 This project uses [pipenv](https://docs.pipenv.org/) for managing the development environment. If you don't have it installed, run
 
 ```
 pip install pipenv
+```
+
+The project requires the `nightly` version of Rust.
+
+Install it via `rustup`:
+
+```
+rustup override set nightly
+```
+
+If you have already installed the `nightly` version, make sure it is updated:
+
+```
+rustup update nightly
 ```
 
 After that, you can compile the current version of hyperjson, execute all tests and benchmarks with the following commands:
@@ -116,6 +129,20 @@ make bench
 Now just modify the source code and run the above commands again to test your changes. Happy hacking!
 
 🤫 Pssst!...check out the `Makefile` for more commands.
+
+## Troubleshooting
+
+In case you want to test your changes within a virtual environment, run
+
+```
+pipenv shell
+```
+
+When you are done testing, exit the virtual environment:
+
+```
+exit
+```
 
 ## Creating pretty diagrams
 
