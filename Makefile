@@ -8,30 +8,25 @@ build: nightly
 nightly:
 	rustup override set nightly
 
-.PHONY: install2
-install2: nightly
-	pipenv install --dev
-	python2 setup.py install
-
 .PHONY: install
 install: nightly
 	pipenv install --dev
-	python3 setup.py install
+	pipenv run python setup.py install
 
 .PHONY: test
 test:
-	pytest tests
+	pipenv run pytest tests
 
 .PHONY: bench
 bench:
-	pytest benchmarks
+	pipenv run pytest benchmarks
 
 .PHONY: bench-all
 bench-all:
-	pytest benchmarks --compare
+	pipenv run pytest benchmarks --compare
 	
 .PHONY: plot
 plot:
-	pytest benchmarks --compare --benchmark-json=benchmark.json
+	pipenv run pytest benchmarks --compare --benchmark-json=benchmark.json
 	@echo "Rendering plots from benchmarks"
-	python benchmarks/histogram.py
+	pipenv run python benchmarks/histogram.py
