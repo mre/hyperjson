@@ -4,7 +4,7 @@ import hyperjson
 import string
 from io import StringIO
 
-simple_types = [1, 1.0, -1, None, "str", True]
+simple_types = [1, 1.0, -1, None, "str", True, False]
 
 
 @pytest.mark.parametrize("payload", simple_types)
