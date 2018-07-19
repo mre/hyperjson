@@ -98,11 +98,29 @@ Just pick one of the open tickets. We will provide mentorship for all of them. :
 
 
 ## Developer guide
-
 This project uses [pipenv](https://docs.pipenv.org/) for managing the development environment. If you don't have it installed, run
 
 ```
 pip install pipenv
+```
+After installing `pipenv`, enter the project directory and create virtual enviroment by running
+
+```
+pipenv shell
+```
+
+The project requires the `nightly` version of Rust.
+
+Install it via `rustup`:
+
+```
+rustup override set nightly
+```
+
+If you have already installed the `nightly` version, make sure it is updated:
+
+```
+rustup update nightly
 ```
 
 After that, you can compile the current version of hyperjson, execute all tests and benchmarks with the following commands:
