@@ -1,5 +1,3 @@
-DIR := $(shell basename $(CURDIR))
-
 .PHONY: build
 build: nightly
 	cargo build

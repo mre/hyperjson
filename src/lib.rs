@@ -6,7 +6,6 @@ extern crate serde;
 
 #[macro_use]
 extern crate failure;
-#[macro_use]
 extern crate serde_derive;
 
 #[macro_use]
@@ -14,8 +13,6 @@ extern crate pyo3;
 extern crate serde_json;
 
 use std::collections::BTreeMap;
-use std::convert::TryFrom;
-use std::convert::TryInto;
 use std::fmt;
 use std::marker::PhantomData;
 
