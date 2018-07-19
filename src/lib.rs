@@ -52,8 +52,10 @@ impl From<HyperJsonError> for PyErr {
                 PyErr::new::<pyo3::exc::TypeError, _>(format!("{}", error))
             }
             // TODO
-            HyperJsonError::PyErr { error } => PyErr::new::<pyo3::exc::TypeError, _>("PyErr"),
-            HyperJsonError::InvalidCast { t, e } => {
+            HyperJsonError::PyErr { error: _error } => {
+                PyErr::new::<pyo3::exc::TypeError, _>("PyErr")
+            }
+            HyperJsonError::InvalidCast { t: _t, e: _e } => {
                 PyErr::new::<pyo3::exc::TypeError, _>("InvalidCast")
             }
             _ => PyErr::new::<pyo3::exc::TypeError, _>("Unknown reason"),
@@ -164,16 +166,16 @@ fn hyperjson(py: Python, m: &PyModule) -> PyResult<()> {
     pub fn dumps_fn(
         py: Python,
         obj: PyObject,
-        skipkeys: Option<bool>,
+        _skipkeys: Option<bool>,
         ensure_ascii: Option<PyObject>,
-        check_circular: Option<PyObject>,
-        allow_nan: Option<PyObject>,
-        cls: Option<PyObject>,
-        indent: Option<PyObject>,
-        separators: Option<PyObject>,
-        default: Option<PyObject>,
+        _check_circular: Option<PyObject>,
+        _allow_nan: Option<PyObject>,
+        _cls: Option<PyObject>,
+        _indent: Option<PyObject>,
+        _separators: Option<PyObject>,
+        _default: Option<PyObject>,
         sort_keys: Option<PyObject>,
-        kwargs: Option<&PyDict>,
+        _kwargs: Option<&PyDict>,
     ) -> PyResult<PyObject> {
         let v = SerializePyObject {
             py,
@@ -193,16 +195,16 @@ fn hyperjson(py: Python, m: &PyModule) -> PyResult<()> {
         py: Python,
         obj: PyObject,
         fp: PyObject,
-        skipkeys: Option<PyObject>,
-        ensure_ascii: Option<PyObject>,
-        check_circular: Option<PyObject>,
-        allow_nan: Option<PyObject>,
-        cls: Option<PyObject>,
-        indent: Option<PyObject>,
-        separators: Option<PyObject>,
-        default: Option<PyObject>,
-        sort_keys: Option<PyObject>,
-        kwargs: Option<&PyDict>,
+        _skipkeys: Option<PyObject>,
+        _ensure_ascii: Option<PyObject>,
+        _check_circular: Option<PyObject>,
+        _allow_nan: Option<PyObject>,
+        _cls: Option<PyObject>,
+        _indent: Option<PyObject>,
+        _separators: Option<PyObject>,
+        _default: Option<PyObject>,
+        _sort_keys: Option<PyObject>,
+        _kwargs: Option<&PyDict>,
     ) -> PyResult<PyObject> {
         let s = dumps_fn(
             py, obj, None, None, None, None, None, None, None, None, None, None,
@@ -219,12 +221,12 @@ fn hyperjson(py: Python, m: &PyModule) -> PyResult<()> {
 pub fn loads_impl(
     py: Python,
     s: PyObject,
-    encoding: Option<PyObject>,
-    cls: Option<PyObject>,
-    object_hook: Option<PyObject>,
+    _encoding: Option<PyObject>,
+    _cls: Option<PyObject>,
+    _object_hook: Option<PyObject>,
     parse_float: Option<PyObject>,
     parse_int: Option<PyObject>,
-    kwargs: Option<&PyDict>,
+    _kwargs: Option<&PyDict>,
 ) -> PyResult<PyObject> {
     let string_result: Result<String, _> = s.extract(py);
     match string_result {
@@ -400,7 +402,11 @@ impl<'p, 'a> Serialize for SerializePyObject<'p, 'a> {
     }
 }
 
-fn convert_special_floats(py: Python, s: &str, parse_int: &Option<PyObject>) -> PyResult<PyObject> {
+fn convert_special_floats(
+    py: Python,
+    s: &str,
+    _parse_int: &Option<PyObject>,
+) -> PyResult<PyObject> {
     match s {
         // TODO: If `allow_nan` is false (default: True), then this should be a ValueError
         // https://docs.python.org/3/library/json.html
@@ -546,7 +552,6 @@ impl<'de, 'a> Visitor<'de> for HyperJsonValue<'a> {
 mod tests {
     use super::*;
     use std::fs;
-    use std::io::Read;
     use test::Bencher;
 
     #[bench]
