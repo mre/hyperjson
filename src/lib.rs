@@ -23,6 +23,8 @@ use pyo3::prelude::*;
 use serde::de::{self, DeserializeSeed, Deserializer, MapAccess, SeqAccess, Visitor};
 use serde::ser::{self, Serialize, SerializeMap, SerializeSeq, Serializer};
 
+use std::borrow::Cow;
+
 #[derive(Debug, Fail)]
 pub enum HyperJsonError {
     #[fail(display = "Conversion error: {}", error)]
@@ -335,11 +337,13 @@ impl<'p, 'a> Serialize for SerializePyObject<'p, 'a> {
                 for (key, value) in x {
                     if key == self.py.None().as_ref(self.py) {
                         map.serialize_key("null")?;
-                    } else if let Ok(key) = key.extract::<bool>() {
-                        map.serialize_key(if key { "true" } else { "false" })?;
                     } else if let Ok(key) = key.str() {
                         let key = key.to_string().map_err(debug_py_err)?;
-                        map.serialize_key(&key)?;
+                        match key {
+                            Cow::Borrowed("true") => map.serialize_key(&true)?,
+                            Cow::Borrowed("false") => map.serialize_key(&false)?,
+                            _ => map.serialize_key(&key)?,
+                        }
                     } else {
                         return Err(ser::Error::custom(format_args!(
                             "Dictionary key is not a string: {:?}",
