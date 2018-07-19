@@ -339,11 +339,7 @@ impl<'p, 'a> Serialize for SerializePyObject<'p, 'a> {
                         map.serialize_key("null")?;
                     } else if let Ok(key) = key.str() {
                         let key = key.to_string().map_err(debug_py_err)?;
-                        match key {
-                            Cow::Borrowed("true") => map.serialize_key(&true)?,
-                            Cow::Borrowed("false") => map.serialize_key(&false)?,
-                            _ => map.serialize_key(&key)?,
-                        }
+                        map.serialize_key(&key)?
                     } else {
                         return Err(ser::Error::custom(format_args!(
                             "Dictionary key is not a string: {:?}",
