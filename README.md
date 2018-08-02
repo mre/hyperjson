@@ -30,6 +30,8 @@ Unless you care about **performance and safety**.
 Turns out, parsing JSON correctly is [hard](http://seriot.ch/parsing_json.php), but due to Rust, the risk of running
 into [stack overflows or segmentation faults](https://github.com/esnme/ultrajson/issues) is lower (basically zero, especially in comparison to C implementations).
 
+For a more in-detail discussion, [watch the talk about this project recorded at the Rust Cologne Meetup in August 2018.](https://media.ccc.de/v/rustcologne.2018.08.hyperjson)
+
 ## Goals
 
 * **Compatibility**: Support the full feature-set of Python's json module.
