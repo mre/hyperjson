@@ -67,7 +67,7 @@ name = "hyperjson"
 version = "0.1.0"
 dependencies = [
  "failure 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "pyo3 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pyo3 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.70 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.70 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.24 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -150,13 +150,13 @@ dependencies = [
 
 [[package]]
 name = "pyo3"
-version = "0.3.2"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "libc 0.2.42 (registry+https://github.com/rust-lang/crates.io-index)",
  "mashup 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-traits 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "pyo3cls 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pyo3cls 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "regex 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "spin 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "version_check 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -164,7 +164,7 @@ dependencies = [
 
 [[package]]
 name = "pyo3-derive-backend"
-version = "0.3.2"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "log 0.4.3 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -175,11 +175,11 @@ dependencies = [
 
 [[package]]
 name = "pyo3cls"
-version = "0.3.2"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "proc-macro2 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)",
- "pyo3-derive-backend 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pyo3-derive-backend 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "quote 0.6.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "syn 0.14.5 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -349,9 +349,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum proc-macro-hack 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "3ba8d4f9257b85eb6cdf13f055cea3190520aab1409ca2ab43493ea4820c25f0"
 "checksum proc-macro-hack-impl 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "d5cb6f960ad471404618e9817c0e5d10b1ae74cfdf01fab89ea0641fe7fb2892"
 "checksum proc-macro2 0.4.9 (registry+https://github.com/rust-lang/crates.io-index)" = "cccdc7557a98fe98453030f077df7f3a042052fae465bb61d2c2c41435cfd9b6"
-"checksum pyo3 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)" = "f84967fb8688ee276b074fa10e8160396f8e5c4eb2e97f9e55d5223a5e1beec3"
-"checksum pyo3-derive-backend 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)" = "c9cadd3abe7ea8effd3a062699a89741262ecccf2625c3cd9cdfe8db733c280c"
-"checksum pyo3cls 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)" = "74de52b97675a44cea67433c128002eb85ee3219f1941809359ebfd7e56b3f70"
+"checksum pyo3 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "9e733e6e55706b236b259511b40075c62885608fc578c8564bf3c33bf8f2ce84"
+"checksum pyo3-derive-backend 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "f21fab56a323b1ddfc14334de29458c6ecc43b7bd142f1eafe20069f079df2fa"
+"checksum pyo3cls 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ac00892e83b1f429ee768c26a4832281967f857b78b9100e5812d899e6eee541"
 "checksum quote 0.6.4 (registry+https://github.com/rust-lang/crates.io-index)" = "b71f9f575d55555aa9c06188be9d4e2bfc83ed02537948ac0d520c24d0419f1a"
 "checksum regex 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "5bbbea44c5490a1e84357ff28b7d518b4619a159fed5d25f6c1de2d19cc42814"
 "checksum regex-syntax 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)" = "747ba3b235651f6e2f67dfa8bcdcd073ddb7c243cb21c442fc12395dfcac212d"
