@@ -11,6 +11,11 @@ install: nightly
 	pipenv install --dev
 	pipenv run python setup.py install
 
+.PHONY: clean
+clean:
+	pipenv --rm || true
+	cargo clean
+
 .PHONY: test
 test:
 	pipenv run pytest tests
@@ -28,3 +33,9 @@ plot:
 	pipenv run pytest benchmarks --compare --benchmark-json=benchmark.json
 	@echo "Rendering plots from benchmarks"
 	pipenv run python benchmarks/histogram.py
+
+.PHONY: profile-mac
+profile-mac: nightly
+	cargo build --bin hyperjson-bench
+	pipenv shell && sudo macos-profiler time-spent --command ./target/debug/hyperjson-bench	&& exit
+
