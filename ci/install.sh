@@ -9,7 +9,6 @@ main() {
     which rustc
     rustc --version
     pip install pipenv
-    sudo apt-get install libdbus-1-dev
     cargo install pyo3-pack
     make install
     pipenv graph
