@@ -71,7 +71,7 @@ MacBook Pro 15 inch, Mid 2015 (2,2 GHz Intel Core i7, 16 GB RAM) Darwin 17.6.18
 ![Serialization benchmarks](assets/serialize.png)
 ![Deserialization benchmarks](assets/deserialize.png)
 
-## Installation
+## Building the module from the sources
 
 To compile the code and create an importable Python module from it, call  
 

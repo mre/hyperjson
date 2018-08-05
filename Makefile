@@ -8,8 +8,7 @@ nightly:
 
 .PHONY: install
 install: nightly
-	pipenv install --dev
-	pipenv run python setup.py install
+	pyo3-pack build
 
 .PHONY: clean
 clean:
