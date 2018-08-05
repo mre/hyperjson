@@ -4,7 +4,8 @@ sudo: false
 addons:
   apt:
     packages:
-      - rpm
+     - rpm
+     - libdbus-1-dev
 
 python:
   #- 2.7
@@ -12,9 +13,6 @@ python:
   - 3.5
   - 3.6
 
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq libdbus-1-dev
 
 install:
     - bash ci/install.sh
