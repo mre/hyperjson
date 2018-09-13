@@ -1,4 +1,4 @@
-#![feature(use_extern_macros, try_from, test)]
+#![feature(try_from, test)]
 
 extern crate test;
 
@@ -77,7 +77,7 @@ import_exception!(json, JSONDecodeError);
 
 /// A hyper-fast JSON encoder/decoder written in Rust
 #[pymodinit]
-fn hyperjson(py: Python, m: &PyModule) -> PyResult<()> {
+fn hyperjson(_py: Python, m: &PyModule) -> PyResult<()> {
     // See https://github.com/PyO3/pyo3/issues/171
     // Use JSONDecodeError from stdlib until issue is resolved.
     // py_exception!(_hyperjson, JSONDecodeError);
@@ -111,7 +111,7 @@ fn hyperjson(py: Python, m: &PyModule) -> PyResult<()> {
         )
     }
 
-    m.add("__version__", env!("CARGO_PKG_VERSION"));
+    m.add("__version__", env!("CARGO_PKG_VERSION"))?;
 
     // This function is a poor man's implementation of
     // impl From<&str> for PyResult<PyObject>, which is not possible,
@@ -167,7 +167,7 @@ fn hyperjson(py: Python, m: &PyModule) -> PyResult<()> {
         py: Python,
         obj: PyObject,
         _skipkeys: Option<bool>,
-        ensure_ascii: Option<PyObject>,
+        _ensure_ascii: Option<PyObject>,
         _check_circular: Option<PyObject>,
         _allow_nan: Option<PyObject>,
         _cls: Option<PyObject>,
