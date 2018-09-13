@@ -167,7 +167,7 @@ fn hyperjson(_py: Python, m: &PyModule) -> PyResult<()> {
         py: Python,
         obj: PyObject,
         _skipkeys: Option<bool>,
-        _ensure_ascii: Option<PyObject>,
+        ensure_ascii: Option<PyObject>,
         _check_circular: Option<PyObject>,
         _allow_nan: Option<PyObject>,
         _cls: Option<PyObject>,
