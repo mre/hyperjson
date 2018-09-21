@@ -22,6 +22,8 @@ use pyo3::prelude::*;
 use serde::de::{self, DeserializeSeed, Deserializer, MapAccess, SeqAccess, Visitor};
 use serde::ser::{self, Serialize, SerializeMap, SerializeSeq, Serializer};
 
+const DEFAUL_HASHMAP_CAPACITY: usize = 10;
+
 #[derive(Debug, Fail)]
 pub enum HyperJsonError {
     #[fail(display = "Conversion error: {}", error)]
@@ -540,7 +542,7 @@ impl<'de, 'a> Visitor<'de> for HyperJsonValue<'a> {
     where
         A: MapAccess<'de>,
     {
-        let mut entries = FnvHashMap::default();
+        let mut entries = FnvHashMap::with_capacity_and_hasher(DEFAUL_HASHMAP_CAPACITY, Default::default());
 
         while let Some((key, value)) = map.next_entry_seed(PhantomData::<String>, self)? {
             entries.insert(key, value);
