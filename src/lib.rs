@@ -12,7 +12,9 @@ extern crate serde_derive;
 extern crate pyo3;
 extern crate serde_json;
 
-use std::collections::BTreeMap;
+extern crate fnv;
+
+use fnv::FnvHashMap;
 use std::fmt;
 use std::marker::PhantomData;
 
@@ -538,7 +540,7 @@ impl<'de, 'a> Visitor<'de> for HyperJsonValue<'a> {
     where
         A: MapAccess<'de>,
     {
-        let mut entries = BTreeMap::new();
+        let mut entries = FnvHashMap::default();
 
         while let Some((key, value)) = map.next_entry_seed(PhantomData::<String>, self)? {
             entries.insert(key, value);
