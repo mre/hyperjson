@@ -8,6 +8,7 @@ serde_json = "1.0.13"
 failure = "0.1.1"
 serde = "1.0.53"
 serde_derive = "1.0.53"
+fnv = "1.0.6"
 
 [dependencies.pyo3]
 version = "0.4.0"

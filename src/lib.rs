@@ -12,13 +12,17 @@ extern crate serde_derive;
 extern crate pyo3;
 extern crate serde_json;
 
-use std::collections::BTreeMap;
+extern crate fnv;
+
+use fnv::FnvHashMap;
 use std::fmt;
 use std::marker::PhantomData;
 
 use pyo3::prelude::*;
 use serde::de::{self, DeserializeSeed, Deserializer, MapAccess, SeqAccess, Visitor};
 use serde::ser::{self, Serialize, SerializeMap, SerializeSeq, Serializer};
+
+const DEFAULT_HASHMAP_CAPACITY: usize = 10;
 
 #[derive(Debug, Fail)]
 pub enum HyperJsonError {
@@ -538,7 +542,7 @@ impl<'de, 'a> Visitor<'de> for HyperJsonValue<'a> {
     where
         A: MapAccess<'de>,
     {
-        let mut entries = BTreeMap::new();
+        let mut entries = FnvHashMap::with_capacity_and_hasher(DEFAULT_HASHMAP_CAPACITY, Default::default());
 
         while let Some((key, value)) = map.next_entry_seed(PhantomData::<String>, self)? {
             entries.insert(key, value);
