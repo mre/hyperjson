@@ -19,7 +19,7 @@ module](https://docs.python.org/3/library/json.html):
 >>> hyperjson.dumps([{"key": "value"}, 81, True])
 '[{"key":"value"},81,true]'
 >>> hyperjson.loads("""[{"key": "value"}, 81, true]""")
-[{u'key': u'value'}, 81, True
+[{u'key': u'value'}, 81, True]
 ```
 
 ## Motivation
