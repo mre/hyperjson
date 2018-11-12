@@ -139,14 +139,14 @@ fn hyperjson(_py: Python, m: &PyModule) -> PyResult<()> {
 
         // if args.len() == 0 {
         //     // TODO: This is the wrong error message.
-        //     return Err(exc::LookupError::new("oh no"));
+        //     return Err(PyLookupError::py_err("oh no"));
         // }
         // if args.len() >= 2 {
-        //     // return Err(PyTypeError::new(format!(
+        //     // return Err(PyTypeError::py_err(format!(
         //     //     "Unknown encoding: {}",
         //     //     args.get_item(1).to_string()
         //     // )));
-        //     return Err(exc::LookupError::new(
+        //     return Err(PyLookupError::py_err(
         //         "loads() takes exactly 1 argument (2 given)",
         //     ));
         // }
