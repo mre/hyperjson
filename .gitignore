@@ -112,3 +112,4 @@ venv.bak/
 **/*.rs.bk
 skipped.py
 benchmark.json
+.idea
