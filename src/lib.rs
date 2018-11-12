@@ -17,6 +17,9 @@ use std::fmt;
 use std::marker::PhantomData;
 
 use pyo3::prelude::*;
+use pyo3::types::{PyObjectRef, PyList, PyDict, PyTuple, PyFloat};
+use pyo3::types::exceptions::TypeError as PyTypeError;
+use pyo3::types::exceptions::ValueError as PyValueError;
 use serde::de::{self, DeserializeSeed, Deserializer, MapAccess, SeqAccess, Visitor};
 use serde::ser::{self, Serialize, SerializeMap, SerializeSeq, Serializer};
 
@@ -49,16 +52,16 @@ impl From<HyperJsonError> for PyErr {
     fn from(h: HyperJsonError) -> PyErr {
         match h {
             HyperJsonError::InvalidConversion { error } => {
-                PyErr::new::<pyo3::exc::TypeError, _>(format!("{}", error))
+                PyErr::new::<PyTypeError, _>(format!("{}", error))
             }
             // TODO
             HyperJsonError::PyErr { error: _error } => {
-                PyErr::new::<pyo3::exc::TypeError, _>("PyErr")
+                PyErr::new::<PyTypeError, _>("PyErr")
             }
             HyperJsonError::InvalidCast { t: _t, e: _e } => {
-                PyErr::new::<pyo3::exc::TypeError, _>("InvalidCast")
+                PyErr::new::<PyTypeError, _>("InvalidCast")
             }
-            _ => PyErr::new::<pyo3::exc::TypeError, _>("Unknown reason"),
+            _ => PyErr::new::<PyTypeError, _>("Unknown reason"),
         }
     }
 }
@@ -96,7 +99,7 @@ fn hyperjson(_py: Python, m: &PyModule) -> PyResult<()> {
         // Reset file pointer to beginning See
         // https://github.com/PyO3/pyo3/issues/143 Note that we ignore the return
         // value, because `seek` does not strictly need to exist on the object
-        let _success = io.call_method("seek", (0,), pyo3::NoArgs);
+        let _success = io.call_method("seek", (0, ), None);
 
         let s_obj = io.call_method0("read")?;
         loads_fn(
@@ -139,7 +142,7 @@ fn hyperjson(_py: Python, m: &PyModule) -> PyResult<()> {
         //     return Err(exc::LookupError::new("oh no"));
         // }
         // if args.len() >= 2 {
-        //     // return Err(exc::TypeError::new(format!(
+        //     // return Err(PyTypeError::new(format!(
         //     //     "Unknown encoding: {}",
         //     //     args.get_item(1).to_string()
         //     // )));
@@ -210,7 +213,7 @@ fn hyperjson(_py: Python, m: &PyModule) -> PyResult<()> {
             py, obj, None, None, None, None, None, None, None, None, None, None,
         )?;
         let fp_ref: &PyObjectRef = fp.as_ref(py);
-        fp_ref.call_method1("write", (s,))?;
+        fp_ref.call_method1("write", (s, ))?;
         // TODO: Will this always return None?
         Ok(pyo3::Python::None(py))
     }
@@ -237,30 +240,25 @@ pub fn loads_impl(
                 Ok(py_object) => {
                     deserializer
                         .end()
-                        .map_err(|e| JSONDecodeError::new((e.to_string(), string.clone(), 0)))?;
+                        .map_err(|e| JSONDecodeError::py_err((e.to_string(), string.clone(), 0)))?;
                     Ok(py_object)
                 }
                 Err(e) => {
-                    return convert_special_floats(py, &string, &parse_int).or_else(|err| {
-                        if e.is_syntax() {
-                            return Err(JSONDecodeError::new((
-                                format!("Value: {:?}, Error: {:?}", s, err),
-                                string.clone(),
-                                0,
-                            )));
-                        } else {
-                            return Err(exc::ValueError::new(format!(
-                                "Value: {:?}, Error: {:?}",
-                                s, e
-                            )));
-                        }
-                    })
+                    return convert_special_floats(py, &string, &parse_int).or_else(|err| if e.is_syntax() {
+                        return Err(JSONDecodeError::py_err((
+                            format!("Value: {:?}, Error: {:?}", s, err),
+                            string.clone(),
+                            0,
+                        )));
+                    } else {
+                        return Err(PyValueError::py_err(format!("Value: {:?}, Error: {:?}", s, e)));
+                    });
                 }
             }
         }
         _ => {
             let bytes: Vec<u8> = s.extract(py).or_else(|e| {
-                Err(exc::TypeError::new(format!(
+                Err(PyTypeError::py_err(format!(
                     "the JSON object must be str, bytes or bytearray, got: {:?}",
                     e
                 )))
@@ -271,11 +269,11 @@ pub fn loads_impl(
                 Ok(py_object) => {
                     deserializer
                         .end()
-                        .map_err(|e| JSONDecodeError::new((e.to_string(), bytes.clone(), 0)))?;
+                        .map_err(|e| JSONDecodeError::py_err((e.to_string(), bytes.clone(), 0)))?;
                     Ok(py_object)
                 }
                 Err(e) => {
-                    return Err(exc::TypeError::new(format!(
+                    return Err(PyTypeError::py_err(format!(
                         "the JSON object must be str, bytes or bytearray, got: {:?}",
                         e
                     )));
@@ -293,8 +291,8 @@ struct SerializePyObject<'p, 'a> {
 
 impl<'p, 'a> Serialize for SerializePyObject<'p, 'a> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
+        where
+            S: Serializer,
     {
         macro_rules! cast {
             ($f:expr) => {
@@ -413,7 +411,7 @@ fn convert_special_floats(
         "NaN" => Ok(std::f64::NAN.to_object(py)),
         "Infinity" => Ok(std::f64::INFINITY.to_object(py)),
         "-Infinity" => Ok(std::f64::NEG_INFINITY.to_object(py)),
-        _ => Err(exc::ValueError::new(format!("Value: {:?}", s))),
+        _ => Err(PyValueError::py_err(format!("Value: {:?}", s))),
     }
 }
 
@@ -446,8 +444,8 @@ impl<'de, 'a> DeserializeSeed<'de> for HyperJsonValue<'a> {
     type Value = PyObject;
 
     fn deserialize<D>(self, deserializer: D) -> Result<Self::Value, D::Error>
-    where
-        D: Deserializer<'de>,
+        where
+            D: Deserializer<'de>,
     {
         deserializer.deserialize_any(self)
     }
@@ -455,11 +453,11 @@ impl<'de, 'a> DeserializeSeed<'de> for HyperJsonValue<'a> {
 
 impl<'a> HyperJsonValue<'a> {
     fn parse_primitive<E, T>(self, value: T, parser: &PyObject) -> Result<PyObject, E>
-    where
-        E: de::Error,
-        T: ToString,
+        where
+            E: de::Error,
+            T: ToString,
     {
-        match parser.call1(self.py, (value.to_string(),)) {
+        match parser.call1(self.py, (value.to_string(), )) {
             Ok(primitive) => Ok(primitive),
             Err(err) => Err(de::Error::custom(HyperJsonError::from(err))),
         }
@@ -474,15 +472,15 @@ impl<'de, 'a> Visitor<'de> for HyperJsonValue<'a> {
     }
 
     fn visit_bool<E>(self, value: bool) -> Result<Self::Value, E>
-    where
-        E: de::Error,
+        where
+            E: de::Error,
     {
         Ok(value.to_object(self.py))
     }
 
     fn visit_i64<E>(self, value: i64) -> Result<Self::Value, E>
-    where
-        E: de::Error,
+        where
+            E: de::Error,
     {
         match self.parse_int {
             Some(parser) => self.parse_primitive(value, parser),
@@ -491,8 +489,8 @@ impl<'de, 'a> Visitor<'de> for HyperJsonValue<'a> {
     }
 
     fn visit_u64<E>(self, value: u64) -> Result<Self::Value, E>
-    where
-        E: de::Error,
+        where
+            E: de::Error,
     {
         match self.parse_int {
             Some(parser) => self.parse_primitive(value, parser),
@@ -501,8 +499,8 @@ impl<'de, 'a> Visitor<'de> for HyperJsonValue<'a> {
     }
 
     fn visit_f64<E>(self, value: f64) -> Result<Self::Value, E>
-    where
-        E: de::Error,
+        where
+            E: de::Error,
     {
         match self.parse_float {
             Some(parser) => self.parse_primitive(value, parser),
@@ -511,8 +509,8 @@ impl<'de, 'a> Visitor<'de> for HyperJsonValue<'a> {
     }
 
     fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
-    where
-        E: de::Error,
+        where
+            E: de::Error,
     {
         Ok(value.to_object(self.py))
     }
@@ -522,8 +520,8 @@ impl<'de, 'a> Visitor<'de> for HyperJsonValue<'a> {
     }
 
     fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
-    where
-        A: SeqAccess<'de>,
+        where
+            A: SeqAccess<'de>,
     {
         let mut elements = Vec::new();
 
@@ -535,8 +533,8 @@ impl<'de, 'a> Visitor<'de> for HyperJsonValue<'a> {
     }
 
     fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
-    where
-        A: MapAccess<'de>,
+        where
+            A: MapAccess<'de>,
     {
         let mut entries = BTreeMap::new();
 
