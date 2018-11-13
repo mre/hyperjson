@@ -2,10 +2,10 @@
 name = "profiling"
 version = "0.1.0"
 authors = ["Matthias Endler <matthias-endler@gmx.net>"]
-edition = "2018"
 
 [dependencies]
-hyperjson = { path = ".." }
+# Disabling the default features makes pyo3 choose binary linking
+hyperjson = { path = "..", default-features = false }
 
 [dependencies.pyo3]
 version = "0.5.0"

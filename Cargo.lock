@@ -138,6 +138,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "profiling"
+version = "0.1.0"
+dependencies = [
+ "hyperjson 0.1.0",
+ "pyo3 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "pyo3"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

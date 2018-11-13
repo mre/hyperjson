@@ -2,7 +2,6 @@
 name = "hyperjson"
 version = "0.1.0"
 authors = ["Matthias Endler <matthias-endler@gmx.net>"]
-edition = "2018"
 
 [dependencies]
 serde_json = "1.0.13"
@@ -17,4 +16,13 @@ features = ["extension-module"]
 [lib]
 name = "hyperjson"
 crate-type = ["rlib", "cdylib"]
+
+[features]
+# We must make this feature optional to build binaries such as the profiling crate
+default = ["pyo3/extension-module"]
+
+[workspace]
+members = [
+  "profiling"
+]
 
