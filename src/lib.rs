@@ -1,27 +1,24 @@
 #![feature(try_from, test)]
 
-extern crate test;
-
-extern crate serde;
-
 #[macro_use]
 extern crate failure;
-extern crate serde_derive;
-
 #[macro_use]
 extern crate pyo3;
+extern crate serde;
+extern crate serde_derive;
 extern crate serde_json;
+extern crate test;
 
 use std::collections::BTreeMap;
 use std::fmt;
 use std::marker::PhantomData;
 
 use pyo3::prelude::*;
-use pyo3::types::{PyObjectRef, PyList, PyDict, PyTuple, PyFloat};
+use pyo3::types::{PyDict, PyFloat, PyList, PyObjectRef, PyTuple};
 use pyo3::types::exceptions::TypeError as PyTypeError;
 use pyo3::types::exceptions::ValueError as PyValueError;
-use serde::de::{self, DeserializeSeed, Deserializer, MapAccess, SeqAccess, Visitor};
-use serde::ser::{self, Serialize, SerializeMap, SerializeSeq, Serializer};
+use serde::de::{self, Deserializer, DeserializeSeed, MapAccess, SeqAccess, Visitor};
+use serde::ser::{self, Serialize, SerializeMap, Serializer, SerializeSeq};
 
 #[derive(Debug, Fail)]
 pub enum HyperJsonError {
@@ -548,9 +545,10 @@ impl<'de, 'a> Visitor<'de> for HyperJsonValue<'a> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::fs;
     use test::Bencher;
+
+    use super::*;
 
     #[bench]
     fn bench_dict_string_int_pairs(b: &mut Bencher) {

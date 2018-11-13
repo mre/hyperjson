@@ -2,6 +2,7 @@
 name = "hyperjson"
 version = "0.1.0"
 authors = ["Matthias Endler <matthias-endler@gmx.net>"]
+edition = "2018"
 
 [dependencies]
 serde_json = "1.0.13"
@@ -17,9 +18,3 @@ features = ["extension-module"]
 name = "hyperjson"
 crate-type = ["rlib", "cdylib"]
 
-[[bin]]
-name = "hyperjson-bench"
-path = "src/bench.rs"
-
-[profile.release]
-debug = true
