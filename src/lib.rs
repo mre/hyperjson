@@ -73,6 +73,138 @@ impl From<PyErr> for HyperJsonError {
 
 import_exception!(json, JSONDecodeError);
 
+#[pyfunction]
+pub fn load(py: Python, fp: PyObject, kwargs: Option<&PyDict>) -> PyResult<PyObject> {
+    // Temporary workaround for
+    // https://github.com/PyO3/pyo3/issues/145
+    let io: &PyObjectRef = fp.as_ref(py);
+
+    // Alternative workaround
+    // fp.getattr(py, "seek")?;
+    // fp.getattr(py, "read")?;
+
+    // Reset file pointer to beginning See
+    // https://github.com/PyO3/pyo3/issues/143 Note that we ignore the return
+    // value, because `seek` does not strictly need to exist on the object
+    let _success = io.call_method("seek", (0,), None);
+
+    let s_obj = io.call_method0("read")?;
+    loads(
+        py,
+        s_obj.to_object(py),
+        None,
+        None,
+        None,
+        None,
+        None,
+        kwargs,
+    )
+}
+
+// This function is a poor man's implementation of
+// impl From<&str> for PyResult<PyObject>, which is not possible,
+// because we have none of these types under our control.
+// Note: Encoding param is deprecated and ignored.
+#[pyfunction]
+pub fn loads(
+    py: Python,
+    s: PyObject,
+    encoding: Option<PyObject>,
+    cls: Option<PyObject>,
+    object_hook: Option<PyObject>,
+    parse_float: Option<PyObject>,
+    parse_int: Option<PyObject>,
+    kwargs: Option<&PyDict>,
+) -> PyResult<PyObject> {
+    // if let Some(kwargs) = kwargs {
+    //     for (key, val) in kwargs.iter() {
+    //         println!("{} = {}", key, val);
+    //     }
+    // }
+
+    // if args.len() == 0 {
+    //     // TODO: This is the wrong error message.
+    //     return Err(PyLookupError::py_err("oh no"));
+    // }
+    // if args.len() >= 2 {
+    //     // return Err(PyTypeError::py_err(format!(
+    //     //     "Unknown encoding: {}",
+    //     //     args.get_item(1).to_string()
+    //     // )));
+    //     return Err(PyLookupError::py_err(
+    //         "loads() takes exactly 1 argument (2 given)",
+    //     ));
+    // }
+    // let s = args.get_item(0).to_string();
+
+    // This was moved out of the Python module code to enable benchmarking.
+    loads_impl(
+        py,
+        s,
+        encoding,
+        cls,
+        object_hook,
+        parse_float,
+        parse_int,
+        kwargs,
+    )
+}
+
+#[pyfunction]
+// ensure_ascii, check_circular, allow_nan, cls, indent, separators, default, sort_keys, kwargs = "**")]
+#[allow(unused_variables)]
+pub fn dumps(
+    py: Python,
+    obj: PyObject,
+    _skipkeys: Option<bool>,
+    ensure_ascii: Option<PyObject>,
+    _check_circular: Option<PyObject>,
+    _allow_nan: Option<PyObject>,
+    _cls: Option<PyObject>,
+    _indent: Option<PyObject>,
+    _separators: Option<PyObject>,
+    _default: Option<PyObject>,
+    sort_keys: Option<PyObject>,
+    _kwargs: Option<&PyDict>,
+) -> PyResult<PyObject> {
+    let v = SerializePyObject {
+        py,
+        obj: obj.as_ref(py),
+        sort_keys: match sort_keys {
+            Some(sort_keys) => sort_keys.is_true(py)?,
+            None => false,
+        },
+    };
+    let s: Result<String, HyperJsonError> =
+        serde_json::to_string(&v).map_err(|error| HyperJsonError::InvalidConversion { error });
+    Ok(s?.to_object(py))
+}
+
+#[pyfunction]
+pub fn dump(
+    py: Python,
+    obj: PyObject,
+    fp: PyObject,
+    _skipkeys: Option<PyObject>,
+    _ensure_ascii: Option<PyObject>,
+    _check_circular: Option<PyObject>,
+    _allow_nan: Option<PyObject>,
+    _cls: Option<PyObject>,
+    _indent: Option<PyObject>,
+    _separators: Option<PyObject>,
+    _default: Option<PyObject>,
+    _sort_keys: Option<PyObject>,
+    _kwargs: Option<&PyDict>,
+) -> PyResult<PyObject> {
+    let s = dumps(
+        py, obj, None, None, None, None, None, None, None, None, None, None,
+    )?;
+    let fp_ref: &PyObjectRef = fp.as_ref(py);
+    fp_ref.call_method1("write", (s,))?;
+    // TODO: Will this always return None?
+    Ok(pyo3::Python::None(py))
+}
+
 /// A hyper-fast JSON encoder/decoder written in Rust
 #[pymodinit]
 fn hyperjson(_py: Python, m: &PyModule) -> PyResult<()> {
@@ -81,137 +213,12 @@ fn hyperjson(_py: Python, m: &PyModule) -> PyResult<()> {
     // py_exception!(_hyperjson, JSONDecodeError);
     // m.add("JSONDecodeError", py.get_type::<JSONDecodeError>());
 
-    #[pyfn(m, "load")]
-    pub fn load_fn(py: Python, fp: PyObject, kwargs: Option<&PyDict>) -> PyResult<PyObject> {
-        // Temporary workaround for
-        // https://github.com/PyO3/pyo3/issues/145
-        let io: &PyObjectRef = fp.as_ref(py);
-
-        // Alternative workaround
-        // fp.getattr(py, "seek")?;
-        // fp.getattr(py, "read")?;
-
-        // Reset file pointer to beginning See
-        // https://github.com/PyO3/pyo3/issues/143 Note that we ignore the return
-        // value, because `seek` does not strictly need to exist on the object
-        let _success = io.call_method("seek", (0,), None);
-
-        let s_obj = io.call_method0("read")?;
-        loads_fn(
-            py,
-            s_obj.to_object(py),
-            None,
-            None,
-            None,
-            None,
-            None,
-            kwargs,
-        )
-    }
-
     m.add("__version__", env!("CARGO_PKG_VERSION"))?;
 
-    // This function is a poor man's implementation of
-    // impl From<&str> for PyResult<PyObject>, which is not possible,
-    // because we have none of these types under our control.
-    // Note: Encoding param is deprecated and ignored.
-    #[pyfn(m, "loads")]
-    pub fn loads_fn(
-        py: Python,
-        s: PyObject,
-        encoding: Option<PyObject>,
-        cls: Option<PyObject>,
-        object_hook: Option<PyObject>,
-        parse_float: Option<PyObject>,
-        parse_int: Option<PyObject>,
-        kwargs: Option<&PyDict>,
-    ) -> PyResult<PyObject> {
-        // if let Some(kwargs) = kwargs {
-        //     for (key, val) in kwargs.iter() {
-        //         println!("{} = {}", key, val);
-        //     }
-        // }
-
-        // if args.len() == 0 {
-        //     // TODO: This is the wrong error message.
-        //     return Err(PyLookupError::py_err("oh no"));
-        // }
-        // if args.len() >= 2 {
-        //     // return Err(PyTypeError::py_err(format!(
-        //     //     "Unknown encoding: {}",
-        //     //     args.get_item(1).to_string()
-        //     // )));
-        //     return Err(PyLookupError::py_err(
-        //         "loads() takes exactly 1 argument (2 given)",
-        //     ));
-        // }
-        // let s = args.get_item(0).to_string();
-
-        // This was moved out of the Python module code to enable benchmarking.
-        loads_impl(
-            py,
-            s,
-            encoding,
-            cls,
-            object_hook,
-            parse_float,
-            parse_int,
-            kwargs,
-        )
-    }
-
-    #[pyfn(m, "dumps")] // ensure_ascii, check_circular, allow_nan, cls, indent, separators, default, sort_keys, kwargs = "**")]
-    pub fn dumps_fn(
-        py: Python,
-        obj: PyObject,
-        _skipkeys: Option<bool>,
-        ensure_ascii: Option<PyObject>,
-        _check_circular: Option<PyObject>,
-        _allow_nan: Option<PyObject>,
-        _cls: Option<PyObject>,
-        _indent: Option<PyObject>,
-        _separators: Option<PyObject>,
-        _default: Option<PyObject>,
-        sort_keys: Option<PyObject>,
-        _kwargs: Option<&PyDict>,
-    ) -> PyResult<PyObject> {
-        let v = SerializePyObject {
-            py,
-            obj: obj.as_ref(py),
-            sort_keys: match sort_keys {
-                Some(sort_keys) => sort_keys.is_true(py)?,
-                None => false,
-            },
-        };
-        let s: Result<String, HyperJsonError> =
-            serde_json::to_string(&v).map_err(|error| HyperJsonError::InvalidConversion { error });
-        Ok(s?.to_object(py))
-    }
-
-    #[pyfn(m, "dump")]
-    pub fn dump_fn(
-        py: Python,
-        obj: PyObject,
-        fp: PyObject,
-        _skipkeys: Option<PyObject>,
-        _ensure_ascii: Option<PyObject>,
-        _check_circular: Option<PyObject>,
-        _allow_nan: Option<PyObject>,
-        _cls: Option<PyObject>,
-        _indent: Option<PyObject>,
-        _separators: Option<PyObject>,
-        _default: Option<PyObject>,
-        _sort_keys: Option<PyObject>,
-        _kwargs: Option<&PyDict>,
-    ) -> PyResult<PyObject> {
-        let s = dumps_fn(
-            py, obj, None, None, None, None, None, None, None, None, None, None,
-        )?;
-        let fp_ref: &PyObjectRef = fp.as_ref(py);
-        fp_ref.call_method1("write", (s,))?;
-        // TODO: Will this always return None?
-        Ok(pyo3::Python::None(py))
-    }
+    m.add_function(wrap_function!(load))?;
+    m.add_function(wrap_function!(loads))?;
+    m.add_function(wrap_function!(dump))?;
+    m.add_function(wrap_function!(dumps))?;
 
     Ok(())
 }
