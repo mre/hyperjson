@@ -13,5 +13,4 @@ setup(name='hyperjson',
           'Operating System :: MacOS :: MacOS X',
       ],
       packages=['hyperjson'],
-      package_dir={'': 'package'},
       zip_safe=False)
