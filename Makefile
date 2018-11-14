@@ -1,22 +1,27 @@
 .PHONY: build
-build: nightly
+build: nightly dev-packages
 	cargo build
+	pipenv run pyo3-pack build
 
 .PHONY: nightly
 nightly:
 	rustup override set nightly
 
 .PHONY: install
-install: nightly
-	pyo3-pack build
+install: nightly dev-packages
+	pipenv run pyo3-pack develop
 
 .PHONY: clean
 clean:
 	pipenv --rm || true
 	cargo clean
 
+.PHONY: dev-packages
+dev-packages:
+	pipenv install --dev
+
 .PHONY: test
-test:
+test: dev-packages install
 	pipenv run pytest tests
 
 .PHONY: bench
@@ -33,8 +38,7 @@ plot:
 	@echo "Rendering plots from benchmarks"
 	pipenv run python benchmarks/histogram.py
 
-.PHONY: profile-mac
-profile-mac: nightly
-	cargo build --bin hyperjson-bench
-	pipenv shell && sudo macos-profiler time-spent --command ./target/debug/hyperjson-bench	&& exit
+.PHONY: profile
+profile: nightly
+	cd profiling && pipenv run cargo build
 

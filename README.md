@@ -1,6 +1,6 @@
 ![hyperjson](assets/logo.gif)
 
-[![Build Status](https://travis-ci.org/mre/hyperjson.svg?branch-master)](https://travis-ci.org/mre/hyperjson)
+[![Build Status](https://travis-ci.org/mre/hyperjson.svg?branch=master)](https://travis-ci.org/mre/hyperjson)
 
 A hyper-fast, safe Python module to read and write JSON data. Works as a
 drop-in replacement for Python's built-in
@@ -19,7 +19,7 @@ module](https://docs.python.org/3/library/json.html):
 >>> hyperjson.dumps([{"key": "value"}, 81, True])
 '[{"key":"value"},81,true]'
 >>> hyperjson.loads("""[{"key": "value"}, 81, true]""")
-[{u'key': u'value'}, 81, True
+[{u'key': u'value'}, 81, True]
 ```
 
 ## Motivation

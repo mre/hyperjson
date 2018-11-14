@@ -1,22 +1,22 @@
-#![feature(use_extern_macros, try_from, test)]
-
-extern crate test;
-
-extern crate serde;
+#![feature(try_from, test)]
 
 #[macro_use]
 extern crate failure;
-extern crate serde_derive;
-
 #[macro_use]
 extern crate pyo3;
+extern crate serde;
+extern crate serde_derive;
 extern crate serde_json;
+extern crate test;
 
 use std::collections::BTreeMap;
 use std::fmt;
 use std::marker::PhantomData;
 
 use pyo3::prelude::*;
+use pyo3::types::exceptions::TypeError as PyTypeError;
+use pyo3::types::exceptions::ValueError as PyValueError;
+use pyo3::types::{PyDict, PyFloat, PyList, PyObjectRef, PyTuple};
 use serde::de::{self, DeserializeSeed, Deserializer, MapAccess, SeqAccess, Visitor};
 use serde::ser::{self, Serialize, SerializeMap, SerializeSeq, Serializer};
 
@@ -49,16 +49,14 @@ impl From<HyperJsonError> for PyErr {
     fn from(h: HyperJsonError) -> PyErr {
         match h {
             HyperJsonError::InvalidConversion { error } => {
-                PyErr::new::<pyo3::exc::TypeError, _>(format!("{}", error))
+                PyErr::new::<PyTypeError, _>(format!("{}", error))
             }
             // TODO
-            HyperJsonError::PyErr { error: _error } => {
-                PyErr::new::<pyo3::exc::TypeError, _>("PyErr")
-            }
+            HyperJsonError::PyErr { error: _error } => PyErr::new::<PyTypeError, _>("PyErr"),
             HyperJsonError::InvalidCast { t: _t, e: _e } => {
-                PyErr::new::<pyo3::exc::TypeError, _>("InvalidCast")
+                PyErr::new::<PyTypeError, _>("InvalidCast")
             }
-            _ => PyErr::new::<pyo3::exc::TypeError, _>("Unknown reason"),
+            _ => PyErr::new::<PyTypeError, _>("Unknown reason"),
         }
     }
 }
@@ -77,7 +75,7 @@ import_exception!(json, JSONDecodeError);
 
 /// A hyper-fast JSON encoder/decoder written in Rust
 #[pymodinit]
-fn hyperjson(py: Python, m: &PyModule) -> PyResult<()> {
+fn hyperjson(_py: Python, m: &PyModule) -> PyResult<()> {
     // See https://github.com/PyO3/pyo3/issues/171
     // Use JSONDecodeError from stdlib until issue is resolved.
     // py_exception!(_hyperjson, JSONDecodeError);
@@ -96,7 +94,7 @@ fn hyperjson(py: Python, m: &PyModule) -> PyResult<()> {
         // Reset file pointer to beginning See
         // https://github.com/PyO3/pyo3/issues/143 Note that we ignore the return
         // value, because `seek` does not strictly need to exist on the object
-        let _success = io.call_method("seek", (0,), pyo3::NoArgs);
+        let _success = io.call_method("seek", (0,), None);
 
         let s_obj = io.call_method0("read")?;
         loads_fn(
@@ -111,7 +109,7 @@ fn hyperjson(py: Python, m: &PyModule) -> PyResult<()> {
         )
     }
 
-    m.add("__version__", env!("CARGO_PKG_VERSION"));
+    m.add("__version__", env!("CARGO_PKG_VERSION"))?;
 
     // This function is a poor man's implementation of
     // impl From<&str> for PyResult<PyObject>, which is not possible,
@@ -136,14 +134,14 @@ fn hyperjson(py: Python, m: &PyModule) -> PyResult<()> {
 
         // if args.len() == 0 {
         //     // TODO: This is the wrong error message.
-        //     return Err(exc::LookupError::new("oh no"));
+        //     return Err(PyLookupError::py_err("oh no"));
         // }
         // if args.len() >= 2 {
-        //     // return Err(exc::TypeError::new(format!(
+        //     // return Err(PyTypeError::py_err(format!(
         //     //     "Unknown encoding: {}",
         //     //     args.get_item(1).to_string()
         //     // )));
-        //     return Err(exc::LookupError::new(
+        //     return Err(PyLookupError::py_err(
         //         "loads() takes exactly 1 argument (2 given)",
         //     ));
         // }
@@ -237,30 +235,30 @@ pub fn loads_impl(
                 Ok(py_object) => {
                     deserializer
                         .end()
-                        .map_err(|e| JSONDecodeError::new((e.to_string(), string.clone(), 0)))?;
+                        .map_err(|e| JSONDecodeError::py_err((e.to_string(), string.clone(), 0)))?;
                     Ok(py_object)
                 }
                 Err(e) => {
                     return convert_special_floats(py, &string, &parse_int).or_else(|err| {
                         if e.is_syntax() {
-                            return Err(JSONDecodeError::new((
+                            return Err(JSONDecodeError::py_err((
                                 format!("Value: {:?}, Error: {:?}", s, err),
                                 string.clone(),
                                 0,
                             )));
                         } else {
-                            return Err(exc::ValueError::new(format!(
+                            return Err(PyValueError::py_err(format!(
                                 "Value: {:?}, Error: {:?}",
                                 s, e
                             )));
                         }
-                    })
+                    });
                 }
             }
         }
         _ => {
             let bytes: Vec<u8> = s.extract(py).or_else(|e| {
-                Err(exc::TypeError::new(format!(
+                Err(PyTypeError::py_err(format!(
                     "the JSON object must be str, bytes or bytearray, got: {:?}",
                     e
                 )))
@@ -271,11 +269,11 @@ pub fn loads_impl(
                 Ok(py_object) => {
                     deserializer
                         .end()
-                        .map_err(|e| JSONDecodeError::new((e.to_string(), bytes.clone(), 0)))?;
+                        .map_err(|e| JSONDecodeError::py_err((e.to_string(), bytes.clone(), 0)))?;
                     Ok(py_object)
                 }
                 Err(e) => {
-                    return Err(exc::TypeError::new(format!(
+                    return Err(PyTypeError::py_err(format!(
                         "the JSON object must be str, bytes or bytearray, got: {:?}",
                         e
                     )));
@@ -413,7 +411,7 @@ fn convert_special_floats(
         "NaN" => Ok(std::f64::NAN.to_object(py)),
         "Infinity" => Ok(std::f64::INFINITY.to_object(py)),
         "-Infinity" => Ok(std::f64::NEG_INFINITY.to_object(py)),
-        _ => Err(exc::ValueError::new(format!("Value: {:?}", s))),
+        _ => Err(PyValueError::py_err(format!("Value: {:?}", s))),
     }
 }
 
@@ -550,9 +548,10 @@ impl<'de, 'a> Visitor<'de> for HyperJsonValue<'a> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::fs;
     use test::Bencher;
+
+    use super::*;
 
     #[bench]
     fn bench_dict_string_int_pairs(b: &mut Bencher) {
