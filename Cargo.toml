@@ -22,7 +22,4 @@ crate-type = ["rlib", "cdylib"]
 default = ["pyo3/extension-module"]
 
 [workspace]
-members = [
-  "profiling"
-]
-
+members = [ "profiling" ]
