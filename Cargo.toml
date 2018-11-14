@@ -11,7 +11,6 @@ serde_derive = "1.0.53"
 
 [dependencies.pyo3]
 version = "0.5.0"
-features = ["extension-module"]
 
 [lib]
 name = "hyperjson"
