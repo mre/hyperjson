@@ -68,15 +68,15 @@ MacBook Pro 15 inch, Mid 2015 (2,2 GHz Intel Core i7, 16 GB RAM) Darwin 17.6.18
 ![Serialization benchmarks](assets/serialize.png)
 ![Deserialization benchmarks](assets/deserialize.png)
 
-## Building the module from the sources
+## Building from source
 
-To compile the code and create an importable Python module from it, call  
+To compile the Python module and install it inside the virtual environment, call
 
 ```
 make install
 ```
 
-From there, you can simply use it from Python as seen in the usage example above.
+From there, you can simply use it from Python like in the usage example above.
 
 ## Contributions welcome!
 
