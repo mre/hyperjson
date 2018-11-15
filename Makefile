@@ -32,8 +32,8 @@ quicktest:
 bench:
 	pipenv run pytest benchmarks
 
-.PHONY: bench-all
-bench-all:
+.PHONY: bench-compare
+bench-compare:
 	pipenv run pytest benchmarks --compare
 	
 .PHONY: plot

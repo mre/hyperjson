@@ -17,7 +17,7 @@ install:
 script:
   - export PATH="$HOME/.cargo/bin:$PATH"
   - make test
-  - make bench-all
+  - make bench-compare
 
 deploy:
   provider: pypi
