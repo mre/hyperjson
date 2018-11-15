@@ -44,7 +44,7 @@ bench: ## Run benchmarks
 
 .PHONY: bench-compare
 bench-compare: ## Run benchmarks and compare results with other JSON encoders
-	pipenv run pytest benchmarks --compare --benchmark-json=benchmark.json
+	pipenv run pytest benchmarks --compare
 
 .PHONY: plot
 plot: bench-compare ## Plot graph from benchmarks
