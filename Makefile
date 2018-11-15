@@ -21,8 +21,12 @@ dev-packages:
 	pipenv install --dev
 
 .PHONY: test
-test: dev-packages install
+test: dev-packages install quicktest
+
+.PHONY: quicktest
+quicktest:
 	pipenv run pytest tests
+
 
 .PHONY: bench
 bench:

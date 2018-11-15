@@ -47,8 +47,12 @@ def test_list_floats(lst):
 def test_list_text(lst):
     assert hyperjson.loads(hyperjson.dumps(lst)) == lst
 
+@given(st.lists(st.one_of(st.none(), st.text())))
+def test_list_mixed(lst):
+    assert hyperjson.loads(hyperjson.dumps(
+        lst)) == lst
 
-@given(st.lists(st.one_of(st.none(), st_int, st_floats, st.text())))
+@given(st.lists(st.one_of(st_int, st_floats)))
 def test_list_mixed(lst):
     assert hyperjson.loads(hyperjson.dumps(
         lst)) == pytest.approx(lst)
