@@ -56,5 +56,6 @@ plot: bench-compare ## Plot graph from benchmarks
 .PHONY: profile
 profile: nightly ## Run perf-based profiling (only works on Linux!)
 	cd profiling && pipenv run cargo build --release
+	perf record --call-graph dwarf,16384 -e cpu-clock -F 997 target/release/profiling
 	perf script | stackcollapse-perf.pl | c++filt | flamegraph.pl > flame.svg
 

@@ -1,9 +1,16 @@
-//! Simple benchmark for finding hotspots using profilers like callgrind.
-//! Usage:
+//! Simple hyperjson benchmark for finding hotspots using profilers like perf or callgrind.
+//!
+//! Example usage on Linux:
 //!
 //! ```
-//! cargo build
-//! valgrind --tool=callgrind --main-stacksize=1000000000 target/debug/hyperjson-bench
+//! make profile
+//! ```
+//!
+//! Example usage on macOS:
+//!
+//! ```
+//! cargo build --release
+//! valgrind --tool=callgrind --main-stacksize=1000000000 target/release/profiling
 //! callgrind_annotate --auto=yes callgrind.out.35583 >out.rs
 //! qcachegrind callgrind.out.35583
 //! ```
@@ -22,7 +29,7 @@ fn main() {
     let gil = Python::acquire_gil();
     let py = gil.python();
 
-    for _ in 1..10 {
+    for _ in 1..100 {
         let obj = dict_string_int.to_object(py);
         println!(
             "{}",
