@@ -1,6 +1,7 @@
 .PHONY: build
-build: nightly
+build: nightly dev-packages
 	cargo build
+	pipenv run pyo3-pack build
 
 .PHONY: nightly
 nightly:
@@ -8,7 +9,7 @@ nightly:
 
 .PHONY: install
 install: nightly dev-packages
-	pipenv run python setup.py install
+	pipenv run pyo3-pack develop
 
 .PHONY: clean
 clean:
@@ -20,15 +21,19 @@ dev-packages:
 	pipenv install --dev
 
 .PHONY: test
-test: dev-packages install
+test: dev-packages install quicktest
+
+.PHONY: quicktest
+quicktest:
 	pipenv run pytest tests
+
 
 .PHONY: bench
 bench:
 	pipenv run pytest benchmarks
 
-.PHONY: bench-all
-bench-all:
+.PHONY: bench-compare
+bench-compare:
 	pipenv run pytest benchmarks --compare
 	
 .PHONY: plot

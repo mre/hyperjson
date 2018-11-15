@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [dev-packages]
-setuptools-rust = "*"
 pytest = "*"
 pytest-runner = "*"
 pytest-benchmark = "*"
@@ -13,10 +12,11 @@ ujson = "*"
 yajl = "*"
 python-rapidjson = "*"
 wheel = "*"
-hypothesis = "*"
 pylint = "*"
 matplotlib = "*"
-"autopep8" = "*"
+hypothesis = "*"
+autopep8 = "*"
+pyo3-pack = "*"
 
 [packages]
 
