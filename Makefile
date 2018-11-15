@@ -1,7 +1,10 @@
 .PHONY: build
 build: nightly dev-packages
-	cargo build
 	pipenv run pyo3-pack build
+
+.PHONY: build-release
+build-release: nightly dev-packages
+	pipenv run pyo3-pack build --release
 
 .PHONY: nightly
 nightly:
@@ -44,5 +47,6 @@ plot:
 
 .PHONY: profile
 profile: nightly
-	cd profiling && pipenv run cargo build
+	cd profiling && pipenv run cargo build --release
+	perf script | stackcollapse-perf.pl | c++filt | flamegraph.pl > flame.svg
 
