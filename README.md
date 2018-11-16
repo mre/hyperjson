@@ -68,16 +68,6 @@ MacBook Pro 15 inch, Mid 2015 (2,2 GHz Intel Core i7, 16 GB RAM) Darwin 17.6.18
 ![Serialization benchmarks](assets/serialize.png)
 ![Deserialization benchmarks](assets/deserialize.png)
 
-## Building from source
-
-To compile the Python module and install it inside the virtual environment, call
-
-```
-make install
-```
-
-From there, you can simply use it from Python like in the usage example above.
-
 ## Contributions welcome!
 
 If you would like to hack on hyperjson, here's what needs to be done:
@@ -89,7 +79,7 @@ If you would like to hack on hyperjson, here's what needs to be done:
 - [X] Benchmark against [json](https://docs.python.org/3/library/json.html) and
   [ujson](https://github.com/esnme/ultrajson/) (see [#1](https://github.com/mre/hyperjson/issues/1))
 - [X] Add a CI/CD pipeline for easier testing (see [#2](https://github.com/mre/hyperjson/issues/2))
-- [ ] Create a proper pip package from it, to make installing easier (see [#3](https://github.com/mre/hyperjson/issues/3)).
+- [X] Create a proper pip package from it, to make installing easier (see [#3](https://github.com/mre/hyperjson/issues/3)).
 - [ ] Profile and optimize performance (see [#16](https://github.com/mre/hyperjson/issues/16))
 - [ ] Add remaining [keyword-only arguments](https://docs.python.org/3/library/json.html#basic-usage) to methods
 
@@ -126,7 +116,7 @@ make test
 make bench
 ```
 
-🤫 Pssst!...check out the `Makefile` for more commands.
+🤫 Pssst!... run `make help` to learn more.
 
 
 ## Drawing pretty diagrams

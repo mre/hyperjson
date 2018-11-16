@@ -112,3 +112,5 @@ venv.bak/
 skipped.py
 benchmark.json
 .idea
+flame.svg
+perf.data
