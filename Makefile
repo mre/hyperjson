@@ -2,6 +2,8 @@
 SHELL := /bin/bash
 .PHONY: help
 
+ts := $(shell date --utc +%FT%TZ)
+
 help: ## This help message
 	@echo -e "$$(grep -hE '^\S+:.*##' $(MAKEFILE_LIST) | sed -e 's/:.*##\s*/:/' -e 's/^\(.\+\):\(.*\)/\\x1b[36m\1\\x1b[m:\2/' | column -c2 -t -s :)"
 
@@ -54,8 +56,10 @@ plot: bench-compare ## Plot graph from benchmarks
 # Setup instructions here:
 # https://gist.github.com/dlaehnemann/df31787c41bd50c0fe223df07cf6eb89
 .PHONY: profile
+profile: OUTPUT_PATH = measurements/flame-$(ts).svg
 profile: nightly ## Run perf-based profiling (only works on Linux!)
 	cd profiling && pipenv run cargo build --release
 	perf record --call-graph dwarf,16384 -e cpu-clock -F 997 target/release/profiling
-	perf script | stackcollapse-perf.pl | c++filt | flamegraph.pl > flame.svg
+	time perf script | stackcollapse-perf.pl | c++filt | flamegraph.pl > $(OUTPUT_PATH)
+	@echo "$(OUTPUT_PATH)"
 

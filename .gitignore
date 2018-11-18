@@ -114,3 +114,4 @@ benchmark.json
 .idea
 flame.svg
 perf.data
+perf.data.old

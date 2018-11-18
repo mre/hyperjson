@@ -20,6 +20,7 @@ extern crate pyo3;
 use pyo3::prelude::*;
 use std::fs;
 
+
 fn main() {
     let bench_file_name = "benchmarks/dict_string_int_plain.txt";
 
@@ -29,11 +30,12 @@ fn main() {
     let gil = Python::acquire_gil();
     let py = gil.python();
 
+    let obj = dict_string_int.to_object(py);
+
     for _ in 1..100 {
-        let obj = dict_string_int.to_object(py);
         println!(
             "{}",
-            hyperjson::loads_impl(py, obj, None, None, None, None, None, None).is_ok()
+            hyperjson::loads_impl(py, obj.clone_ref(py), None, None, None, None, None, None).is_ok()
         );
     }
 }
