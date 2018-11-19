@@ -8,10 +8,17 @@ drop-in replacement for Python's built-in
 around Rust's [serde-json](https://github.com/serde-rs/json) built with
 [pyo3](https://github.com/PyO3/pyo3). Compatible with Python 3 and 2 (not officially supported). This is alpha software and there will be bugs, so maybe don't deploy to production *just* yet. :wink:
 
+## Installation
+
+```
+pip install hyperjson
+```
+
 ## Usage
 
 hyperjson is meant as a drop-in replacement for Python's [json
 module](https://docs.python.org/3/library/json.html):  
+
 
 ```python
 >>> import hyperjson 

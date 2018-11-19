@@ -24,6 +24,10 @@ nightly: ## Set rust compiler to nightly version
 install: nightly dev-packages ## Install hyperjson module into current virtualenv
 	pipenv run pyo3-pack develop
 
+.PHONY: publish
+publish: ## Publish crate on Pypi
+	pipenv run pyo3-pack publish
+
 .PHONY: clean
 clean: ## Clean up build artifacts
 	pipenv --rm || true
