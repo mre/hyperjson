@@ -246,20 +246,20 @@ pub fn loads_impl(
                     Ok(py_object)
                 }
                 Err(e) => {
-                    return convert_special_floats(py, &string, &parse_int).or_else(|err| {
+                    convert_special_floats(py, &string, &parse_int).or_else(|err| {
                         if e.is_syntax() {
-                            return Err(JSONDecodeError::py_err((
+                            Err(JSONDecodeError::py_err((
                                 format!("Value: {:?}, Error: {:?}", s, err),
                                 string.clone(),
                                 0,
-                            )));
+                            )))
                         } else {
-                            return Err(PyValueError::py_err(format!(
+                            Err(PyValueError::py_err(format!(
                                 "Value: {:?}, Error: {:?}",
                                 s, e
-                            )));
+                            )))
                         }
-                    });
+                    })
                 }
             }
         }
@@ -280,10 +280,10 @@ pub fn loads_impl(
                     Ok(py_object)
                 }
                 Err(e) => {
-                    return Err(PyTypeError::py_err(format!(
+                    Err(PyTypeError::py_err(format!(
                         "the JSON object must be str, bytes or bytearray, got: {:?}",
                         e
-                    )));
+                    )))
                 }
             }
         }
