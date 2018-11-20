@@ -26,8 +26,7 @@ pub fn exec(iterations: u64) {
                 None,
                 None,
                 None,
-            )
-            .is_ok()
+            ).is_ok()
         );
     }
 }

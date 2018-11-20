@@ -140,12 +140,12 @@ pub fn loads(
     // This was moved out of the Python module code to enable benchmarking.
     loads_impl(
         py,
-        s,
-        encoding,
-        cls,
-        object_hook,
-        parse_float,
-        parse_int,
+        &s,
+        encoding.as_ref(),
+        cls.as_ref(),
+        object_hook.as_ref(),
+        parse_float.as_ref(),
+        parse_int.as_ref(),
         kwargs,
     )
 }
@@ -225,12 +225,12 @@ fn hyperjson(_py: Python, m: &PyModule) -> PyResult<()> {
 
 pub fn loads_impl(
     py: Python,
-    s: PyObject,
-    _encoding: Option<PyObject>,
-    _cls: Option<PyObject>,
-    _object_hook: Option<PyObject>,
-    parse_float: Option<PyObject>,
-    parse_int: Option<PyObject>,
+    s: &PyObject,
+    _encoding: Option<&PyObject>,
+    _cls: Option<&PyObject>,
+    _object_hook: Option<&PyObject>,
+    parse_float: Option<&PyObject>,
+    parse_int: Option<&PyObject>,
     _kwargs: Option<&PyDict>,
 ) -> PyResult<PyObject> {
     let string_result: Result<String, _> = s.extract(py);
@@ -245,22 +245,20 @@ pub fn loads_impl(
                         .map_err(|e| JSONDecodeError::py_err((e.to_string(), string.clone(), 0)))?;
                     Ok(py_object)
                 }
-                Err(e) => {
-                    convert_special_floats(py, &string, &parse_int).or_else(|err| {
-                        if e.is_syntax() {
-                            Err(JSONDecodeError::py_err((
-                                format!("Value: {:?}, Error: {:?}", s, err),
-                                string.clone(),
-                                0,
-                            )))
-                        } else {
-                            Err(PyValueError::py_err(format!(
-                                "Value: {:?}, Error: {:?}",
-                                s, e
-                            )))
-                        }
-                    })
-                }
+                Err(e) => convert_special_floats(py, &string, parse_int).or_else(|err| {
+                    if e.is_syntax() {
+                        Err(JSONDecodeError::py_err((
+                            format!("Value: {:?}, Error: {:?}", s, err),
+                            string.clone(),
+                            0,
+                        )))
+                    } else {
+                        Err(PyValueError::py_err(format!(
+                            "Value: {:?}, Error: {:?}",
+                            s, e
+                        )))
+                    }
+                }),
             }
         }
         _ => {
@@ -279,12 +277,10 @@ pub fn loads_impl(
                         .map_err(|e| JSONDecodeError::py_err((e.to_string(), bytes.clone(), 0)))?;
                     Ok(py_object)
                 }
-                Err(e) => {
-                    Err(PyTypeError::py_err(format!(
-                        "the JSON object must be str, bytes or bytearray, got: {:?}",
-                        e
-                    )))
-                }
+                Err(e) => Err(PyTypeError::py_err(format!(
+                    "the JSON object must be str, bytes or bytearray, got: {:?}",
+                    e
+                ))),
             }
         }
     }
@@ -410,7 +406,7 @@ impl<'p, 'a> Serialize for SerializePyObject<'p, 'a> {
 fn convert_special_floats(
     py: Python,
     s: &str,
-    _parse_int: &Option<PyObject>,
+    _parse_int: Option<&PyObject>,
 ) -> PyResult<PyObject> {
     match s {
         // TODO: If `allow_nan` is false (default: True), then this should be a ValueError
@@ -425,15 +421,15 @@ fn convert_special_floats(
 #[derive(Copy, Clone)]
 struct HyperJsonValue<'a> {
     py: Python<'a>,
-    parse_float: &'a Option<PyObject>,
-    parse_int: &'a Option<PyObject>,
+    parse_float: &'a Option<&'a PyObject>,
+    parse_int: &'a Option<&'a PyObject>,
 }
 
 impl<'a> HyperJsonValue<'a> {
     fn new(
         py: Python<'a>,
-        parse_float: &'a Option<PyObject>,
-        parse_int: &'a Option<PyObject>,
+        parse_float: &'a Option<&'a PyObject>,
+        parse_int: &'a Option<&'a PyObject>,
     ) -> HyperJsonValue<'a> {
         // We cannot borrow the runtime here,
         // because it wouldn't live long enough
@@ -459,7 +455,7 @@ impl<'de, 'a> DeserializeSeed<'de> for HyperJsonValue<'a> {
 }
 
 impl<'a> HyperJsonValue<'a> {
-    fn parse_primitive<E, T>(self, value: T, parser: &PyObject) -> Result<PyObject, E>
+    fn parse_primitive<E, T>(self, value: &T, parser: &PyObject) -> Result<PyObject, E>
     where
         E: de::Error,
         T: ToString,
@@ -490,7 +486,7 @@ impl<'de, 'a> Visitor<'de> for HyperJsonValue<'a> {
         E: de::Error,
     {
         match self.parse_int {
-            Some(parser) => self.parse_primitive(value, parser),
+            Some(parser) => self.parse_primitive(&value, parser),
             None => Ok(value.to_object(self.py)),
         }
     }
@@ -500,7 +496,7 @@ impl<'de, 'a> Visitor<'de> for HyperJsonValue<'a> {
         E: de::Error,
     {
         match self.parse_int {
-            Some(parser) => self.parse_primitive(value, parser),
+            Some(parser) => self.parse_primitive(&value, parser),
             None => Ok(value.to_object(self.py)),
         }
     }
@@ -510,7 +506,7 @@ impl<'de, 'a> Visitor<'de> for HyperJsonValue<'a> {
         E: de::Error,
     {
         match self.parse_float {
-            Some(parser) => self.parse_primitive(value, parser),
+            Some(parser) => self.parse_primitive(&value, parser),
             None => Ok(value.to_object(self.py)),
         }
     }
