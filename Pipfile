@@ -1,0 +1,24 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[dev-packages]
+pytest = "*"
+pytest-runner = "*"
+pytest-benchmark = "*"
+simplejson = "*"
+ujson = "*"
+yajl = "*"
+python-rapidjson = "*"
+wheel = "*"
+pylint = "*"
+matplotlib = "*"
+hypothesis = "*"
+autopep8 = "*"
+pyo3-pack = "*"
+
+[packages]
+
+[requires]
+python_version = "3.6"

@@ -4,6 +4,7 @@ import math
 import json
 import hyperjson
 import io
+from json import JSONDecodeError
 
 
 def test_loading_empty_value():
@@ -13,7 +14,7 @@ def test_loading_empty_value():
         hyperjson.loads("")
 
 
-simple_types = ["1", "1.0", "-1", "null", '"str"', "true"]
+simple_types = ["1", "1.0", "-1", "null", '"str"', "true", "false"]
 
 
 @pytest.mark.parametrize("payload", simple_types)
@@ -54,3 +55,8 @@ def test_repeated_fields():
     """
     weird_json = '{"x": 1, "x": 2, "x": 3}'
     json.loads(weird_json) == hyperjson.loads(weird_json)
+
+
+def test_invalid_extra_data():
+    with pytest.raises(JSONDecodeError):
+        hyperjson.loads("falsef")

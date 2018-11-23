@@ -1,22 +1,20 @@
 language: python
 sudo: false
 
-addons:
-  apt:
-    packages:
-      - rpm
-
 python:
-  #- 2.7
-  #- 3.4
   - 3.5
   - 3.6
 
 install:
-    - bash ci/install.sh
+  - curl https://sh.rustup.rs -sSf > rustup-init.sh
+  - sh rustup-init.sh --default-toolchain nightly -y -v
+  - export PATH="$HOME/.cargo/bin:$PATH"
+  - rustc --version
+  - pip install pipenv
+  - make install
+  - pipenv graph
 
 script:
-    - bash ci/script.sh
-
-before_deploy:
-    - bash ci/before_deploy.sh
+  - export PATH="$HOME/.cargo/bin:$PATH"
+  - make test
+  - make bench-compare

@@ -8,8 +8,10 @@ main() {
     export PATH="$HOME/.cargo/bin:$PATH"
     which rustc
     rustc --version
-    # pip install -r requirements.txt
-    pip freeze
+    pip install pipenv
+    cargo install pyo3-pack
+    make install
+    pipenv graph
 }
 
 main

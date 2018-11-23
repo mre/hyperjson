@@ -12,13 +12,8 @@ main() {
 
     export PATH="$HOME/.cargo/bin:$PATH"
 
-    pip show setuptools-rust 2>&1 1>/dev/null || \
-        pip install setuptools-rust
-    pip install -r requirements-test.txt
-    pip freeze
-    which rustc
-    rustc --version
-    python setup.py test
+    make test
+    make bench-all
 }
 
 main
