@@ -10,5 +10,3 @@ hyperjson = { path = "..", default-features = false }
 [dependencies.pyo3]
 version = "0.5.0"
 
-[profile.release]
-debug = true
