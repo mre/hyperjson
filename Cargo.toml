@@ -22,3 +22,8 @@ default = ["pyo3/extension-module"]
 
 [workspace]
 members = [ "profiling" ]
+
+[profile.release]
+opt-level = 3
+codegen-units = 1
+lto = true
