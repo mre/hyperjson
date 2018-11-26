@@ -1,1 +1,1 @@
-from .hyperjson import loads, load, dumps, dump, __version__
+from .hyperjson import *

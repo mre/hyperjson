@@ -13,11 +13,14 @@ hyperjson = support.import_fresh_module('hyperjson')
 cjson.JSONDecodeError = cjson.decoder.JSONDecodeError = json.JSONDecodeError
 
 # create two base classes that will be used by the other tests
+
+
 class PyTest(unittest.TestCase):
     json = pyjson
     loads = staticmethod(pyjson.loads)
     dumps = staticmethod(pyjson.dumps)
     JSONDecodeError = staticmethod(pyjson.JSONDecodeError)
+
 
 @unittest.skipUnless(cjson, 'requires _json')
 class CTest(unittest.TestCase):
@@ -27,17 +30,18 @@ class CTest(unittest.TestCase):
         dumps = staticmethod(cjson.dumps)
         JSONDecodeError = staticmethod(cjson.JSONDecodeError)
 
+
 @unittest.skipUnless(hyperjson, 'requires hyperjson')
 class RustTest(unittest.TestCase):
     if hyperjson is not None:
         json = hyperjson
         loads = staticmethod(hyperjson.loads)
         dumps = staticmethod(hyperjson.dumps)
-        # FIXME: hyperjson does not have this
-        JSONDecodeError = staticmethod(pyjson.JSONDecodeError)
-        # JSONDecodeError = staticmethod(hyperjson.JSONDecodeError)
+        JSONDecodeError = staticmethod(hyperjson.JSONDecodeError)
 
 # test PyTest and CTest checking if the functions come from the right module
+
+
 class TestPyTest(PyTest):
     def test_pyjson(self):
         self.assertEqual(self.json.scanner.make_scanner.__module__,
@@ -47,6 +51,7 @@ class TestPyTest(PyTest):
         self.assertEqual(self.json.encoder.encode_basestring_ascii.__module__,
                          'json.encoder')
 
+
 class TestCTest(CTest):
     def test_cjson(self):
         self.assertEqual(self.json.scanner.make_scanner.__module__, '_json')
@@ -54,6 +59,7 @@ class TestCTest(CTest):
         self.assertEqual(self.json.encoder.c_make_encoder.__module__, '_json')
         self.assertEqual(self.json.encoder.encode_basestring_ascii.__module__,
                          '_json')
+
 
 class TestRustTest(RustTest):
     def test_hyperjson(self):
