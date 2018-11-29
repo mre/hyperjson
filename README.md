@@ -32,12 +32,11 @@ module](https://docs.python.org/3/library/json.html):
 Parsing JSON is a solved problem; so, no need to reinvent the wheel, right?  
 Well, unless you care about **performance and safety**.
 
-Turns out, parsing JSON *correctly* is a [hard problem](http://seriot.ch/parsing_json.php). Thanks to Rust however, we can minimize risk of running
-into [stack overflows or segmentation faults](https://github.com/esnme/ultrajson/issues) however.
+Turns out, parsing JSON *correctly* is a [hard problem](http://seriot.ch/parsing_json.php). Thanks to Rust however, we can minimize the risk of running into [stack overflows or segmentation faults](https://github.com/esnme/ultrajson/issues) however.
 
-hyperjson a thin wrapper around Rust's [serde-json](https://github.com/serde-rs/json) and [pyo3](https://github.com/PyO3/pyo3). It is compatible with Python 3 (and 2 on a best-effort basis). 
+hyperjson is a thin wrapper around Rust's [serde-json](https://github.com/serde-rs/json) and [pyo3](https://github.com/PyO3/pyo3). It is compatible with Python 3 (and 2 on a best-effort basis). 
 
-For a more in-detail discussion, [watch the talk about this project recorded at the Rust Cologne Meetup in August 2018.](https://media.ccc.de/v/rustcologne.2018.08.hyperjson)
+For a more in-depth discussion, [watch the talk about this project recorded at the Rust Cologne Meetup in August 2018.](https://media.ccc.de/v/rustcologne.2018.08.hyperjson)
 
 ## Goals
 
