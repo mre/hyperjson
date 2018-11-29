@@ -1,12 +1,11 @@
 # Needed SHELL since I'm using zsh
 SHELL := /bin/bash
-.PHONY: help
 
 ts := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
+.PHONY: help
 help: ## This help message
 	@echo -e "$$(grep -hE '^\S+:.*##' $(MAKEFILE_LIST) | sed -e 's/:.*##\s*/:/' -e 's/^\(.\+\):\(.*\)/\\x1b[36m\1\\x1b[m:\2/' | column -c2 -t -s :)"
-
 
 .PHONY: build
 build: nightly dev-packages ## Builds Rust code and hyperjson Python modules
