@@ -32,15 +32,32 @@ pub enum HyperJsonError {
     InvalidFloat { x: String },
     #[fail(display = "Invalid type: {}, Error: {}", t, e)]
     InvalidCast { t: String, e: String },
+    #[fail(display = "Extra data")]
+    TrailingCharacters { line: usize, column: usize },
     // NoneError doesn't have an impl for `Display`
     // See https://github.com/rust-lang-nursery/failure/issues/61
     // See https://github.com/rust-lang/rust/issues/42327#issuecomment-378324282
     // #[fail(display = "Error: {}", s)]
-    // NoneError { s: String },
+    // NoneError { s: String }
 }
 
 impl From<serde_json::Error> for HyperJsonError {
     fn from(error: serde_json::Error) -> HyperJsonError {
+        let msg = error.to_string();
+
+        if msg.contains("trailing characters") {
+            return HyperJsonError::TrailingCharacters {
+                line: error.line(),
+                column: error.column(),
+            };
+        }
+        if msg.contains("") {
+            return HyperJsonError::TrailingCharacters {
+                line: error.line(),
+                column: error.column(),
+            };
+        }
+
         HyperJsonError::InvalidConversion { error }
     }
 }
@@ -50,6 +67,9 @@ impl From<HyperJsonError> for PyErr {
         match h {
             HyperJsonError::InvalidConversion { error } => {
                 PyErr::new::<PyTypeError, _>(format!("{}", error))
+            }
+            HyperJsonError::TrailingCharacters { line, column } => {
+                JSONDecodeError::py_err((h.to_string(), "".to_string(), column))
             }
             // TODO
             HyperJsonError::PyErr { error: _error } => PyErr::new::<PyTypeError, _>("PyErr"),
@@ -70,8 +90,6 @@ impl From<PyErr> for HyperJsonError {
         }
     }
 }
-
-import_exception!(json, JSONDecodeError);
 
 #[pyfunction]
 pub fn load(py: Python, fp: PyObject, kwargs: Option<&PyDict>) -> PyResult<PyObject> {
@@ -205,15 +223,13 @@ pub fn dump(
     Ok(pyo3::Python::None(py))
 }
 
+py_exception!(hyperjson, JSONDecodeError, pyo3::exceptions::Exception);
+
 /// A hyper-fast JSON encoder/decoder written in Rust
 #[pymodinit]
-fn hyperjson(_py: Python, m: &PyModule) -> PyResult<()> {
-    // See https://github.com/PyO3/pyo3/issues/171
-    // Use JSONDecodeError from stdlib until issue is resolved.
-    // py_exception!(_hyperjson, JSONDecodeError);
-    // m.add("JSONDecodeError", py.get_type::<JSONDecodeError>());
-
+fn hyperjson(py: Python, m: &PyModule) -> PyResult<()> {
     m.add("__version__", env!("CARGO_PKG_VERSION"))?;
+    m.add("JSONDecodeError", py.get_type::<JSONDecodeError>())?;
 
     m.add_function(wrap_function!(load))?;
     m.add_function(wrap_function!(loads))?;
@@ -240,9 +256,7 @@ pub fn loads_impl(
             let seed = HyperJsonValue::new(py, &parse_float, &parse_int);
             match seed.deserialize(&mut deserializer) {
                 Ok(py_object) => {
-                    deserializer
-                        .end()
-                        .map_err(|e| JSONDecodeError::py_err((e.to_string(), string.clone(), 0)))?;
+                    deserializer.end().map_err(HyperJsonError::from)?;
                     Ok(py_object)
                 }
                 Err(e) => {

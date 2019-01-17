@@ -4,6 +4,12 @@ import hyperjson
 from collections import OrderedDict
 from io import StringIO
 
+# We have to import the exceptions into the scope, because we are not actually testing
+# cpython, but hyperjson.
+
+from json import JSONDecodeError
+
+
 """
 These are official json tests copied from
 https://github.com/python/cpython/blob/cfa797c0681b7fef47cf93955fd06b54ddd09a7f/Lib/test/test_json/test_decode.py
@@ -72,17 +78,17 @@ def test_keys_reuse():
 def test_extra_data(self):
     s = '[1, 2, 3]5'
     msg = 'Extra data'
-    self.assertRaisesRegex(self.JSONDecodeError, msg, hyperjson.loads, s)
+    self.assertRaisesRegex(JSONDecodeError, msg, hyperjson.loads, s)
 
 
-@pytest.mark.skip(reason="Error type not implemented yet")
+# @pytest.mark.skip(reason="Error type not implemented yet")
 def test_invalid_escape(self):
     s = '["abc\\y"]'
     msg = 'escape'
-    self.assertRaisesRegex(self.JSONDecodeError, msg, hyperjson.loads, s)
+    self.assertRaisesRegex(JSONDecodeError, msg, hyperjson.loads, s)
 
 
-@pytest.mark.skip(reason="Error type not implemented yet")
+# @pytest.mark.skip(reason="Error type not implemented yet")
 def test_invalid_input_type(self):
     msg = 'the JSON object must be str'
     for value in [1, 3.14, [], {}, None]:
@@ -93,13 +99,19 @@ def test_invalid_input_type(self):
 def test_string_with_utf8_bom(self):
     # see #18958
     bom_json = "[1,2,3]".encode('utf-8-sig').decode('utf-8')
-    with self.assertRaises(self.JSONDecodeError) as cm:
+    with self.assertRaises(JSONDecodeError) as cm:
         self.loads(bom_json)
     self.assertIn('BOM', str(cm.exception))
-    with self.assertRaises(self.JSONDecodeError) as cm:
+    with self.assertRaises(JSONDecodeError) as cm:
         self.json.load(StringIO(bom_json))
     self.assertIn('BOM', str(cm.exception))
     # make sure that the BOM is not detected in the middle of a string
     bom_in_str = '"{}"'.format(''.encode('utf-8-sig').decode('utf-8'))
     self.assertEqual(self.loads(bom_in_str), '\ufeff')
     self.assertEqual(self.json.load(StringIO(bom_in_str)), '\ufeff')
+
+
+@pytest.mark.skip(reason="JSONDecoder not implemented yet")
+def test_negative_index(self):
+    d = hyperjson.JSONDecoder()
+    self.assertRaises(ValueError, d.raw_decode, 'a'*42, -50000)

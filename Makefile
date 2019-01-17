@@ -41,7 +41,7 @@ test: dev-packages install quicktest ## Intall hyperjson module and run tests
 
 .PHONY: quicktest
 quicktest: ## Run tests on already installed hyperjson module
-	pipenv run pytest tests
+	pipenv run pytest tests/cpython/test_fail.py
 
 .PHONY: bench
 bench: ## Run benchmarks
