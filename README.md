@@ -52,8 +52,8 @@ For a more in-depth discussion, [watch the talk about this project recorded at t
   are restricted to the standard library, camelCase is not Pythonic) and are not
   available in Python's `json` module.
 * **Whitespace preservation**: Whitespace in JSON strings is not preserved.
-  Mainly because JSON is a whitespace-agnostic format and `serde-json` stips
-  them out by desfault. In practice this should not be a problem, since your
+  Mainly because JSON is a whitespace-agnostic format and `serde-json` strips
+  them out by default. In practice this should not be a problem, since your
   application must not depend on whitespace padding, but it's something to be
   aware of.
 
