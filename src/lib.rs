@@ -206,7 +206,7 @@ pub fn dump(
 }
 
 /// A hyper-fast JSON encoder/decoder written in Rust
-#[pymodinit]
+#[pymodule]
 fn hyperjson(_py: Python, m: &PyModule) -> PyResult<()> {
     // See https://github.com/PyO3/pyo3/issues/171
     // Use JSONDecodeError from stdlib until issue is resolved.
@@ -215,10 +215,10 @@ fn hyperjson(_py: Python, m: &PyModule) -> PyResult<()> {
 
     m.add("__version__", env!("CARGO_PKG_VERSION"))?;
 
-    m.add_function(wrap_function!(load))?;
-    m.add_function(wrap_function!(loads))?;
-    m.add_function(wrap_function!(dump))?;
-    m.add_function(wrap_function!(dumps))?;
+    m.add_wrapped(wrap_pyfunction!(load))?;
+    m.add_wrapped(wrap_pyfunction!(loads))?;
+    m.add_wrapped(wrap_pyfunction!(dump))?;
+    m.add_wrapped(wrap_pyfunction!(dumps))?;
 
     Ok(())
 }
