@@ -14,8 +14,8 @@ use std::fmt;
 use std::marker::PhantomData;
 
 use pyo3::prelude::*;
-use pyo3::types::exceptions::TypeError as PyTypeError;
-use pyo3::types::exceptions::ValueError as PyValueError;
+use pyo3::exceptions::TypeError as PyTypeError;
+use pyo3::exceptions::ValueError as PyValueError;
 use pyo3::types::{PyDict, PyFloat, PyList, PyObjectRef, PyTuple};
 use serde::de::{self, DeserializeSeed, Deserializer, MapAccess, SeqAccess, Visitor};
 use serde::ser::{self, Serialize, SerializeMap, SerializeSeq, Serializer};
