@@ -2,6 +2,8 @@
 name = "hyperjson"
 version = "0.2.1"
 authors = ["Matthias Endler <matthias-endler@gmx.net>"]
+description = "A hyper-fast Python module for reading/writing JSON data using Rust's serde-json."
+license = "Apache-2.0"
 
 [dependencies]
 serde_json = "1.0.40"
