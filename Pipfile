@@ -13,10 +13,11 @@ yajl = "*"
 python-rapidjson = "*"
 wheel = "*"
 pylint = "*"
-matplotlib = "*"
+# pinned for py3.5 support
+matplotlib = "==3.0.3"
 hypothesis = "*"
 autopep8 = "*"
-pyo3-pack = "*"
+maturin = "*"
 
 [packages]
 

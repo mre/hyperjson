@@ -6,9 +6,9 @@ authors = ["Matthias Endler <matthias-endler@gmx.net>"]
 [dependencies]
 # Disabling the default features makes pyo3 choose binary linking
 hyperjson = { path = "..", default-features = false }
-structopt = "0.2.13"
-clap = "2.32.0"
+structopt = "0.3.2"
+clap = "2.33.0"
 
 [dependencies.pyo3]
-version = "0.5.0"
+version = "0.8.0"
 

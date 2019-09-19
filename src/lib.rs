@@ -1,4 +1,4 @@
-#![feature(try_from, test)]
+#![feature(test)]
 
 #[macro_use]
 extern crate failure;
@@ -14,9 +14,9 @@ use std::fmt;
 use std::marker::PhantomData;
 
 use pyo3::prelude::*;
-use pyo3::types::exceptions::TypeError as PyTypeError;
-use pyo3::types::exceptions::ValueError as PyValueError;
-use pyo3::types::{PyDict, PyFloat, PyList, PyObjectRef, PyTuple};
+use pyo3::exceptions::TypeError as PyTypeError;
+use pyo3::exceptions::ValueError as PyValueError;
+use pyo3::types::{PyDict, PyFloat, PyList, PyAny, PyTuple};
 use serde::de::{self, DeserializeSeed, Deserializer, MapAccess, SeqAccess, Visitor};
 use serde::ser::{self, Serialize, SerializeMap, SerializeSeq, Serializer};
 
@@ -77,7 +77,7 @@ import_exception!(json, JSONDecodeError);
 pub fn load(py: Python, fp: PyObject, kwargs: Option<&PyDict>) -> PyResult<PyObject> {
     // Temporary workaround for
     // https://github.com/PyO3/pyo3/issues/145
-    let io: &PyObjectRef = fp.as_ref(py);
+    let io: &PyAny = fp.extract(py)?;
 
     // Alternative workaround
     // fp.getattr(py, "seek")?;
@@ -169,7 +169,7 @@ pub fn dumps(
 ) -> PyResult<PyObject> {
     let v = SerializePyObject {
         py,
-        obj: obj.as_ref(py),
+        obj: obj.extract(py)?,
         sort_keys: match sort_keys {
             Some(sort_keys) => sort_keys.is_true(py)?,
             None => false,
@@ -199,7 +199,7 @@ pub fn dump(
     let s = dumps(
         py, obj, None, None, None, None, None, None, None, None, None, None,
     )?;
-    let fp_ref: &PyObjectRef = fp.as_ref(py);
+    let fp_ref: &PyAny = fp.extract(py)?;
     fp_ref.call_method1("write", (s,))?;
     // TODO: Will this always return None?
     Ok(pyo3::Python::None(py))
@@ -292,7 +292,7 @@ pub fn loads_impl(
 
 struct SerializePyObject<'p, 'a> {
     py: Python<'p>,
-    obj: &'a PyObjectRef,
+    obj: &'a PyAny,
     sort_keys: bool,
 }
 
@@ -324,7 +324,7 @@ impl<'p, 'a> Serialize for SerializePyObject<'p, 'a> {
         cast!(|x: &PyDict| {
             if self.sort_keys {
                 // TODO: this could be implemented more efficiently by building
-                // a `Vec<Cow<str>, &PyObjectRef>` of the map entries, sorting
+                // a `Vec<Cow<str>, &PyAny>` of the map entries, sorting
                 // by key, and serializing as in the `else` branch. That avoids
                 // buffering every map value into a serde_json::Value.
                 let no_sort_keys = SerializePyObject {
@@ -337,7 +337,7 @@ impl<'p, 'a> Serialize for SerializePyObject<'p, 'a> {
             } else {
                 let mut map = serializer.serialize_map(Some(x.len()))?;
                 for (key, value) in x {
-                    if key == self.py.None().as_ref(self.py) {
+                    if key.is_none() {
                         map.serialize_key("null")?;
                     } else if let Ok(key) = key.extract::<bool>() {
                         map.serialize_key(if key { "true" } else { "false" })?;
@@ -390,7 +390,7 @@ impl<'p, 'a> Serialize for SerializePyObject<'p, 'a> {
         extract!(u64);
         extract!(i64);
 
-        if self.obj == self.py.None().as_ref(self.py) {
+        if self.obj.is_none() {
             return serializer.serialize_unit();
         }
 

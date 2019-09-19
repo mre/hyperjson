@@ -36,7 +36,7 @@ arg_enum! {
 #[derive(StructOpt, Debug)]
 struct Opt {
     /// Profile to use
-    #[structopt(raw(possible_values = "&Profile::variants()", case_insensitive = "true"))]
+    #[structopt(possible_values = &Profile::variants(), case_insensitive = true)]
     profile: Profile,
 
     /// Number of profiling iterations
