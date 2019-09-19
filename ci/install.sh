@@ -9,7 +9,7 @@ main() {
     which rustc
     rustc --version
     pip install pipenv
-    cargo install pyo3-pack
+    cargo install maturin
     make install
     pipenv graph
 }

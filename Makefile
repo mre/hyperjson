@@ -9,11 +9,11 @@ help: ## This help message
 
 .PHONY: build
 build: nightly dev-packages ## Builds Rust code and hyperjson Python modules
-	pipenv run pyo3-pack build
+	pipenv run maturin build
 
 .PHONY: build-release
 build-release: nightly dev-packages ## Build hyperjson module in release mode
-	pipenv run pyo3-pack build --release
+	pipenv run maturin build --release
 
 .PHONY: nightly
 nightly: ## Set rust compiler to nightly version
@@ -21,11 +21,11 @@ nightly: ## Set rust compiler to nightly version
 
 .PHONY: install
 install: nightly dev-packages ## Install hyperjson module into current virtualenv
-	pipenv run pyo3-pack develop
+	pipenv run maturin develop
 
 .PHONY: publish
 publish: ## Publish crate on Pypi
-	pipenv run pyo3-pack publish
+	pipenv run maturin publish
 
 .PHONY: clean
 clean: ## Clean up build artifacts
