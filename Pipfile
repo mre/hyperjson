@@ -16,9 +16,9 @@ pylint = "*"
 matplotlib = "*"
 hypothesis = "*"
 autopep8 = "*"
+maturin = "*"
 
 [packages]
-maturin = "*"
 
 [requires]
 python_version = "3.6"
