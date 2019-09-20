@@ -1,6 +1,12 @@
 name: Test
 
-on: [push]
+on:
+  push:
+    paths:
+      - '.github/workflows/test.yaml'
+      - 'src/*'
+      - 'profiling/*'
+      - 'benchmarks/*'
 
 jobs:
   test_cpython:
