@@ -3,7 +3,7 @@ name: Test
 on:
   push:
     paths:
-      - '.github/workflows/test.yaml'
+      - '.github/workflows/test.yml'
       - 'src/*'
       - 'profiling/*'
       - 'benchmarks/*'
