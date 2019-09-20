@@ -21,7 +21,7 @@ nightly: ## Set rust compiler to nightly version
 
 .PHONY: install
 install: nightly dev-packages ## Install hyperjson module into current virtualenv
-	pipenv run maturin develop
+	pipenv run maturin develop --release
 
 .PHONY: publish
 publish: ## Publish crate on Pypi
