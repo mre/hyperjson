@@ -130,7 +130,7 @@ dependencies = [
 
 [[package]]
 name = "hyperjson"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "failure 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "pyo3 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -269,7 +269,7 @@ name = "profiling"
 version = "0.1.0"
 dependencies = [
  "clap 2.33.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "hyperjson 0.2.1",
+ "hyperjson 0.2.2",
  "pyo3 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "structopt 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
