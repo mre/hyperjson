@@ -21,7 +21,7 @@ nightly: ## Set rust compiler to nightly version
 
 .PHONY: install
 install: nightly dev-packages ## Install hyperjson module into current virtualenv
-	pipenv run maturin develop
+	pipenv run maturin develop --release
 
 .PHONY: publish
 publish: ## Publish crate on Pypi
@@ -48,7 +48,7 @@ bench: ## Run benchmarks
 	pipenv run pytest benchmarks
 
 .PHONY: bench-compare
-bench-compare: ## Run benchmarks and compare results with other JSON encoders
+bench-compare: nightly dev-packages install ## Run benchmarks and compare results with other JSON encoders
 	pipenv run pytest benchmarks --compare
 
 .PHONY: plot

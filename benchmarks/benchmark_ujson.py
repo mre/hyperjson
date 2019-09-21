@@ -26,6 +26,7 @@ if not skip_lib_comparisons:
     import ujson
     import simplejson
     import yajl
+    import orjson
 
 benchmark_results = []
 
@@ -55,7 +56,7 @@ def results_record_result(callback, is_encode, count):
 
 
 def results_output_table():
-    LIBRARIES = ("hyperjson", "ujson", "yajl", "simplejson", "json")
+    LIBRARIES = ("hyperjson", "ujson", "yajl", "simplejson", "json", "orjson")
     ENDC = '\033[0m'
     GREEN = '\033[92m'
 
@@ -143,6 +144,9 @@ def dumps_with_yajl():
     yajl.dumps(test_object)
 
 
+def dumps_with_orjson():
+    orjson.dumps(test_object)
+
 # =============================================================================
 # JSON encoding with sort_keys=True.
 # =============================================================================
@@ -165,6 +169,9 @@ def dumps_sorted_with_simplejson():
 def dumps_sorted_with_ujson():
     ujson.dumps(test_object, ensure_ascii=False, sort_keys=True)
 
+
+def dumps_sorted_with_orjson():
+    orjson.dumps(test_object, sort_keys=True)
 
 # =============================================================================
 # JSON decoding.
@@ -189,6 +196,9 @@ def loads_with_yajl():
     yajl.loads(decode_data)
 
 
+def load_with_orjson():
+    orjson.loads(test_object)
+
 # =============================================================================
 # Benchmarks.
 # =============================================================================
@@ -199,6 +209,7 @@ def run_decode(count):
         results_record_result(loads_with_simplejson, False, count)
         results_record_result(loads_with_yajl, False, count)
         results_record_result(loads_with_json, False, count)
+        results_record_result(loads_with_orjson, False, count)
 
 
 def run_encode(count):
@@ -208,6 +219,7 @@ def run_encode(count):
         results_record_result(dumps_with_simplejson, True, count)
         results_record_result(dumps_with_yajl, True, count)
         results_record_result(dumps_with_json, True, count)
+        results_record_result(dumps_with_orjson, True, count)
 
 
 def run_encode_sort_keys(count):
@@ -217,6 +229,7 @@ def run_encode_sort_keys(count):
         results_record_result(dumps_sorted_with_simplejson, True, count)
         results_record_result(dumps_sorted_with_yajl, True, count)
         results_record_result(dumps_sorted_with_json, True, count)
+        results_record_result(dumps_sorted_with_orjson, True, count)
 
 
 def benchmark_array_doubles():
@@ -370,7 +383,6 @@ if __name__ == "__main__":
     benchmark_array_true_values()
     benchmark_array_of_dict_string_int_pairs()
     benchmark_dict_of_arrays_of_dict_string_int_pairs()
-    # Disabled for now because of https://github.com/PyO3/pyo3/issues/177
-    # benchmark_complex_object()
+    benchmark_complex_object()
     if not skip_lib_comparisons:
         results_output_table()
