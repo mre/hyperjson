@@ -14,16 +14,11 @@
 //! callgrind_annotate --auto=yes callgrind.out.35583 >out.rs
 //! qcachegrind callgrind.out.35583
 //! ```
-extern crate structopt;
-#[macro_use]
-extern crate clap;
-
-extern crate hyperjson;
-extern crate pyo3;
 
 mod profiles;
 
 use structopt::StructOpt;
+use clap::arg_enum;
 
 arg_enum! {
     #[derive(Debug)]

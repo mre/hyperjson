@@ -1,22 +1,16 @@
 #![feature(test)]
 
-#[macro_use]
-extern crate failure;
-#[macro_use]
-extern crate pyo3;
-extern crate serde;
-extern crate serde_derive;
-extern crate serde_json;
-extern crate test;
-
 use std::collections::BTreeMap;
 use std::fmt;
 use std::marker::PhantomData;
+use failure::Fail;
 
 use pyo3::prelude::*;
 use pyo3::exceptions::TypeError as PyTypeError;
 use pyo3::exceptions::ValueError as PyValueError;
 use pyo3::types::{PyDict, PyFloat, PyList, PyAny, PyTuple};
+use pyo3::{import_exception, wrap_pyfunction};
+
 use serde::de::{self, DeserializeSeed, Deserializer, MapAccess, SeqAccess, Visitor};
 use serde::ser::{self, Serialize, SerializeMap, SerializeSeq, Serializer};
 

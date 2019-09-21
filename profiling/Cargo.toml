@@ -2,12 +2,14 @@
 name = "profiling"
 version = "0.1.0"
 authors = ["Matthias Endler <matthias-endler@gmx.net>"]
+edition = "2018"
 
 [dependencies]
 # Disabling the default features makes pyo3 choose binary linking
 hyperjson = { path = "..", default-features = false }
 structopt = "0.3.2"
 clap = "2.33.0"
+serde_json = "1.0.40"
 
 [dependencies.pyo3]
 version = "0.8.0"
