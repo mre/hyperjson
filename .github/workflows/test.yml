@@ -14,16 +14,16 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
         py: [3.5, 3.6, 3.7]
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-      - name: Install Rust
-        run: |
-          wget --https-only --secure-protocol=TLSv1_2 -O rustup-init.sh https://sh.rustup.rs
-          sh ./rustup-init.sh --default-toolchain nightly -y -v
-          echo ::add-path::$HOME/.cargo/bin
+      - name: Install Rust Nightly
+        uses: actions-rs/toolchain@master
+        with:
+          toolchain: nightly
+          default: true
       - name: Setup Python
         uses: actions/setup-python@v1
         with:
@@ -35,8 +35,6 @@ jobs:
           echo ::add-path::$HOME/.local/bin
       - name: Setup Virtualenv
         run: |
-          # squelch the warning
-          sed -i -e 's/python_version.*/python_version = "${{matrix.py}}"/g' Pipfile
           pipenv --python ${{ matrix.py }} install --dev
           echo ::add-path::$(dirname $(pipenv run which pip 2>/dev/null))
       - name: Setup Hyperjson
