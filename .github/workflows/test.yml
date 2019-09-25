@@ -43,7 +43,7 @@ jobs:
       # py3.5 on github windows won't build without adding vs tools 2014
       - name: Setup Hyperjson
         if: |
-          (matrix.os == 'windows-latest' && matrix.py != "3.5") ||
+          (matrix.os == 'windows-latest' && matrix.py != '3.5') ||
           (matrix.os != 'windows-latest')
         run: |
           pipenv install maturin==0.7.2
