@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - '.github/workflows/test.yml'
+      - 'Pipfile*'
+      - 'Cargo*'
       - 'src/*'
       - 'profiling/*'
       - 'benchmarks/*'
