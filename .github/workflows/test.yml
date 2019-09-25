@@ -23,7 +23,7 @@ jobs:
         if: |
           (matrix.os == 'windows-latest' && matrix.py != '3.5') ||
           (matrix.os != 'windows-latest')
-        run: echo ::warning::We can't build on Windows with Python 3.5 just yet
+        run: echo "::warning::We can't build on Windows with Python 3.5 just yet"
       - name: Checkout
         uses: actions/checkout@v1
       - name: Install Rust Nightly
