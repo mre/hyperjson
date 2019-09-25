@@ -17,13 +17,8 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        py: [3.5, 3.6, 3.7]
+        py: [3.6, 3.7]
     steps:
-      - name: Ignore CPython 3.5 on Windows
-        if: |
-          (matrix.os == 'windows-latest' && matrix.py != '3.5') ||
-          (matrix.os != 'windows-latest')
-        run: echo "::warning::We can't build on Windows with Python 3.5 just yet"
       - name: Checkout
         uses: actions/checkout@v1
       - name: Install Rust Nightly
@@ -48,7 +43,6 @@ jobs:
           pipenv --python ${{ matrix.py }} install --dev
           echo ::add-path::$(dirname $(pipenv run which pip 2>/dev/null))
         shell: bash
-      # py3.5 on github windows won't build without adding vs tools 2014
       - name: Setup Hyperjson
         run: |
           set -xueo pipefail
