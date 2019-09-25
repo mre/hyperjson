@@ -1,7 +1,11 @@
 {
     "_meta": {
         "hash": {
+<<<<<<< HEAD
             "sha256": "177e8efb938a3786461d2b4fbc7aa4145e6beb4e423c783cbf5911bd407561ff"
+=======
+            "sha256": "9248bdd8b9724988689a19855667ee1b1c22958d6b7e2c5879bae6e919906d54"
+>>>>>>> 7367356... nvm, pin maturin to a version with linux wheels
         },
         "pipfile-spec": 6,
         "requires": {
@@ -152,11 +156,15 @@
         },
         "maturin": {
             "hashes": [
-                "sha256:715aae61031ce0dc20fd2cd02cc4f7c467aca420a496c1fd0213779634561d04",
-                "sha256:da79bc28ac9ad8f29b177eeaf602da896b5f04adb08ef3d45d8946e997fc6237"
+                "sha256:1e015309f97e34169b13e133d7ef74eaca3eade889cd4c66109b23f4b845187c",
+                "sha256:3c3fde596ca8b74d35e2d8874d9116b2f7cca66ab91f0c94ce78223f76d4fa89",
+                "sha256:cbef38c4da788c87fd1a6ad9e71e786e6dd2180f7ed8ce4bca1d191f0fb427fd",
+                "sha256:d7bba3a4dd1c8fcf24eca45cbf1df650a8821954cc6f1b75f267b2c6bcd02812",
+                "sha256:e47f7a1c31a9678d9d5d89bba033003fc25124062da2ea755ea90aed901f8445",
+                "sha256:e89272805f04c5058fca4ebe9af63b4af8d6892ea46334ed9a1f2ad84aecd676"
             ],
             "index": "pypi",
-            "version": "==0.7.5"
+            "version": "==0.7.2"
         },
         "mccabe": {
             "hashes": [
