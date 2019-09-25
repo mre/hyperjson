@@ -39,7 +39,12 @@ jobs:
         run: |
           pipenv --python ${{ matrix.py }} install --dev
           echo ::add-path::$(dirname $(pipenv run which pip 2>/dev/null))
+        shell: bash
+      # py3.5 on github windows won't build without adding vs tools 2014
       - name: Setup Hyperjson
+        if: |
+          (matrix.os == 'windows-latest' && matrix.py != "3.5") ||
+          (matrix.os != 'windows-latest')
         run: |
           pipenv install maturin==0.7.2
           pipenv run maturin develop --release
