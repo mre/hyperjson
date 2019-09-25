@@ -41,7 +41,7 @@ jobs:
           echo ::add-path::$(dirname $(pipenv run which pip 2>/dev/null))
       - name: Setup Hyperjson
         run: |
-          pipenv install maturin
+          pipenv install maturin==0.7.2
           pipenv run maturin develop --release
       - name: Run Tests
         run: pipenv run pytest tests
