@@ -41,7 +41,7 @@ jobs:
         run: |
           set -xueo pipefail
           pipenv --python ${{ matrix.py }} install --dev
-          echo ::add-path::$(dirname $(pipenv run which pip 2>/dev/null))
+          echo "::add-path::$(pipenv --venv)/bin"
         shell: bash
       - name: Setup Hyperjson
         run: |
