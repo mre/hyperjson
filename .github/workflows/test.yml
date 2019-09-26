@@ -16,7 +16,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        # ubuntu and mac finally behave, now let's focus on windows
+        # os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [windows-latest]
         py: [3.6, 3.7]
     steps:
       - name: Checkout
@@ -42,6 +44,8 @@ jobs:
           set -xueo pipefail
           pipenv --python ${{ matrix.py }} install --dev
           echo "::add-path::$(pipenv --venv)/bin"
+          # so windows folks can find the python*.lib
+          echo "::set-env name=LIBPATH::$(pipenv --venv)/libs"
         shell: bash
       - name: Setup Hyperjson
         run: |
