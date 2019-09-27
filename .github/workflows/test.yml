@@ -16,9 +16,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # ubuntu and mac finally behave, now let's focus on windows
-        # os: [ubuntu-latest, macOS-latest, windows-latest]
-        os: [windows-latest]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
         py: [3.6, 3.7]
     steps:
       - name: Checkout
