@@ -48,14 +48,14 @@ jobs:
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             ver=$(pipenv --bare run python -c 'import platform; print(platform.python_version())')
             real_path="C:\\hostedtoolcache\\windows\\Python\\$ver\\x64"
-            echo "::set-env name=RUSTFLAGS::\"-L$real_path\""
+            echo "::set-env name=EXTRA_RUST_ARGS::-L$real_path"
           fi
         shell: bash
       - name: Setup Hyperjson
         run: |
           set -xueo pipefail
           pipenv install maturin==0.7.2
-          pipenv run maturin develop --release
+          pipenv run maturin develop --release ${EXTRA_RUST_ARGS:+--rustc-extra-args $EXTRA_RUST_ARGS}
         shell: bash
       - name: Run Tests
         run: pipenv run pytest tests
