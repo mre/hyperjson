@@ -55,7 +55,7 @@ jobs:
         run: |
           set -xueo pipefail
           pipenv install maturin==0.7.2
-          pipenv run maturin develop --release ${EXTRA_RUST_ARGS:+--rustc-extra-args $EXTRA_RUST_ARGS}
+          pipenv run maturin develop --release ${EXTRA_RUST_ARGS:+--rustc-extra-args=$EXTRA_RUST_ARGS}
         shell: bash
       - name: Run Tests
         run: pipenv run pytest tests
