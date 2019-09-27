@@ -47,7 +47,7 @@ jobs:
           # so windows folks can find the python*.lib
           ver=$(pipenv --bare run python -c 'import platform; print(platform.python_version())')
           real_path="C:\\hostedtoolcache\\windows\\Python\\$ver\\x64"
-          echo ::set-env name=LIBPATH::"$real_path"
+          echo "::set-env name=LIB::$real_path"
         shell: bash
       - name: Setup Hyperjson
         run: |
