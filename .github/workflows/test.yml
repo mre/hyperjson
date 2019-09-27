@@ -45,7 +45,7 @@ jobs:
           pipenv --python ${{ matrix.py }} install --dev
           echo "::add-path::$(pipenv --venv)/bin"
           # so windows folks can find the python*.lib
-          if [[ "${{ matrix.os }}" == "windows-latest"]]; then
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             ver=$(pipenv --bare run python -c 'import platform; print(platform.python_version())')
             real_path="C:\\hostedtoolcache\\windows\\Python\\$ver\\x64"
             echo "::set-env name=RUSTFLAGS::\"-L$real_path\""
