@@ -1,0 +1,61 @@
+name: Test
+
+on:
+  push:
+    paths:
+      - '.github/workflows/test.yml'
+      - 'Pipfile*'
+      - 'Cargo*'
+      - 'src/*'
+      - 'profiling/*'
+      - 'benchmarks/*'
+
+jobs:
+  test_cpython:
+    name: CPython ${{ matrix.py }} for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        py: [3.6, 3.7]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install Rust Nightly
+        uses: actions-rs/toolchain@master
+        with:
+          toolchain: nightly
+          default: true
+      - name: Setup Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.py }}
+          architecture: x64
+      - name: Install Pipenv
+        run: |
+          set -xueo pipefail
+          pip3 install --user pipenv
+          echo ::add-path::$HOME/.local/bin
+        shell: bash
+      - name: Setup Virtualenv
+        run: |
+          set -xueo pipefail
+          pipenv --python ${{ matrix.py }} install --dev
+          echo "::add-path::$(pipenv --venv)/bin"
+          # so windows folks can find the python*.lib
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            ver=$(pipenv --bare run python -c 'import platform; print(platform.python_version())')
+            real_path="C:\\\\hostedtoolcache\\\\windows\\\\Python\\\\$ver\\\\x64\\\\libs"
+            echo "::set-env name=EXTRA_RUST_ARGS::-L$real_path"
+          fi
+        shell: bash
+      - name: Setup Hyperjson
+        run: |
+          set -xueo pipefail
+          pipenv install maturin==0.7.2
+          pipenv run maturin develop --release ${EXTRA_RUST_ARGS:+--rustc-extra-args=$EXTRA_RUST_ARGS}
+        shell: bash
+      - name: Run Tests
+        run: pipenv run pytest tests
+      - name: Benchmarks
+        run: pipenv run pytest benchmarks --compare
