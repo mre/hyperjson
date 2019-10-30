@@ -54,11 +54,11 @@
         },
         "hypothesis": {
             "hashes": [
-                "sha256:70a80436bdf844e2e9aaabe74100cc62b7e90c150fdd4dd864c64fcfc9bde273",
-                "sha256:9663f911d0a0ccb0b602b424d1b599e1a3637cba0e28d669d3d2b8d33ca44516"
+                "sha256:7385185ceeada55746a406a90fc84bfc22481fd570cc4bbcf8401ea93ce574e3",
+                "sha256:c32f79ba3b587a210de4f17e88d704b712c4301a554d4f5d7a67d01076dce1d0"
             ],
             "index": "pypi",
-            "version": "==4.42.0"
+            "version": "==4.42.3"
         },
         "importlib-metadata": {
             "hashes": [
