@@ -56,19 +56,19 @@
         },
         "hypothesis": {
             "hashes": [
-                "sha256:2c95e0c416ec13ac85efff4eef95bb4b6dbd7bfc77b2f29bf70dc4e512bfc714",
-                "sha256:ff4b9b8286437eb323a3e0a62adb00039c4207038c229c3f5f1eff6051e376b1"
+                "sha256:771370874d53089f9c8e3e2f0d5e0802a35e086b35bca26318e59c42f00499d5",
+                "sha256:8cef9ff0d544a56d0f256491925b6ec7e9f9f3e3a43869e7c65007c7948c6a74"
             ],
             "index": "pypi",
-            "version": "==4.53.1"
+            "version": "==4.53.2"
         },
         "importlib-metadata": {
             "hashes": [
-                "sha256:3a8b2dfd0a2c6a3636e7c016a7e54ae04b997d30e69d5eacdca7a6c2221a1402",
-                "sha256:41e688146d000891f32b1669e8573c57e39e5060e7f5f647aa617cd9a9568278"
+                "sha256:073a852570f92da5f744a3472af1b61e28e9f78ccf0c9117658dc32b15de7b45",
+                "sha256:d95141fbfa7ef2ec65cfd945e2af7e5a6ddbd7c8d9a25e66ff3be8e3daf9f60f"
             ],
             "markers": "python_version < '3.8'",
-            "version": "==1.2.0"
+            "version": "==1.3.0"
         },
         "isort": {
             "hashes": [
