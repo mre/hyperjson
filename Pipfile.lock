@@ -56,11 +56,11 @@
         },
         "hypothesis": {
             "hashes": [
-                "sha256:0c0df6c7abfe1f5f9cd2e8801f3c3e181e223a05abe3ea13a8ba570e01498061",
-                "sha256:5137f42dfee2d9ce13c6c112c3462a2c55657dd69434137cd8ed55a7e6827d2b"
+                "sha256:11649b90ff6c820d2f6a9b7409f95b8ffc6faefb54527f942ce4b8db92dd7ce3",
+                "sha256:70c454f345642ed95c2d9d14ccee9f582e09688ac2ce0d8c5e3795113c629448"
             ],
             "index": "pypi",
-            "version": "==4.54.0"
+            "version": "==4.55.1"
         },
         "importlib-metadata": {
             "hashes": [
@@ -375,6 +375,13 @@
                 "sha256:30f610279e8b2578cab6db20741130331735c781b56053c59c4076da27f06b66"
             ],
             "version": "==1.13.0"
+        },
+        "sortedcontainers": {
+            "hashes": [
+                "sha256:974e9a32f56b17c1bac2aebd9dcf197f3eb9cd30553c5852a3187ad162e1a03a",
+                "sha256:d9e96492dd51fae31e60837736b38fe42a187b5404c16606ff7ee7cd582d4c60"
+            ],
+            "version": "==2.1.0"
         },
         "toml": {
             "hashes": [
