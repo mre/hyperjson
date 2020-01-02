@@ -56,11 +56,11 @@
         },
         "hypothesis": {
             "hashes": [
-                "sha256:47b85d6ce8393b2e0160898b9f53d2e95fb904e503125a70a11158d03eab2f4a",
-                "sha256:e14afdfb01fa8fe93ae7b03e74e151566153acfc9682a2855a9deedf8bef210f"
+                "sha256:1f2dff70fc23027abde8645fd94a49ba1044483756040045c3260a40040f1576",
+                "sha256:de0a577eaf3fa1437b769b38a0147a1db8d537c3643b3d89190282f34d9bdf86"
             ],
             "index": "pypi",
-            "version": "==5.0.0"
+            "version": "==5.0.1"
         },
         "importlib-metadata": {
             "hashes": [
@@ -425,10 +425,9 @@
         },
         "wcwidth": {
             "hashes": [
-                "sha256:3df37372226d6e63e1b1e1eda15c594bca98a22d33a23832a90998faa96bc65e",
-                "sha256:f4ebe71925af7b40a864553f761ed559b43544f8f71746c2d756c7fe788ade7c"
+                "sha256:8fd29383f539be45b20bd4df0dc29c20ba48654a41e661925e612311e9f3c603"
             ],
-            "version": "==0.1.7"
+            "version": "==0.1.8"
         },
         "wheel": {
             "hashes": [
