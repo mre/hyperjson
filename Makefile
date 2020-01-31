@@ -9,11 +9,11 @@ help: ## This help message
 
 .PHONY: build
 build: nightly dev-packages ## Builds Rust code and hyperjson Python modules
-	pipenv run maturin build
+	poetry run maturin build
 
 .PHONY: build-release
 build-release: nightly dev-packages ## Build hyperjson module in release mode
-	pipenv run maturin build --release
+	poetry run maturin build --release
 
 .PHONY: nightly
 nightly: ## Set rust compiler to nightly version
@@ -21,44 +21,43 @@ nightly: ## Set rust compiler to nightly version
 
 .PHONY: install
 install: nightly dev-packages ## Install hyperjson module into current virtualenv
-	pipenv run maturin develop --release
+	poetry run maturin develop --release
 
 .PHONY: publish
 publish: ## Publish crate on Pypi
-	pipenv run maturin publish
+	poetry run maturin publish
 
 .PHONY: clean
 clean: ## Clean up build artifacts
-	pipenv --rm || true
 	cargo clean
 
 .PHONY: dev-packages
 dev-packages: ## Install Python development packages for project
-	pipenv install --dev
+	poetry install
 
 .PHONY: test
 test: dev-packages install quicktest ## Intall hyperjson module and run tests
 
 .PHONY: quicktest
 quicktest: ## Run tests on already installed hyperjson module
-	pipenv run pytest tests
+	poetry run pytest tests
 
 .PHONY: bench
 bench: ## Run benchmarks
-	pipenv run pytest benchmarks
+	poetry run pytest benchmarks
 
 .PHONY: bench-compare
 bench-compare: nightly dev-packages install ## Run benchmarks and compare results with other JSON encoders
-	pipenv run pytest benchmarks --compare
+	poetry run pytest benchmarks --compare
 
 .PHONY: plot
 plot: bench-compare ## Plot graph from benchmarks
 	@echo "Rendering plots from benchmarks"
-	pipenv run python benchmarks/histogram.py
+	poetry run python benchmarks/histogram.py
 
 .PHONY: build-profile
 build-profile: ## Builds binary for profiling
-	cd profiling && pipenv run cargo build --release
+	cd profiling && poetry run cargo build --release
 
 # Setup instructions here:
 # https://gist.github.com/dlaehnemann/df31787c41bd50c0fe223df07cf6eb89

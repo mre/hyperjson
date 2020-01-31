@@ -1,5 +1,3 @@
-#![feature(test)]
-
 use std::collections::BTreeMap;
 use std::fmt;
 use std::marker::PhantomData;
@@ -544,26 +542,5 @@ impl<'de, 'a> Visitor<'de> for HyperJsonValue<'a> {
         }
 
         Ok(entries.to_object(self.py))
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use std::fs;
-    use test::Bencher;
-
-    use super::*;
-
-    #[bench]
-    fn bench_dict_string_int_pairs(b: &mut Bencher) {
-        let dict_string_int = fs::read_to_string("benchmark/dict_string_int_plain.txt").unwrap();
-
-        let gil = Python::acquire_gil();
-        let py = gil.python();
-
-        b.iter(|| {
-            let obj = dict_string_int.to_object(py);
-            loads_impl(py, obj, None, None, None, None, None, None)
-        });
     }
 }
