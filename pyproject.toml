@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hyperjson"
-version = "0.2.3"
+version = "0.2.4"
 description = "A hyper-fast Python module for reading/writing JSON data"
 authors = ["Matthias Endler <matthias-endler@gmx.net>"]
 license = "Apache-2.0"

@@ -1,6 +1,6 @@
 [package]
 name = "hyperjson"
-version = "0.2.3"
+version = "0.2.4"
 authors = ["Matthias Endler <matthias-endler@gmx.net>"]
 description = "A hyper-fast Python module for reading/writing JSON data"
 edition = "2018"
