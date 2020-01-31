@@ -5,7 +5,7 @@ description = "A hyper-fast Python module for reading/writing JSON data"
 authors = ["Matthias Endler <matthias-endler@gmx.net>"]
 license = "Apache-2.0"
 readme = "README.md"
-repository = "https://gitlab.com/mre/hyperjson"
+repository = "https://github.com/mre/hyperjson"
 keywords = ["json", "parser", "fast"]
 
 [tool.poetry.dependencies]
