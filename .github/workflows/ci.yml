@@ -165,7 +165,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: PyPi publish
-        if: startsWith(github.ref, 'refs/tags/')
+        if: github.event_name == 'release' && github.event.action == 'created'
         env:
           MATURIN_PASSWORD: ${{ secrets.PYPI }}
         run: poetry run maturin publish --username __token__
