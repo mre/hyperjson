@@ -8,7 +8,10 @@ use error::*;
 use pyo3::exceptions::TypeError as PyTypeError;
 use pyo3::exceptions::ValueError as PyValueError;
 use pyo3::prelude::*;
-use pyo3::{wrap_pyfunction, types::{PyAny, PyDict, PyFloat, PyList, PyTuple}};
+use pyo3::{
+    types::{PyAny, PyDict, PyFloat, PyList, PyTuple},
+    wrap_pyfunction,
+};
 
 use serde::de::{self, DeserializeSeed, Deserializer, MapAccess, SeqAccess, Visitor};
 use serde::ser::{self, Serialize, SerializeMap, SerializeSeq, Serializer};
