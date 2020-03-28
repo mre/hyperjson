@@ -35,8 +35,12 @@ clean: ## Clean up build artifacts
 dev-packages: ## Install Python development packages for project
 	poetry install
 
+.PHONY: cargo-test
+cargo-test: ## Run cargo tests only
+	cargo test
+
 .PHONY: test
-test: dev-packages install quicktest ## Intall hyperjson module and run tests
+test: cargo-test dev-packages install quicktest ## Intall hyperjson module and run tests
 
 .PHONY: quicktest
 quicktest: ## Run tests on already installed hyperjson module

@@ -1,69 +1,17 @@
 use std::collections::BTreeMap;
 use std::fmt;
 use std::marker::PhantomData;
-use failure::Fail;
 
-use pyo3::prelude::*;
+mod error;
+use error::*;
+
 use pyo3::exceptions::TypeError as PyTypeError;
 use pyo3::exceptions::ValueError as PyValueError;
-use pyo3::types::{PyDict, PyFloat, PyList, PyAny, PyTuple};
-use pyo3::{import_exception, wrap_pyfunction};
+use pyo3::prelude::*;
+use pyo3::{wrap_pyfunction, types::{PyAny, PyDict, PyFloat, PyList, PyTuple}};
 
 use serde::de::{self, DeserializeSeed, Deserializer, MapAccess, SeqAccess, Visitor};
 use serde::ser::{self, Serialize, SerializeMap, SerializeSeq, Serializer};
-
-#[derive(Debug, Fail)]
-pub enum HyperJsonError {
-    #[fail(display = "Conversion error: {}", error)]
-    InvalidConversion { error: serde_json::Error },
-    #[fail(display = "Python Runtime exception: {}", error)]
-    PyErr { error: String },
-    #[fail(display = "Dictionary key is not a string: {:?}", obj)]
-    DictKeyNotString { obj: PyObject },
-    #[fail(display = "Invalid float: {}", x)]
-    InvalidFloat { x: String },
-    #[fail(display = "Invalid type: {}, Error: {}", t, e)]
-    InvalidCast { t: String, e: String },
-    // NoneError doesn't have an impl for `Display`
-    // See https://github.com/rust-lang-nursery/failure/issues/61
-    // See https://github.com/rust-lang/rust/issues/42327#issuecomment-378324282
-    // #[fail(display = "Error: {}", s)]
-    // NoneError { s: String },
-}
-
-impl From<serde_json::Error> for HyperJsonError {
-    fn from(error: serde_json::Error) -> HyperJsonError {
-        HyperJsonError::InvalidConversion { error }
-    }
-}
-
-impl From<HyperJsonError> for PyErr {
-    fn from(h: HyperJsonError) -> PyErr {
-        match h {
-            HyperJsonError::InvalidConversion { error } => {
-                PyErr::new::<PyTypeError, _>(format!("{}", error))
-            }
-            // TODO
-            HyperJsonError::PyErr { error: _error } => PyErr::new::<PyTypeError, _>("PyErr"),
-            HyperJsonError::InvalidCast { t: _t, e: _e } => {
-                PyErr::new::<PyTypeError, _>("InvalidCast")
-            }
-            _ => PyErr::new::<PyTypeError, _>("Unknown reason"),
-        }
-    }
-}
-
-impl From<PyErr> for HyperJsonError {
-    fn from(error: PyErr) -> HyperJsonError {
-        // TODO: This should probably just have the underlying PyErr as an argument,
-        // but this type is not `Sync`, so we just use the debug representation for now.
-        HyperJsonError::PyErr {
-            error: format!("{:?}", error),
-        }
-    }
-}
-
-import_exception!(json, JSONDecodeError);
 
 #[pyfunction]
 pub fn load(py: Python, fp: PyObject, kwargs: Option<&PyDict>) -> PyResult<PyObject> {
