@@ -104,12 +104,19 @@ pub fn dumps(
     _check_circular: Option<PyObject>,
     _allow_nan: Option<PyObject>,
     _cls: Option<PyObject>,
-    _indent: Option<PyObject>,
+    indent: Option<PyObject>,
     _separators: Option<PyObject>,
     _default: Option<PyObject>,
     sort_keys: Option<PyObject>,
     _kwargs: Option<&PyDict>,
 ) -> PyResult<PyObject> {
+    let indent_data: Option<Vec<u8>> = if let Some(indent_py) = indent {
+        let indent_number = indent_py.extract(py)?;
+        Some(vec![b' '; indent_number])
+    } else {
+        None
+    };
+
     let v = SerializePyObject {
         py,
         obj: obj.extract(py)?,
@@ -118,8 +125,18 @@ pub fn dumps(
             None => false,
         },
     };
-    let s: Result<String, HyperJsonError> =
-        serde_json::to_string(&v).map_err(|error| HyperJsonError::InvalidConversion { error });
+
+    let s: Result<String, HyperJsonError> = if let Some(indent) = indent_data {
+        let buf = Vec::new();
+        let formatter = serde_json::ser::PrettyFormatter::with_indent(&indent);
+        let mut ser = serde_json::Serializer::with_formatter(buf, formatter);
+        v.serialize(&mut ser)
+            .map_err(|error| HyperJsonError::InvalidConversion { error })?;
+        String::from_utf8(ser.into_inner()).map_err(|error| HyperJsonError::Utf8Error { error })
+    } else {
+        serde_json::to_string(&v).map_err(|error| HyperJsonError::InvalidConversion { error })
+    };
+
     Ok(s?.to_object(py))
 }
 
@@ -133,14 +150,14 @@ pub fn dump(
     _check_circular: Option<PyObject>,
     _allow_nan: Option<PyObject>,
     _cls: Option<PyObject>,
-    _indent: Option<PyObject>,
+    indent: Option<PyObject>,
     _separators: Option<PyObject>,
     _default: Option<PyObject>,
     _sort_keys: Option<PyObject>,
     _kwargs: Option<&PyDict>,
 ) -> PyResult<PyObject> {
     let s = dumps(
-        py, obj, None, None, None, None, None, None, None, None, None, None,
+        py, obj, None, None, None, None, None, indent, None, None, None, None,
     )?;
     let fp_ref: &PyAny = fp.extract(py)?;
     fp_ref.call_method1("write", (s,))?;

@@ -1,8 +1,9 @@
-import pytest
 import json
-import hyperjson
 import string
 from io import StringIO
+
+import hyperjson
+import pytest
 
 simple_types = [1, 1.0, -1, None, "str", True, False]
 
@@ -71,3 +72,34 @@ def test_dict_of_arrays_of_dict_string_int_pairs():
     # assert ignore_whitespace(json.dumps(payload)) == ignore_whitespace(
     #     hyperjson.dumps(payload))
     assert hyperjson.loads(hyperjson.dumps(payload)) == payload
+
+
+@pytest.mark.parametrize(
+    "json_data,string_data,indent",
+    (
+        ("str", '"str"', 4),
+        (True, "true", 4),
+        (None, "null", 4),
+        (5, "5", 4),
+        ({}, "{}", 4),
+        ([], "[]", 4),
+        ([2], "[\n    2\n]", 4),
+        ({"2": 3}, '{\n    "2": 3\n}', 4),
+        ([[1], {"2": 3}], '[\n  [\n    1\n  ],\n  {\n    "2": 3\n  }\n]', 2),
+        ({"a": [1], "d": {"2": 3}}, '{\n  "a": [\n    1\n  ],\n  "d": {\n    "2": 3\n  }\n}', 2),
+    ),
+    ids=(
+        "0-level-str",
+        "0-level-bool",
+        "0-level-null",
+        "0-level-number",
+        "0-level-dict",
+        "0-level-array",
+        "1-level-array",
+        "1-level-dict",
+        "2-level-array",
+        "2-level-dict",
+    )
+)
+def test_indent(json_data, string_data, indent):
+    assert hyperjson.dumps(json_data, indent=indent, sort_keys=True) == string_data
