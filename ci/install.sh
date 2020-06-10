@@ -8,10 +8,11 @@ main() {
     export PATH="$HOME/.cargo/bin:$PATH"
     which rustc
     rustc --version
-    pip install pipenv
+    curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+    source ~/.poetry/env
     cargo install maturin
     make install
-    pipenv graph
+    poetry show --tree
 }
 
 main

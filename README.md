@@ -93,10 +93,11 @@ Just pick one of the open tickets. We can provide mentorship if you like. :smile
 
 ## Developer guide
 
-This project uses [pipenv](https://docs.pipenv.org/) for managing the development environment. If you don't have it installed, run
+This project uses [poetry](https://python-poetry.org/docs/) for managing the development environment. If you don't have it installed, run
 
 ```
-pip install poetry
+curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+export PATH="$HOME/.poetry/bin:$PATH"
 ```
 
 The project requires the `nightly` version of Rust.
