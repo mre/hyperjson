@@ -18,6 +18,8 @@ pub enum HyperJsonError {
     // See https://github.com/rust-lang/rust/issues/42327#issuecomment-378324282
     // #[fail(display = "Error: {}", s)]
     // NoneError { s: String },
+    #[fail(display = "Utf8 error: {}", error)]
+    Utf8Error { error: std::string::FromUtf8Error },
 }
 
 impl From<serde_json::Error> for HyperJsonError {

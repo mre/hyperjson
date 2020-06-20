@@ -1,15 +1,31 @@
-import pytest
 import json
-import hyperjson
 import string
 from io import StringIO
+
+import hyperjson
+import pytest
+
+
+@pytest.fixture(params=["fp", "str"])
+def dumps(request):
+    if request.param == "fp":
+
+        def dump(obj, *args, **kwargs):
+            fp = StringIO()
+            json.dump(obj, fp, *args, **kwargs)
+            return fp.getvalue()
+
+        return dump
+    elif request.param == "str":
+        return json.dumps
+
 
 simple_types = [1, 1.0, -1, None, "str", True, False]
 
 
 @pytest.mark.parametrize("payload", simple_types)
-def test_simple_types(payload):
-    assert json.dumps(payload) == hyperjson.dumps(payload)
+def test_simple_types(payload, dumps):
+    assert json.dumps(payload) == dumps(payload)
 
 
 def ignore_whitespace(a):
@@ -28,7 +44,7 @@ simple_dicts = [
 
 
 @pytest.mark.parametrize("d,allowed", simple_dicts)
-def test_simple_dicts(d, allowed):
+def test_simple_dicts(d, allowed, dumps):
     """
     Python dictionaries are guaranteed to be ordered in Python 3.6+,
     in Python <=3.5 they are not ordered.
@@ -37,7 +53,7 @@ def test_simple_dicts(d, allowed):
     See https://stackoverflow.com/a/7214316/270334
     Therefore, we ignore ordering to avoid flaky tests.
     """
-    actual = ignore_whitespace(hyperjson.dumps(d))
+    actual = ignore_whitespace(dumps(d))
     assert actual in allowed
 
 
@@ -48,12 +64,11 @@ complex_dicts = [
 
 
 @pytest.mark.parametrize("d", complex_dicts)
-def test_complex_dicts(d):
-    assert ignore_whitespace(json.dumps(
-        d)) == ignore_whitespace(hyperjson.dumps(d))
+def test_complex_dicts(d, dumps):
+    assert ignore_whitespace(json.dumps(d)) == ignore_whitespace(dumps(d))
 
 
-def test_dict_of_arrays_of_dict_string_int_pairs():
+def test_dict_of_arrays_of_dict_string_int_pairs(dumps):
     payload = {
         '9.865710069007799': [
             {
@@ -70,4 +85,41 @@ def test_dict_of_arrays_of_dict_string_int_pairs():
     # because of Rust's hashmap implementation.
     # assert ignore_whitespace(json.dumps(payload)) == ignore_whitespace(
     #     hyperjson.dumps(payload))
-    assert hyperjson.loads(hyperjson.dumps(payload)) == payload
+    assert hyperjson.loads(dumps(payload)) == payload
+
+
+@pytest.mark.parametrize(
+    "json_data,string_data,indent",
+    (
+        ("str", '"str"', 4),
+        (True, "true", 4),
+        (None, "null", 4),
+        (5, "5", 4),
+        ({}, "{}", 4),
+        ([], "[]", 4),
+        ([2], "[\n    2\n]", 4),
+        ({"2": 3}, '{\n    "2": 3\n}', 4),
+        ([[1], {"2": 3}], '[\n  [\n    1\n  ],\n  {\n    "2": 3\n  }\n]', 2),
+        ({"a": [1], "d": {"2": 3}}, '{\n  "a": [\n    1\n  ],\n  "d": {\n    "2": 3\n  }\n}', 2),
+    ),
+    ids=(
+        "0-level-str",
+        "0-level-bool",
+        "0-level-null",
+        "0-level-number",
+        "0-level-dict",
+        "0-level-array",
+        "1-level-array",
+        "1-level-dict",
+        "2-level-array",
+        "2-level-dict",
+    )
+)
+def test_indent(json_data, string_data, indent, dumps):
+    assert dumps(json_data, indent=indent, sort_keys=True) == string_data
+
+
+def test_sort(dumps):
+    data = {"d": 1, "c": 1, "e": 1, "b": 1, "f": 1, "a": 1}
+    sortedKeys = dumps(data, sort_keys=True)
+    assert sortedKeys == '{"a": 1, "b": 1, "c": 1, "d": 1, "e": 1, "f": 1}'
