@@ -25,7 +25,7 @@ simple_types = [1, 1.0, -1, None, "str", True, False]
 
 @pytest.mark.parametrize("payload", simple_types)
 def test_simple_types(payload, dumps):
-    assert dumps(payload) == dumps(payload)
+    assert json.dumps(payload) == dumps(payload)
 
 
 def ignore_whitespace(a):
@@ -65,7 +65,7 @@ complex_dicts = [
 
 @pytest.mark.parametrize("d", complex_dicts)
 def test_complex_dicts(d, dumps):
-    assert ignore_whitespace(dumps(d)) == ignore_whitespace(dumps(d))
+    assert ignore_whitespace(json.dumps(d)) == ignore_whitespace(dumps(d))
 
 
 def test_dict_of_arrays_of_dict_string_int_pairs(dumps):
