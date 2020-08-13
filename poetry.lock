@@ -166,10 +166,23 @@ version = "8.1.0"
 [[package]]
 category = "dev"
 description = "Fast, correct Python JSON library"
+marker = "python_version < \"3.8\""
 name = "orjson"
 optional = false
 python-versions = "*"
 version = "2.0.11"
+
+[[package]]
+category = "dev"
+description = "Core utilities for Python packages"
+name = "packaging"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+version = "20.4"
+
+[package.dependencies]
+pyparsing = ">=2.0.2"
+six = "*"
 
 [[package]]
 category = "dev"
@@ -245,6 +258,14 @@ colorama = "*"
 isort = ">=4.2.5"
 mccabe = "*"
 six = "*"
+
+[[package]]
+category = "dev"
+description = "Python parsing module"
+name = "pyparsing"
+optional = false
+python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+version = "2.4.7"
 
 [[package]]
 category = "dev"
@@ -347,11 +368,14 @@ version = "1.35"
 
 [[package]]
 category = "dev"
-description = "A built-package format for Python."
+description = "A built-package format for Python"
 name = "wheel"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "0.33.6"
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
+version = "0.35.0"
+
+[package.dependencies]
+packaging = ">=20.2"
 
 [package.extras]
 test = ["pytest (>=3.0.0)", "pytest-cov"]
@@ -386,7 +410,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pathlib2", "unittest2", "jaraco.itertools"]
 
 [metadata]
-content-hash = "11ecc744197024c12f53a5df650c79dbc1bb2acea10d58832bd6c665beb7687a"
+content-hash = "88a68d98bc1bfde4d8c759ac2144a7985cf9bd736c5270de79227efb2cf0a027"
 python-versions = "^3.5"
 
 [metadata.files]
@@ -481,6 +505,10 @@ orjson = [
     {file = "orjson-2.0.11-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:828062a4d54c7aef0318ca57387a908603ea15e52254f27b8d3906fbc02153a2"},
     {file = "orjson-2.0.11.tar.gz", hash = "sha256:5762bc2f8c9b5bb5111e9411e34eb47736a67c6135269ff22fd22257d855cd23"},
 ]
+packaging = [
+    {file = "packaging-20.4-py2.py3-none-any.whl", hash = "sha256:998416ba6962ae7fbd6596850b80e17859a5753ba17c32284f67bfff33784181"},
+    {file = "packaging-20.4.tar.gz", hash = "sha256:4357f74f47b9c12db93624a82154e9b120fa8293699949152b22065d556079f8"},
+]
 pathlib2 = [
     {file = "pathlib2-2.3.5-py2.py3-none-any.whl", hash = "sha256:0ec8205a157c80d7acc301c0b18fbd5d44fe655968f5d947b6ecef5290fc35db"},
     {file = "pathlib2-2.3.5.tar.gz", hash = "sha256:6cd9a47b597b37cc57de1c05e56fb1a1c9cc9fab04fe78c29acd090418529868"},
@@ -507,6 +535,10 @@ pyflakes = [
 pylint = [
     {file = "pylint-1.9.4-py2.py3-none-any.whl", hash = "sha256:02c2b6d268695a8b64ad61847f92e611e6afcff33fd26c3a2125370c4662905d"},
     {file = "pylint-1.9.4.tar.gz", hash = "sha256:ee1e85575587c5b58ddafa25e1c1b01691ef172e139fc25585e5d3f02451da93"},
+]
+pyparsing = [
+    {file = "pyparsing-2.4.7-py2.py3-none-any.whl", hash = "sha256:ef9d7589ef3c200abe66653d3f1ab1033c3c419ae9b9bdb1240a85b024efc88b"},
+    {file = "pyparsing-2.4.7.tar.gz", hash = "sha256:c203ec8783bf771a155b207279b9bccb8dea02d8f0c9e5f8ead507bc3246ecc1"},
 ]
 pytest = [
     {file = "pytest-3.10.1-py2.py3-none-any.whl", hash = "sha256:3f193df1cfe1d1609d4c583838bea3d532b18d6160fd3f55c9447fdca30848ec"},
@@ -598,8 +630,8 @@ ujson = [
     {file = "ujson-1.35.tar.gz", hash = "sha256:f66073e5506e91d204ab0c614a148d5aa938bdbf104751be66f8ad7a222f5f86"},
 ]
 wheel = [
-    {file = "wheel-0.33.6-py2.py3-none-any.whl", hash = "sha256:f4da1763d3becf2e2cd92a14a7c920f0f00eca30fdde9ea992c836685b9faf28"},
-    {file = "wheel-0.33.6.tar.gz", hash = "sha256:10c9da68765315ed98850f8e048347c3eb06dd81822dc2ab1d4fde9dc9702646"},
+    {file = "wheel-0.35.0-py2.py3-none-any.whl", hash = "sha256:64a0d73747636637479b8b8741f9304bee7a568c80e4029eeb9529ef134b471d"},
+    {file = "wheel-0.35.0.tar.gz", hash = "sha256:625e645aae0706ad09690bded523196a065fbcf9afcdb2d713b59e01ef8699c0"},
 ]
 wrapt = [
     {file = "wrapt-1.11.2.tar.gz", hash = "sha256:565a021fd19419476b9362b05eeaa094178de64f8361e44468f9e9d7843901e1"},
