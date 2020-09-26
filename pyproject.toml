@@ -12,7 +12,7 @@ keywords = ["json", "parser", "fast"]
 python = "^3.5"
 
 [tool.poetry.dev-dependencies]
-pytest = "^3.5"
+pytest = "^6.1"
 pylint = "^1.9"
 flake8 = "^3.5"
 wheel = "*"
