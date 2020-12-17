@@ -25,7 +25,6 @@ skip_lib_comparisons = False
 if not skip_lib_comparisons:
     import ujson
     import simplejson
-    import yajl
     import orjson
 
 benchmark_results = []
@@ -56,7 +55,7 @@ def results_record_result(callback, is_encode, count):
 
 
 def results_output_table():
-    LIBRARIES = ("hyperjson", "ujson", "yajl", "simplejson", "json", "orjson")
+    LIBRARIES = ("hyperjson", "ujson", "simplejson", "json", "orjson")
     ENDC = '\033[0m'
     GREEN = '\033[92m'
 
@@ -140,10 +139,6 @@ def dumps_with_ujson():
     ujson.dumps(test_object, ensure_ascii=False)
 
 
-def dumps_with_yajl():
-    yajl.dumps(test_object)
-
-
 def dumps_with_orjson():
     orjson.dumps(test_object)
 
@@ -152,10 +147,6 @@ def dumps_with_orjson():
 # =============================================================================
 def dumps_sorted_with_json():
     json.dumps(test_object, sort_keys=True)
-
-
-def dumps_sorted_with_yajl():
-    yajl.dumps(test_object, sort_keys=True)
 
 
 def dumps_sorted_with_hyperjson():
@@ -192,10 +183,6 @@ def loads_with_ujson():
     ujson.loads(decode_data)
 
 
-def loads_with_yajl():
-    yajl.loads(decode_data)
-
-
 def load_with_orjson():
     orjson.loads(test_object)
 
@@ -207,7 +194,6 @@ def run_decode(count):
     if not skip_lib_comparisons:
         results_record_result(loads_with_ujson, False, count)
         results_record_result(loads_with_simplejson, False, count)
-        results_record_result(loads_with_yajl, False, count)
         results_record_result(loads_with_json, False, count)
         results_record_result(loads_with_orjson, False, count)
 
@@ -217,7 +203,6 @@ def run_encode(count):
     if not skip_lib_comparisons:
         results_record_result(dumps_with_ujson, True, count)
         results_record_result(dumps_with_simplejson, True, count)
-        results_record_result(dumps_with_yajl, True, count)
         results_record_result(dumps_with_json, True, count)
         results_record_result(dumps_with_orjson, True, count)
 
@@ -227,7 +212,6 @@ def run_encode_sort_keys(count):
     if not skip_lib_comparisons:
         results_record_result(dumps_sorted_with_ujson, True, count)
         results_record_result(dumps_sorted_with_simplejson, True, count)
-        results_record_result(dumps_sorted_with_yajl, True, count)
         results_record_result(dumps_sorted_with_json, True, count)
         results_record_result(dumps_sorted_with_orjson, True, count)
 

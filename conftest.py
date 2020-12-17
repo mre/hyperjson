@@ -41,14 +41,6 @@ else:
     contenders.append(Contender('ujson',
                                 ujson.dumps,
                                 ujson.loads))
-try:
-    import yajl
-except ImportError:
-    pass
-else:
-    contenders.append(Contender('yajl',
-                                yajl.dumps,
-                                yajl.loads))
 
 try:
     import rapidjson

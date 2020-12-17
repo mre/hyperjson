@@ -20,7 +20,6 @@ pytest-runner = "*"
 pytest-benchmark = "*"
 simplejson = "*"
 ujson = "*"
-yajl = "*"
 orjson = { version = "*", markers = "python_version < '3.8'" }
 python-rapidjson = "*"
 hypothesis = "*"
