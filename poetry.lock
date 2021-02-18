@@ -138,7 +138,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "maturin"
-version = "0.9.1"
+version = "0.9.4"
 description = "Build and publish crates with pyo3, rust-cpython and cffi bindings as well as rust binaries as python packages"
 category = "dev"
 optional = false
@@ -386,7 +386,7 @@ testing = ["pathlib2", "unittest2", "jaraco.itertools", "func-timeout"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.5"
-content-hash = "9131acdd024a7b81c98ad60f36982ecf60d15cb9c50615fd74b890d04076015c"
+content-hash = "a5ae5de9a9dbf27889a2baab861538f412a0cc69ebbb9b0a23b8a1748bd4c253"
 
 [metadata.files]
 astroid = [
@@ -453,10 +453,12 @@ lazy-object-proxy = [
     {file = "lazy_object_proxy-1.4.3-cp38-cp38-win_amd64.whl", hash = "sha256:59f79fef100b09564bc2df42ea2d8d21a64fdcda64979c0fa3db7bdaabaf6239"},
 ]
 maturin = [
-    {file = "maturin-0.9.1-py3-none-macosx_10_7_x86_64.whl", hash = "sha256:f4ec4309696ce0887919b4330935fefafa8c7f9f8d6027ab558cccfb7b933519"},
-    {file = "maturin-0.9.1-py3-none-manylinux2010_x86_64.whl", hash = "sha256:5f7f4667b234f6f7006e7c8ef7e35c397737a17cf412e80d2555911dd13af075"},
-    {file = "maturin-0.9.1-py3-none-win_amd64.whl", hash = "sha256:06671dc07d46265cfc87af4c7da456561c42ca1aba04a18b0004b1fe3bd68aed"},
-    {file = "maturin-0.9.1.tar.gz", hash = "sha256:3232d842396a2756bb5f0d147f7230a9efd84498b7c98c00262a70b816b2b957"},
+    {file = "maturin-0.9.4-py3-none-manylinux2010_x86_64.whl", hash = "sha256:e52dfb6bc6f1c1062883fd785466e246d733f9c7eb90a3cd00ff2d4c659d23ca"},
+    {file = "maturin-0.9.4-py3-none-manylinux2014_aarch64.whl", hash = "sha256:ea08990ba22b76da8f83e5cd1a75f0ec08c045fa0149901343eba1fccfc2a406"},
+    {file = "maturin-0.9.4-py3-none-manylinux2014_armv7l.whl", hash = "sha256:213a69ed4976d078439d2bad148f41f82c919ab98fa85d3d54ebc3ba211a5895"},
+    {file = "maturin-0.9.4-py3-none-win32.whl", hash = "sha256:981330c9c46c2e5c6a648ef54809f573fa9bc257151c119089ccf9d3fe9bfb82"},
+    {file = "maturin-0.9.4-py3-none-win_amd64.whl", hash = "sha256:07ed1cc166bff8d66245c2112ae58869d3cb3ae47a057de06945ea0eb10337d6"},
+    {file = "maturin-0.9.4.tar.gz", hash = "sha256:2e0b0c3eb233e7b776c004ee4b980907beaf2babbe21da05a60ac55c1dff46c3"},
 ]
 mccabe = [
     {file = "mccabe-0.6.1-py2.py3-none-any.whl", hash = "sha256:ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42"},
