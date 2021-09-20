@@ -2,10 +2,16 @@
 
 ![Build Status](https://github.com/mre/hyperjson/workflows/CI/badge.svg)
 
+
 A hyper-fast, safe Python module to read and write JSON data. Works as a
 drop-in replacement for Python's built-in
 [json](https://docs.python.org/3/library/json.html) module.
 This is alpha software and there will be bugs, so maybe don't deploy to production _just_ yet. :wink:
+
+## :warning: NOTE
+
+This project is not actively maintained. [orjson](https://github.com/ijl/orjson) is likely the better alternative. 
+
 
 ## Installation
 
